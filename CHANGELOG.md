@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 — 2026-07-29
+
+- Reworked the default `README.md` as an English entry point for international users.
+- Added complete Traditional Chinese, Simplified Chinese, Japanese, Korean, and Spanish README translations.
+- Added a consistent language switcher to every README.
+- Synchronized installation, version 3 manifest, language-resolution, annotation, validation, attribution, and brand-safety documentation across all languages.
+- Updated the package manifest to include the localized README files.
+
 ## 1.2.0 — 2026-07-29
 
 - Replaced the hard-coded Traditional Chinese annotation default with automatic article-language resolution.
