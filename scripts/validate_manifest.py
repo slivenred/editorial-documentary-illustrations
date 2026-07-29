@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Validate an Editorial Documentary Illustrations shot manifest.
-
-No third-party dependencies are required. The JSON Schema file is provided for
-editors and CI systems; this script performs equivalent high-value checks with
-clear human-readable errors and warnings.
-"""
-
+"""Validate a version 2 Editorial Documentary Illustrations manifest."""
 from __future__ import annotations
 
 import argparse
@@ -16,247 +10,155 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-ALLOWED_CAMERAS = {"top-down-map-15deg", "flat-orthographic", "soft-isometric"}
-ALLOWED_ROLES = {
-    "process-station",
-    "route-network",
-    "timeline-journey",
-    "before-after",
-    "scale-up-crowd",
-    "cutaway-mechanism",
-    "ecosystem-tableau",
-    "physical-metaphor",
-    "evidence-chain",
-    "origin-map",
-}
-ALLOWED_DENSITIES = {"low", "medium", "high", "resolved-medium"}
-SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-ID_RE = re.compile(r"^[0-9]{2}$")
-FILENAME_RE = re.compile(r"^[0-9]{2}-[a-z0-9-]+\.png$")
+CAMERAS = {"top-down-map-15deg", "flat-orthographic", "soft-isometric"}
+ROLES = {"process-station", "route-network", "timeline-journey", "before-after",
+         "scale-up-crowd", "cutaway-mechanism", "ecosystem-tableau",
+         "physical-metaphor", "evidence-chain", "origin-map"}
+DENSITIES = {"low", "medium", "high", "resolved-medium"}
+ACCENTS = {"ink", "terracotta", "ochre", "sage", "indigo", "brick"}
+SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SHOT_ID = re.compile(r"^[0-9]{2}$")
+FILENAME = re.compile(r"^[0-9]{2}-[a-z0-9-]+\.png$")
+HEX = re.compile(r"^#[0-9A-Fa-f]{6}$")
+GENERIC_LABELS = {"流程", "結果", "重點", "系統", "資料", "工作流程", "系統架構圖", "重點整理"}
 
 
-def _require_dict(parent: dict[str, Any], key: str, errors: list[str]) -> dict[str, Any]:
+def obj(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> dict[str, Any]:
     value = parent.get(key)
-    if not isinstance(value, dict):
-        errors.append(f"`{key}` must be an object.")
-        return {}
+    if not isinstance(value, dict): errors.append(f"`{path}.{key}` must be an object."); return {}
     return value
 
 
-def _require_list(parent: dict[str, Any], key: str, errors: list[str]) -> list[Any]:
+def arr(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> list[Any]:
     value = parent.get(key)
-    if not isinstance(value, list):
-        errors.append(f"`{key}` must be an array.")
-        return []
+    if not isinstance(value, list): errors.append(f"`{path}.{key}` must be an array."); return []
     return value
 
 
-def _require_str(
-    parent: dict[str, Any],
-    key: str,
-    path: str,
-    errors: list[str],
-    min_len: int = 1,
-) -> str:
+def text(parent: dict[str, Any], key: str, path: str, errors: list[str], minimum: int = 1) -> str:
     value = parent.get(key)
-    if not isinstance(value, str) or len(value.strip()) < min_len:
-        errors.append(f"`{path}.{key}` must be a string of at least {min_len} characters.")
-        return ""
+    if not isinstance(value, str) or len(value.strip()) < minimum:
+        errors.append(f"`{path}.{key}` must be a string of at least {minimum} characters."); return ""
     return value.strip()
 
 
+def number(parent: dict[str, Any], key: str, path: str, errors: list[str], low: float, high: float) -> float | None:
+    value = parent.get(key)
+    if not isinstance(value, (int, float)) or isinstance(value, bool) or not low <= float(value) <= high:
+        errors.append(f"`{path}.{key}` must be a number from {low} to {high}."); return None
+    return float(value)
+
+
+def annotation_item(item: Any, path: str, errors: list[str], headline: bool) -> str:
+    if not isinstance(item, dict): errors.append(f"`{path}` must be an object."); return ""
+    value = text(item, "text", path, errors, 2 if headline else 1)
+    if len(value) > (60 if headline else 40): errors.append(f"`{path}.text` is too long.")
+    number(item, "x", path, errors, 0, 1); number(item, "y", path, errors, 0, 1)
+    if not headline:
+        number(item, "target_x", path, errors, 0, 1); number(item, "target_y", path, errors, 0, 1)
+    acc = text(item, "accent", path, errors)
+    if acc not in ACCENTS and not HEX.fullmatch(acc): errors.append(f"`{path}.accent` is not supported.")
+    size = item.get("font_size")
+    low, high = (28, 56) if headline else (22, 44)
+    if not isinstance(size, int) or not low <= size <= high: errors.append(f"`{path}.font_size` must be {low}–{high}.")
+    number(item, "angle", path, errors, -4, 4)
+    return value
+
+
 def validate_manifest(data: Any) -> tuple[list[str], list[str]]:
-    errors: list[str] = []
-    warnings: list[str] = []
+    errors: list[str] = []; warnings: list[str] = []
+    if not isinstance(data, dict): return ["Manifest root must be an object."], warnings
+    if data.get("version") != 2: errors.append("`version` must be the integer 2.")
 
-    if not isinstance(data, dict):
-        return ["Manifest root must be a JSON object."], warnings
+    article = obj(data, "article", "root", errors)
+    title = text(article, "title", "article", errors)
+    slug = text(article, "slug", "article", errors)
+    text(article, "language", "article", errors, 2); text(article, "summary", "article", errors, 20)
+    target = article.get("target_count")
+    if not isinstance(target, int) or not 1 <= target <= 9: errors.append("`article.target_count` must be 1–9.")
+    if slug and not SLUG.fullmatch(slug): errors.append("`article.slug` must be lowercase kebab-case.")
+    if len(title) > 160: warnings.append("Article title is unusually long.")
 
-    if data.get("version") != 1:
-        errors.append("`version` must be the integer 1.")
+    vb = obj(data, "visual_bible", "root", errors)
+    text(vb, "world_summary", "visual_bible", errors, 20); text(vb, "background", "visual_bible", errors, 20)
+    palette = arr(vb, "palette", "visual_bible", errors)
+    if palette and not 4 <= len(palette) <= 7: errors.append("`visual_bible.palette` must contain 4–7 items.")
+    camera = text(vb, "camera", "visual_bible", errors)
+    if camera and camera not in CAMERAS: errors.append("Unsupported visual_bible camera.")
+    text(vb, "lighting", "visual_bible", errors, 10)
+    text(vb, "character_system", "visual_bible", errors, 20)
+    text(vb, "recurring_motif", "visual_bible", errors, 10)
+    continuity = arr(vb, "continuity_rules", "visual_bible", errors)
+    if continuity and not 4 <= len(continuity) <= 12: errors.append("`visual_bible.continuity_rules` must contain 4–12 items.")
 
-    article = _require_dict(data, "article", errors)
-    title = _require_str(article, "title", "article", errors)
-    slug = _require_str(article, "slug", "article", errors)
-    _require_str(article, "language", "article", errors, min_len=2)
-    _require_str(article, "summary", "article", errors, min_len=20)
-    target_count = article.get("target_count")
-    if not isinstance(target_count, int) or not (1 <= target_count <= 9):
-        errors.append("`article.target_count` must be an integer from 1 to 9.")
-    if slug and not SLUG_RE.fullmatch(slug):
-        errors.append("`article.slug` must be lowercase kebab-case.")
-    if title and len(title) > 160:
-        warnings.append("Article title is unusually long.")
+    shots = arr(data, "shots", "root", errors)
+    if shots and not 1 <= len(shots) <= 9: errors.append("`shots` must contain 1–9 items.")
+    if isinstance(target, int) and shots and len(shots) != target: errors.append("target_count does not match shots length.")
+    ids: list[str] = []; filenames: list[str] = []; roles: list[str] = []
 
-    bible = _require_dict(data, "visual_bible", errors)
-    _require_str(bible, "world_summary", "visual_bible", errors, min_len=20)
-    _require_str(bible, "background", "visual_bible", errors, min_len=20)
-    palette = _require_list(bible, "palette", errors)
-    if palette and not (4 <= len(palette) <= 7):
-        errors.append("`visual_bible.palette` must contain 4 to 7 colors/usages.")
-    camera = _require_str(bible, "camera", "visual_bible", errors)
-    if camera and camera not in ALLOWED_CAMERAS:
-        errors.append(f"`visual_bible.camera` must be one of: {sorted(ALLOWED_CAMERAS)}.")
-    _require_str(bible, "lighting", "visual_bible", errors, min_len=10)
-    _require_str(bible, "character_system", "visual_bible", errors, min_len=20)
-    _require_str(bible, "recurring_motif", "visual_bible", errors, min_len=10)
-    continuity = _require_list(bible, "continuity_rules", errors)
-    if continuity and not (4 <= len(continuity) <= 12):
-        errors.append("`visual_bible.continuity_rules` must contain 4 to 12 rules.")
-
-    shots = _require_list(data, "shots", errors)
-    if shots and not (1 <= len(shots) <= 9):
-        errors.append("`shots` must contain 1 to 9 items.")
-    if isinstance(target_count, int) and shots and len(shots) != target_count:
-        errors.append(
-            f"`article.target_count` is {target_count}, but `shots` contains {len(shots)} items."
-        )
-
-    ids: list[str] = []
-    filenames: list[str] = []
-    roles: list[str] = []
-    placements: list[str] = []
-
-    for index, shot in enumerate(shots, start=1):
-        path = f"shots[{index - 1}]"
-        if not isinstance(shot, dict):
-            errors.append(f"`{path}` must be an object.")
-            continue
-
-        shot_id = _require_str(shot, "id", path, errors)
-        if shot_id and not ID_RE.fullmatch(shot_id):
-            errors.append(f"`{path}.id` must use two digits such as `01`.")
-        ids.append(shot_id)
-
-        placement = _require_str(shot, "placement_after", path, errors, min_len=3)
-        placements.append(placement)
-        _require_str(shot, "anchor", path, errors, min_len=5)
-
-        role = _require_str(shot, "role", path, errors)
-        roles.append(role)
-        if role and role not in ALLOWED_ROLES:
-            errors.append(f"`{path}.role` is not supported: {role!r}.")
-
-        _require_str(shot, "core_idea", path, errors, min_len=10)
-        _require_str(shot, "composition", path, errors, min_len=30)
-        _require_str(shot, "main_subject", path, errors, min_len=5)
-
-        supporting = _require_list(shot, "supporting_elements", errors)
-        if len(supporting) > 8:
-            errors.append(f"`{path}.supporting_elements` may contain at most 8 items.")
-
-        motion_cues = _require_list(shot, "motion_cues", errors)
-        if not (1 <= len(motion_cues) <= 5):
-            errors.append(f"`{path}.motion_cues` must contain 1 to 5 items.")
-
-        density = _require_str(shot, "density", path, errors)
-        if density and density not in ALLOWED_DENSITIES:
-            errors.append(f"`{path}.density` is not supported: {density!r}.")
-
-        people_count = shot.get("people_count")
-        if not isinstance(people_count, int) or not (0 <= people_count <= 30):
-            errors.append(f"`{path}.people_count` must be an integer from 0 to 30.")
-        elif people_count > 8 and density not in {"high", "resolved-medium"}:
-            warnings.append(
-                f"`{path}` has {people_count} people but density is {density!r}; "
-                "use crowd clusters or raise the density."
-            )
-
-        filename = _require_str(shot, "filename", path, errors)
-        filenames.append(filename)
-        if filename and not FILENAME_RE.fullmatch(filename):
-            errors.append(
-                f"`{path}.filename` must look like `01-topic-name.png` using lowercase kebab-case."
-            )
-        if filename and shot_id and not filename.startswith(f"{shot_id}-"):
-            errors.append(f"`{path}.filename` must begin with its shot id `{shot_id}-`.")
-
-        alt = _require_str(shot, "alt_text_zh_tw", path, errors, min_len=12)
-        if len(alt) > 160:
-            errors.append(f"`{path}.alt_text_zh_tw` must be at most 160 characters.")
-
+    for i, shot in enumerate(shots):
+        path = f"shots[{i}]"
+        if not isinstance(shot, dict): errors.append(f"`{path}` must be an object."); continue
+        sid = text(shot, "id", path, errors); ids.append(sid)
+        if sid and not SHOT_ID.fullmatch(sid): errors.append(f"`{path}.id` must use two digits.")
+        text(shot, "placement_after", path, errors, 3); text(shot, "anchor", path, errors, 5)
+        role = text(shot, "role", path, errors); roles.append(role)
+        if role and role not in ROLES: errors.append(f"Unsupported role at `{path}`.")
+        text(shot, "core_idea", path, errors, 10); text(shot, "composition", path, errors, 30)
+        text(shot, "main_subject", path, errors, 5)
+        if len(arr(shot, "supporting_elements", path, errors)) > 8: errors.append(f"`{path}.supporting_elements` may contain at most 8 items.")
+        cues = arr(shot, "motion_cues", path, errors)
+        if not 1 <= len(cues) <= 5: errors.append(f"`{path}.motion_cues` must contain 1–5 items.")
+        density = text(shot, "density", path, errors)
+        if density and density not in DENSITIES: errors.append(f"Unsupported density at `{path}`.")
+        count = shot.get("people_count")
+        if not isinstance(count, int) or not 0 <= count <= 30: errors.append(f"`{path}.people_count` must be 0–30.")
+        filename = text(shot, "filename", path, errors); filenames.append(filename)
+        if filename and not FILENAME.fullmatch(filename): errors.append(f"`{path}.filename` must be lowercase kebab-case PNG.")
+        if sid and filename and not filename.startswith(sid+"-"): errors.append(f"`{path}.filename` must start with `{sid}-`.")
+        alt = text(shot, "alt_text_zh_tw", path, errors, 12)
+        if len(alt) > 160: errors.append(f"`{path}.alt_text_zh_tw` must be ≤160 characters.")
         caption = shot.get("caption_zh_tw")
-        if not isinstance(caption, str):
-            errors.append(f"`{path}.caption_zh_tw` must be a string, which may be empty.")
-        elif len(caption) > 160:
-            errors.append(f"`{path}.caption_zh_tw` must be at most 160 characters.")
+        if not isinstance(caption, str) or len(caption) > 160: errors.append(f"`{path}.caption_zh_tw` must be a string ≤160 characters.")
 
-        beats = shot.get("motion_beats")
-        if beats is not None:
-            if not isinstance(beats, list) or len(beats) != 4:
-                errors.append(f"`{path}.motion_beats`, when present, must contain exactly 4 items.")
-            elif any(not isinstance(beat, str) or len(beat.strip()) < 5 for beat in beats):
-                errors.append(f"Every item in `{path}.motion_beats` must be meaningful text.")
-
-        if (
-            isinstance(people_count, int)
-            and people_count > 12
-            and role == "scale-up-crowd"
-            and "cluster" not in str(shot.get("composition", "")).lower()
-        ):
-            warnings.append(
-                f"`{path}` requests {people_count} people. Describe 2–5 layered crowd clusters "
-                "instead of individually detailed figures."
-            )
+        ann = obj(shot, "annotation", path, errors)
+        enabled = ann.get("enabled")
+        if not isinstance(enabled, bool): errors.append(f"`{path}.annotation.enabled` must be boolean.")
+        text(ann, "language", f"{path}.annotation", errors, 2)
+        status = text(ann, "layout_status", f"{path}.annotation", errors)
+        if status not in {"draft", "final"}: errors.append(f"`{path}.annotation.layout_status` must be draft or final.")
+        if enabled:
+            headline = annotation_item(ann.get("headline"), f"{path}.annotation.headline", errors, True)
+            labels = ann.get("labels")
+            if not isinstance(labels, list) or not 3 <= len(labels) <= 7:
+                errors.append(f"`{path}.annotation.labels` must contain 3–7 items."); labels = []
+            label_texts = [annotation_item(v, f"{path}.annotation.labels[{j}]", errors, False) for j, v in enumerate(labels)]
+            if headline in GENERIC_LABELS: warnings.append(f"`{path}` headline is generic; write a concrete insight.")
+            for value in label_texts:
+                if value in GENERIC_LABELS: warnings.append(f"`{path}` contains generic label `{value}`.")
+            if len({v for v in label_texts if v}) != len([v for v in label_texts if v]): warnings.append(f"`{path}` repeats annotation labels.")
+        beat_list = shot.get("motion_beats")
+        if beat_list is not None and (not isinstance(beat_list, list) or len(beat_list) != 4): errors.append(f"`{path}.motion_beats` must contain exactly 4 items.")
 
     for label, values in (("shot id", ids), ("filename", filenames)):
-        duplicates = [value for value, count in Counter(values).items() if value and count > 1]
-        if duplicates:
-            errors.append(f"Duplicate {label}(s): {', '.join(sorted(duplicates))}.")
-
-    role_counts = Counter(roles)
-    for role, count in role_counts.items():
-        if role and count > 2:
-            warnings.append(
-                f"Role `{role}` is used {count} times. Use more varied composition patterns."
-            )
-
-    placement_counts = Counter(placements)
-    repeated_placements = [p for p, c in placement_counts.items() if p and c > 1]
-    if repeated_placements:
-        warnings.append(
-            "Multiple shots share the same placement anchor. Confirm they are not redundant: "
-            + "; ".join(repeated_placements)
-        )
-
-    if shots and shots[0].get("density") not in {"low", "medium"}:
-        warnings.append("The first shot should usually be a low/medium-density calibration frame.")
-    if shots and isinstance(shots[0].get("people_count"), int) and shots[0]["people_count"] > 5:
-        warnings.append("The first calibration shot should usually contain no more than 5 people.")
-
+        dup = [v for v, n in Counter(values).items() if v and n > 1]
+        if dup: errors.append(f"Duplicate {label}(s): {', '.join(dup)}.")
+    for role, count in Counter(roles).items():
+        if role and count > 2: warnings.append(f"Role `{role}` is used {count} times; vary composition patterns.")
+    if shots and shots[0].get("density") not in {"low", "medium"}: warnings.append("The first calibration shot should be low/medium density.")
+    if shots and isinstance(shots[0].get("people_count"), int) and shots[0]["people_count"] > 5: warnings.append("The calibration shot should usually contain ≤5 people.")
     return errors, warnings
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("manifest", type=Path, help="Path to manifest.json")
-    args = parser.parse_args()
-
-    try:
-        data = json.loads(args.manifest.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        print(f"ERROR: File not found: {args.manifest}", file=sys.stderr)
-        return 2
-    except json.JSONDecodeError as exc:
-        print(f"ERROR: Invalid JSON: {exc}", file=sys.stderr)
-        return 2
-
+    p = argparse.ArgumentParser(description=__doc__); p.add_argument("manifest", type=Path); a = p.parse_args()
+    try: data = json.loads(a.manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc: print(f"ERROR: {exc}", file=sys.stderr); return 2
     errors, warnings = validate_manifest(data)
-
-    for warning in warnings:
-        print(f"WARNING: {warning}")
-    for error in errors:
-        print(f"ERROR: {error}", file=sys.stderr)
-
-    if errors:
-        print(f"\nFAILED: {len(errors)} error(s), {len(warnings)} warning(s).", file=sys.stderr)
-        return 1
-
-    print(
-        f"OK: {args.manifest} — {len(data['shots'])} shot(s), "
-        f"{len(warnings)} warning(s)."
-    )
-    return 0
+    for value in warnings: print(f"WARNING: {value}")
+    for value in errors: print(f"ERROR: {value}", file=sys.stderr)
+    if errors: print(f"FAILED: {len(errors)} error(s), {len(warnings)} warning(s).", file=sys.stderr); return 1
+    print(f"OK: {a.manifest} — {len(data['shots'])} shot(s), {len(warnings)} warning(s)."); return 0
 
 
 if __name__ == "__main__":

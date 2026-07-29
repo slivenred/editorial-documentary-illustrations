@@ -1,20 +1,22 @@
 {
-  "version": 1,
+  "version": 2,
   "article": {
     "title": "<文章標題>",
     "slug": "<kebab-case-slug>",
     "language": "zh-TW",
-    "summary": "<文章一句話摘要>",
+    "summary": "<文章一句話摘要，至少二十個字元>",
     "target_count": 5
   },
   "visual_bible": {
     "world_summary": "<同篇文章的視覺世界>",
     "background": "Warm aged parchment with subtle fiber texture, faint map grid, and two gentle diagonal creases.",
     "palette": [
-      "dark ink brown for outlines",
-      "terracotta for the main actor",
-      "mustard ochre for the primary route",
-      "muted sage for supporting objects"
+      "dark ink brown for outlines and structure",
+      "terracotta for the main actor and primary action",
+      "mustard ochre for the main route",
+      "muted sage for verified or safe outcomes",
+      "dusty indigo for infrastructure or comparison",
+      "warm brick red for risk or escalation"
     ],
     "camera": "top-down-map-15deg",
     "lighting": "Soft warm light from upper left; short soft shadows fall to lower right.",
@@ -24,7 +26,8 @@
       "Keep the same parchment tone and grid strength.",
       "Keep the same camera angle.",
       "Keep the same cutout edge and shadow direction.",
-      "Use no text inside the image."
+      "Do not render text in the base image.",
+      "Keep the same paper-tag annotation style and color semantics."
     ]
   },
   "shots": [
@@ -34,7 +37,7 @@
       "anchor": "<原文錨點>",
       "role": "process-station",
       "core_idea": "<一件要看懂的事>",
-      "composition": "<主要空間、人物與物件安排，至少三十個字元>",
+      "composition": "<主要空間、人物與物件安排，至少三十個字元；同時預留可放標註的安靜區>",
       "main_subject": "<唯一主焦點>",
       "supporting_elements": [
         "<元素 1>",
@@ -48,6 +51,51 @@
       "filename": "01-topic-name.png",
       "alt_text_zh_tw": "<至少十二個字元的繁中 alt text>",
       "caption_zh_tw": "",
+      "annotation": {
+        "enabled": true,
+        "language": "zh-TW",
+        "layout_status": "draft",
+        "headline": {
+          "text": "<這張圖的核心判斷，不是段落標題>",
+          "x": 0.42,
+          "y": 0.06,
+          "accent": "terracotta",
+          "font_size": 42,
+          "angle": 0
+        },
+        "labels": [
+          {
+            "text": "<短標註 1>",
+            "x": 0.06,
+            "y": 0.18,
+            "target_x": 0.24,
+            "target_y": 0.34,
+            "accent": "indigo",
+            "font_size": 31,
+            "angle": -2
+          },
+          {
+            "text": "<短標註 2>",
+            "x": 0.48,
+            "y": 0.28,
+            "target_x": 0.58,
+            "target_y": 0.50,
+            "accent": "terracotta",
+            "font_size": 32,
+            "angle": 1
+          },
+          {
+            "text": "<短標註 3>",
+            "x": 0.74,
+            "y": 0.22,
+            "target_x": 0.84,
+            "target_y": 0.48,
+            "accent": "sage",
+            "font_size": 31,
+            "angle": -1
+          }
+        ]
+      },
       "motion_beats": [
         "<0.0–1.5 秒建立場景>",
         "<1.5–4.0 秒核心轉化>",

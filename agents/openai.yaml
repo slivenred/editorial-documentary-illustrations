@@ -1,6 +1,6 @@
 interface:
   display_name: "紀錄片剪紙文章配圖"
-  short_description: "把文章轉成一致的羊皮紙剪紙紀錄片配圖與 10 秒動畫提示詞"
-  default_prompt: "Use $editorial-documentary-illustrations 為這篇文章規劃並生成 5 張一致的 16:9 紀錄片剪紙正文配圖，圖內不要文字。"
+  short_description: "把文章轉成一致的羊皮紙剪紙底圖，並後製加入可讀的繁中認知標註"
+  default_prompt: "Use $editorial-documentary-illustrations 為這篇文章規劃並生成 5 張一致的 16:9 紀錄片剪紙正文配圖。先生成無字底圖，再根據實際畫面加入一個核心判斷與 3–6 個繁中短標註；文字必須指向可見物件並經過校對。"
 policy:
   allow_implicit_invocation: true

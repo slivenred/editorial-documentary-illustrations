@@ -13,7 +13,7 @@
   "properties": {
     "version": {
       "type": "integer",
-      "const": 1
+      "const": 2
     },
     "article": {
       "type": "object",
@@ -132,7 +132,8 @@
           "people_count",
           "filename",
           "alt_text_zh_tw",
-          "caption_zh_tw"
+          "caption_zh_tw",
+          "annotation"
         ],
         "properties": {
           "id": {
@@ -217,6 +218,182 @@
           "caption_zh_tw": {
             "type": "string",
             "maxLength": 160
+          },
+          "annotation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "enabled",
+              "language",
+              "layout_status"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "language": {
+                "type": "string",
+                "minLength": 2
+              },
+              "layout_status": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "final"
+                ]
+              },
+              "headline": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "text",
+                  "x",
+                  "y",
+                  "accent",
+                  "font_size",
+                  "angle"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 60
+                  },
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "accent": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "ink",
+                          "terracotta",
+                          "ochre",
+                          "sage",
+                          "indigo",
+                          "brick"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^#[0-9A-Fa-f]{6}$"
+                      }
+                    ]
+                  },
+                  "font_size": {
+                    "type": "integer",
+                    "minimum": 28,
+                    "maximum": 56
+                  },
+                  "angle": {
+                    "type": "number",
+                    "minimum": -4,
+                    "maximum": 4
+                  }
+                }
+              },
+              "labels": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 7,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "text",
+                    "x",
+                    "y",
+                    "target_x",
+                    "target_y",
+                    "accent",
+                    "font_size",
+                    "angle"
+                  ],
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40
+                    },
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "target_x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "target_y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "accent": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "ink",
+                            "terracotta",
+                            "ochre",
+                            "sage",
+                            "indigo",
+                            "brick"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^#[0-9A-Fa-f]{6}$"
+                        }
+                      ]
+                    },
+                    "font_size": {
+                      "type": "integer",
+                      "minimum": 22,
+                      "maximum": 44
+                    },
+                    "angle": {
+                      "type": "number",
+                      "minimum": -4,
+                      "maximum": 4
+                    }
+                  }
+                }
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "enabled": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "headline",
+                    "labels"
+                  ]
+                }
+              }
+            ]
           },
           "motion_beats": {
             "type": "array",

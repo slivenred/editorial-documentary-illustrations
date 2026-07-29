@@ -9,15 +9,19 @@ This package's multi-step article-illustration workflow was inspired by and adap
 - Repository: `https://github.com/helloianneo/ian-xiaohei-illustrations`
 - License: MIT
 
-The adapted concepts include article cognitive anchors, shot-list planning, progressive reference files, one-image-at-a-time generation, and QA-driven iteration.
+The adapted workflow concepts include article cognitive anchors, shot-list planning, progressive reference files, one-image-at-a-time generation, concise contextual labels, and QA-driven iteration.
 
-This package does **not** include Ian's recurring character 小黑, Ian's example images, or any original visual asset from that repository. The visual system, character system, prompts, manifest schema, scripts, templates, and documentary cutout style rules in this package were newly written for this adaptation.
+This package does **not** include Ian's recurring character 小黑, Ian's example images, Ian's prompts verbatim, or any original visual asset or font from that repository. The documentary cutout visual system, annotation renderer, character system, prompts, manifest schema, scripts, templates, and style rules in this package were newly written for this adaptation.
 
 The original MIT license text is retained at:
 
 ```text
 third_party/ian-xiaohei-illustrations-LICENSE.txt
 ```
+
+## Font handling
+
+No font files are distributed with this package. The annotation renderer uses a CJK-capable font already installed on the user's system or an explicit local path supplied by the user.
 
 ## Vox name and affiliation
 

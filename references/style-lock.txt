@@ -12,4 +12,4 @@ Use an earthy natural palette: parchment cream, dark ink brown, terracotta, must
 
 The image must feel like a frozen keyframe from a smooth time-lapse: routes, staggered positions, partial assembly, repeated shapes, growing queues, converging objects, or expanding clusters should imply motion organically. Keep one clear focal action, readable hierarchy, generous breathing room, and elegant documentary energy.
 
-No text overlays, no captions, no labels, no speech bubbles, no UI, no data dashboard, no watermark, and no voiceover text. Do not make a PPT infographic, corporate vector illustration, children's cartoon, anime image, 3D render, clay scene, or realistic photograph.
+This is the base-image layer. Do not render any text, letters, numbers, captions, labels, speech bubbles, UI, data dashboards, logos, or watermarks. Leave several calm parchment pockets around the composition so a deterministic post-production step can later add a small number of semantic callout tags without covering the main subject. Do not make a PPT infographic, corporate vector illustration, children's cartoon, anime image, game-like 3D render, clay scene, or realistic photograph.
