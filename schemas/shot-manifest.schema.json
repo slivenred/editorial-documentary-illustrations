@@ -13,7 +13,7 @@
   "properties": {
     "version": {
       "type": "integer",
-      "const": 2
+      "const": 3
     },
     "article": {
       "type": "object",
@@ -22,6 +22,7 @@
         "title",
         "slug",
         "language",
+        "annotation_language",
         "summary",
         "target_count"
       ],
@@ -36,7 +37,11 @@
         },
         "language": {
           "type": "string",
-          "minLength": 2
+          "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$"
+        },
+        "annotation_language": {
+          "type": "string",
+          "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$"
         },
         "summary": {
           "type": "string",
@@ -131,8 +136,8 @@
           "density",
           "people_count",
           "filename",
-          "alt_text_zh_tw",
-          "caption_zh_tw",
+          "alt_text",
+          "caption",
           "annotation"
         ],
         "properties": {
@@ -210,14 +215,14 @@
             "type": "string",
             "pattern": "^[0-9]{2}-[a-z0-9-]+\\.png$"
           },
-          "alt_text_zh_tw": {
+          "alt_text": {
             "type": "string",
             "minLength": 12,
-            "maxLength": 160
+            "maxLength": 200
           },
-          "caption_zh_tw": {
+          "caption": {
             "type": "string",
-            "maxLength": 160
+            "maxLength": 240
           },
           "annotation": {
             "type": "object",
@@ -233,7 +238,7 @@
               },
               "language": {
                 "type": "string",
-                "minLength": 2
+                "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$"
               },
               "layout_status": {
                 "type": "string",
@@ -257,7 +262,7 @@
                   "text": {
                     "type": "string",
                     "minLength": 2,
-                    "maxLength": 60
+                    "maxLength": 80
                   },
                   "x": {
                     "type": "number",
@@ -310,17 +315,17 @@
                     "text",
                     "x",
                     "y",
-                    "target_x",
-                    "target_y",
                     "accent",
                     "font_size",
-                    "angle"
+                    "angle",
+                    "target_x",
+                    "target_y"
                   ],
                   "properties": {
                     "text": {
                       "type": "string",
                       "minLength": 1,
-                      "maxLength": 40
+                      "maxLength": 50
                     },
                     "x": {
                       "type": "number",

@@ -2,33 +2,45 @@
 
 > 把文章中的關鍵判斷、歷史過程、因果鏈、系統機制與規模變化，轉成穩定一致、帶有可讀認知標註的 16:9 羊皮紙剪紙紀錄片配圖。
 
-這是一個可安裝到 Codex／支援 `SKILL.md` 工作流之 AI Agent 的文章配圖 Skill。使用者可以用「VOX 風格」「紀錄片剪紙」「歷史地圖動畫」「文章文配圖」等語句觸發它，但套件對外採品牌中立名稱，並以具體視覺與標註規則取代單純依賴品牌名稱。
+這是一個可安裝到 Codex／支援 `SKILL.md` 工作流之 AI Agent 的文章配圖 Skill。它會先理解文章、建立同篇文章共用的 Visual Bible、生成無字底圖，再依文章的主要讀者語言後製認知標註。
 
 ## 它解決什麼問題
 
 單一超長提示詞常見五種失敗：
 
-1. 同一篇文章的每張圖像是不同畫風。
-2. 羊皮紙背景、剪紙邊緣、人物比例與陰影不一致。
-3. 抽象段落被畫成 PPT 流程圖，而不是有敘事感的場景。
-4. 圖片只漂亮但不幫助理解文章。
-5. 直接讓圖像模型寫繁中，容易錯字、亂碼、假數字或錯誤標示。
+1. 同篇文章的圖片風格不一致。
+2. 抽象內容被畫成 PPT，而不是有敘事感的場景。
+3. 圖片漂亮，但沒有幫助讀者理解文章。
+4. 直接要求圖像模型排字，容易出現錯字、亂碼、假數字或錯誤標示。
+5. 標註被硬寫成某一種語言，和原文章節或目標讀者不一致。
 
 本 Skill 使用五層穩定機制：
 
 - **文章認知錨點**：不平均配圖，只挑真正值得視覺化的段落。
-- **Article Visual Bible**：先固定背景、色盤、人物、鏡頭、光影與重複意象。
+- **Article Visual Bible**：固定背景、色盤、人物、鏡頭、光影與重複意象。
 - **Immutable Style Lock**：每張底圖逐字重複同一段風格鎖定。
-- **Two-layer Annotation Pipeline**：先生成無字底圖，再用程式後製加入經校對的核心判斷與短標註。
-- **QA + Retry Ladder**：分別驗收底圖與最終標註圖，低於門檻就依問題類型修正。
+- **Language-aware Annotation Pipeline**：自動判斷標註語言，先生成無字底圖，再用程式後製文字。
+- **QA + Retry Ladder**：分別驗收底圖與最終標註圖。
+
+## 標註語言如何決定
+
+依下列優先順序決定：
+
+1. 使用者明確指定的標註語言。
+2. 文章 frontmatter、locale 或內容 metadata 中的語言。
+3. 標題、導言、標題層級與主要正文的主導語言。
+4. 混合語言文章以標題、段落標題與多數解說正文為準；忽略程式碼、網址、引用、參考資料標題與專有名詞。
+5. 文章太短而無法判斷時，才使用對話語言作為最後備援。
+
+最後必須把結果寫成具體 BCP 47 語言標籤，例如 `zh-TW`、`en`、`ja`、`ko`、`es`。不能把 `auto` 留在最終 manifest。產品名、模型名、基準測試、縮寫、版本號與數字保留文章中的原始寫法。
 
 ## 預設輸出
 
 - 16:9 橫式文章正文配圖。
 - 一篇文章 3–7 張；長文最多 9 張。
 - 每張最終成品包含 1 個核心判斷與 3–6 個短標註。
-- 圖像模型只負責無字底圖；繁中使用可控程式後製，避免模型錯字。
-- 每張圖包含建議插入位置、核心意思、構圖類型、畫面描述、動態暗示、annotation plan、檔名、繁中 alt text 與可選 caption。
+- 圖像模型只負責無字底圖；標註語言由文章自動判定，文字使用可控程式後製。
+- `alt_text`、`caption` 與圖內標註使用相同的目標語言，除非使用者另有指定。
 - 原始與成品分開保存：
 
 ```text
@@ -43,33 +55,15 @@ assets/<article-slug>-editorial-documentary/
 └── delivery.md
 ```
 
-## 文字標註長什麼樣
-
-每張圖的文字不是逐字摘要，也不是資訊圖表，而是：
-
-- 一句能直接說出該段核心判斷的短標題。
-- 3–6 個指向實際物件的短標註。
-- 紙片標籤、手繪感連線、目標點與克制的色彩語意。
-- 名稱、比例、數字與專有名詞必須和文章一致。
-- 不使用「流程圖」「重點」「結果」等泛用標籤。
-
-文字由 Agent 根據上下文撰寫，再以 Pillow 後製到圖片，不交給圖像模型猜字。
-
 ## 安裝
 
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./editorial-documentary-illustrations \
-  "${CODEX_HOME:-$HOME/.codex}/skills/"
-```
-
-標註渲染需要 Pillow：
-
-```bash
+cp -R ./editorial-documentary-illustrations   "${CODEX_HOME:-$HOME/.codex}/skills/"
 python3 -m pip install -r requirements-annotation.txt
 ```
 
-套件不附帶任何字型檔。渲染器會嘗試尋找系統中的 PingFang TC、Microsoft JhengHei、Noto Sans CJK TC 或其他 CJK 字型，也可用 `--font` 指定本機字型。
+套件不附帶任何字型檔。渲染器會依 `article.annotation_language` 自動尋找相符的本機字型，也可用 `--font` 指定本機字型。阿拉伯文、希伯來文與部分南亞文字建議使用具 RAQM 支援的 Pillow 與對應 Noto 字型。
 
 ## 使用方式
 
@@ -77,8 +71,8 @@ python3 -m pip install -r requirements-annotation.txt
 
 ```text
 Use $editorial-documentary-illustrations
-分析下面文章，先產出 5 張紀錄片剪紙文配圖的 version 2 shot manifest，不要生圖。
-每張要包含一個核心判斷與 3–6 個繁中短標註草案。
+分析下面文章，先產出 5 張紀錄片剪紙文配圖的 version 3 shot manifest，不要生圖。
+自動判斷文章的主要讀者語言，並以該語言撰寫每張圖的一個核心判斷與 3–6 個短標註草案。
 
 <貼上文章>
 ```
@@ -88,11 +82,18 @@ Use $editorial-documentary-illustrations
 ```text
 Use $editorial-documentary-illustrations
 替下面文章生成 5 張 16:9 羊皮紙剪紙正文配圖。
-先生成無字底圖，再根據實際畫面加入繁中認知標註。
-每張保留一個核心判斷與 3–6 個短標註，文字必須指向可見物件並經過校對。
-同篇文章共用相同色盤、人物語言、光線、路徑意象與標註樣式。
+先自動判斷文章的主要讀者語言；若我沒有另外指定，圖內標註、alt text 與 caption 都沿用文章主語言。
+先生成無字底圖，再根據實際畫面加入一個核心判斷與 3–6 個短標註。
+文字必須指向可見物件、保留原文專有名詞，並經過校對。
 
 <貼上文章>
+```
+
+### 指定不同標註語言
+
+```text
+Use $editorial-documentary-illustrations
+文章是英文，但最終文內圖要給台灣讀者，請使用 zh-TW 標註；模型名、縮寫與數字保留英文原樣。
 ```
 
 ### 10 秒動畫提示詞
@@ -105,49 +106,18 @@ Use $editorial-documentary-illustrations
 
 ## 驗證、編譯與後製
 
-驗證 manifest：
-
 ```bash
 python3 scripts/validate_manifest.py path/to/manifest.json
-```
 
-編譯無字底圖 prompt 與 annotation plan：
+python3 scripts/render_prompts.py   path/to/manifest.json   --mode still   --output path/to/prompts-still
 
-```bash
-python3 scripts/render_prompts.py \
-  path/to/manifest.json \
-  --mode still \
-  --output path/to/prompts-still
-```
-
-把模型生成的底圖放在 `images/raw/`，確認並更新 annotation 座標後執行：
-
-```bash
-python3 scripts/annotate_images.py \
-  path/to/manifest.json \
-  --input path/to/images/raw \
-  --output path/to/images \
-  --force
+python3 scripts/annotate_images.py   path/to/manifest.json   --input path/to/images/raw   --output path/to/images   --force
 ```
 
 需要指定字型時：
 
 ```bash
-python3 scripts/annotate_images.py \
-  path/to/manifest.json \
-  --input path/to/images/raw \
-  --output path/to/images \
-  --font /path/to/your-cjk-font.ttc \
-  --force
-```
-
-編譯 10 秒動畫提示詞：
-
-```bash
-python3 scripts/render_prompts.py \
-  path/to/manifest.json \
-  --mode motion \
-  --output path/to/prompts-motion
+python3 scripts/annotate_images.py   path/to/manifest.json   --input path/to/images/raw   --output path/to/images   --font /path/to/local-font.ttf   --force
 ```
 
 ## 目錄結構
@@ -159,41 +129,30 @@ python3 scripts/render_prompts.py \
 ├── LICENSE
 ├── NOTICE.md
 ├── requirements-annotation.txt
-├── agents/
-│   └── openai.yaml
+├── agents/openai.yaml
 ├── references/
 │   ├── annotation-system.md
 │   └── ...
-├── schemas/
-│   └── shot-manifest.schema.json
-├── templates/
-│   └── manifest.template.json
+├── schemas/shot-manifest.schema.json
+├── templates/manifest.template.json
 ├── scripts/
 │   ├── annotate_images.py
 │   ├── render_prompts.py
 │   └── validate_manifest.py
-├── tests/
-│   └── test_tooling.py
-└── third_party/
-    └── ian-xiaohei-illustrations-LICENSE.txt
+├── tests/test_tooling.py
+└── third_party/ian-xiaohei-illustrations-LICENSE.txt
 ```
 
 ## 為什麼不用圖像模型直接寫字
 
-圖像模型適合建立場景、材質與視覺隱喻，但不是穩定的繁中排版器。這套 Skill 將兩件事拆開：
+圖像模型適合建立場景、材質與視覺隱喻，但不是穩定的多語排版器。這套 Skill 將兩件事拆開：
 
 1. 圖像模型生成乾淨、可標註的視覺底圖。
-2. Agent 讀文章、校對文字，再用確定性程式加入標籤。
-
-因此既保留圖像模型的畫面品質，也能讓名稱、數字、階段與因果說法準確可讀。
-
-## 為什麼不用「exact VOX style」作為唯一提示
-
-品牌名稱只是一個模糊捷徑。這套 Skill 把目標拆成可檢查的視覺 DNA：羊皮紙、淡網格、剪紙邊緣、貼紙陰影、俯視地圖鏡頭、簡化人物、路徑移動、自然土色、單一敘事焦點，以及後製的短句認知標註。
+2. Agent 判斷文章語言、校對文字，再以確定性程式加入標籤。
 
 ## 授權與聲明
 
 - 本套件採 MIT License。
-- 工作流架構參考並改寫自 Ian 的 `ian-xiaohei-illustrations`，原專案同樣採 MIT License；詳見 `NOTICE.md` 與 `third_party/ian-xiaohei-illustrations-LICENSE.txt`。
+- 工作流架構參考並改寫自 Ian 的 `ian-xiaohei-illustrations`；詳見 `NOTICE.md`。
 - 本套件不包含原專案的小黑 IP、範例圖片或字型檔。
-- 本套件與 Vox Media 無關，也不應宣稱為 Vox 官方產品。不得複製特定既有影片畫面、logo、字體或品牌資產。
+- 本套件與 Vox Media 無關，也不應宣稱為 Vox 官方產品。

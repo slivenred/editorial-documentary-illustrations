@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add deterministic semantic paper-tag annotations to text-free base images."""
+"""Add deterministic language-aware semantic paper-tag annotations to text-free base images."""
 from __future__ import annotations
 
 import argparse
@@ -16,43 +16,139 @@ ACCENTS = {
     "ink": "#49382B", "terracotta": "#A84E3E", "ochre": "#C58B2D",
     "sage": "#607B59", "indigo": "#4C617C", "brick": "#A74636",
 }
-FONT_CANDIDATES = [
-    "/System/Library/Fonts/PingFang.ttc", "/Library/Fonts/Arial Unicode.ttf",
-    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-    "C:/Windows/Fonts/msjhbd.ttc", "C:/Windows/Fonts/msjh.ttc",
-]
+RTL_LANGS = {"ar", "fa", "he", "ur", "yi", "ps"}
+FONT_GROUPS = {
+    "zh": [
+        "/System/Library/Fonts/PingFang.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+        "C:/Windows/Fonts/msjh.ttc", "C:/Windows/Fonts/msjhbd.ttc",
+    ],
+    "ja": [
+        "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "C:/Windows/Fonts/meiryo.ttc",
+    ],
+    "ko": [
+        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "C:/Windows/Fonts/malgun.ttf",
+    ],
+    "arabic": [
+        "/usr/share/fonts/truetype/noto/NotoSansArabic-Regular.ttf",
+        "/usr/share/fonts/opentype/noto/NotoSansArabic-Regular.ttf",
+        "C:/Windows/Fonts/arial.ttf",
+    ],
+    "hebrew": [
+        "/usr/share/fonts/truetype/noto/NotoSansHebrew-Regular.ttf",
+        "C:/Windows/Fonts/arial.ttf",
+    ],
+    "devanagari": [
+        "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Regular.ttf",
+        "/usr/share/fonts/opentype/noto/NotoSansDevanagari-Regular.ttf",
+    ],
+    "thai": [
+        "/usr/share/fonts/truetype/noto/NotoSansThai-Regular.ttf",
+        "C:/Windows/Fonts/tahoma.ttf",
+    ],
+    "latin": [
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/Library/Fonts/Arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
+        "C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/segoeui.ttf",
+    ],
+    "universal": [
+        "/Library/Fonts/Arial Unicode.ttf",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ],
+}
+FONT_QUERIES = {
+    "zh": ["Noto Sans CJK TC", "Noto Sans CJK SC", "WenQuanYi Zen Hei"],
+    "ja": ["Noto Sans CJK JP", "Noto Sans JP"],
+    "ko": ["Noto Sans CJK KR", "Noto Sans KR"],
+    "arabic": ["Noto Sans Arabic", "DejaVu Sans"],
+    "hebrew": ["Noto Sans Hebrew", "DejaVu Sans"],
+    "devanagari": ["Noto Sans Devanagari", "Noto Sans"],
+    "thai": ["Noto Sans Thai", "Noto Sans"],
+    "latin": ["Noto Sans", "DejaVu Sans", "Liberation Sans"],
+    "universal": ["Noto Sans", "DejaVu Sans"],
+}
 
 
 def pillow():
     try:
-        from PIL import Image, ImageDraw, ImageFilter, ImageFont
+        from PIL import Image, ImageDraw, ImageFilter, ImageFont, features
     except ImportError as exc:
         raise RuntimeError("Install Pillow with `python3 -m pip install -r requirements-annotation.txt`.") from exc
-    return Image, ImageDraw, ImageFilter, ImageFont
+    return Image, ImageDraw, ImageFilter, ImageFont, features
 
 
-def find_font(explicit: str | None) -> Path:
-    candidates = [explicit, os.getenv("EDITORIAL_ANNOTATION_FONT"), *FONT_CANDIDATES]
-    for value in candidates:
-        if value and Path(value).expanduser().is_file():
-            return Path(value).expanduser()
+def language_prefix(language: str) -> str:
+    return (language or "und").split("-", 1)[0].lower()
+
+
+def font_group(language: str, sample_text: str = "") -> str:
+    prefix = language_prefix(language)
+    if prefix == "zh":
+        return "zh"
+    if prefix == "ja":
+        return "ja"
+    if prefix == "ko":
+        return "ko"
+    if prefix in {"ar", "fa", "ur", "ps"}:
+        return "arabic"
+    if prefix in {"he", "yi"}:
+        return "hebrew"
+    if prefix in {"hi", "mr", "ne", "sa"}:
+        return "devanagari"
+    if prefix == "th":
+        return "thai"
+    if any("\u4e00" <= ch <= "\u9fff" for ch in sample_text):
+        return "zh"
+    return "latin"
+
+
+def find_font(explicit: str | None, language: str = "und", sample_text: str = "") -> Path:
+    if explicit:
+        path = Path(explicit).expanduser()
+        if not path.is_file():
+            raise RuntimeError(f"Explicit font does not exist: {path}")
+        return path
+    env_font = os.getenv("EDITORIAL_ANNOTATION_FONT")
+    if env_font:
+        path = Path(env_font).expanduser()
+        if path.is_file():
+            return path
+        raise RuntimeError(f"EDITORIAL_ANNOTATION_FONT does not exist: {path}")
+
+    group = font_group(language, sample_text)
+    for value in [*FONT_GROUPS.get(group, []), *FONT_GROUPS["universal"]]:
+        path = Path(value)
+        if path.is_file():
+            return path
+
     try:
-        value = subprocess.run(
-            ["fc-match", "Noto Sans CJK TC", "-f", "%{file}"], capture_output=True,
-            text=True, timeout=5, check=False,
-        ).stdout.strip()
-        if value and Path(value).is_file():
-            return Path(value)
+        for query in [*FONT_QUERIES.get(group, []), *FONT_QUERIES["universal"]]:
+            value = subprocess.run(
+                ["fc-match", query, "-f", "%{file}"], capture_output=True,
+                text=True, timeout=5, check=False,
+            ).stdout.strip()
+            if value and Path(value).is_file():
+                return Path(value)
     except (FileNotFoundError, subprocess.SubprocessError):
         pass
-    raise RuntimeError("No local CJK font found. Pass --font or set EDITORIAL_ANNOTATION_FONT.")
+    raise RuntimeError(
+        f"No local font found for annotation language {language!r}. "
+        "Pass --font or set EDITORIAL_ANNOTATION_FONT."
+    )
 
 
 def load_manifest(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
-    if data.get("version") != 2 or not isinstance(data.get("shots"), list):
-        raise ValueError("Expected a version 2 manifest with shots.")
+    if data.get("version") != 3 or not isinstance(data.get("shots"), list):
+        raise ValueError("Expected a version 3 manifest with shots.")
     return data
 
 
@@ -64,16 +160,33 @@ def accent(value: str) -> str:
     return ACCENTS.get(value, value)
 
 
-def font_for(ImageFont, path: Path, requested: int, width: int):
-    return ImageFont.truetype(str(path), max(18, round(requested * width / 1600)))
+def has_raqm(features) -> bool:
+    try:
+        return bool(features.check("raqm"))
+    except Exception:
+        return False
 
 
-def make_tag(mods, text: str, font_path: Path, spec: dict[str, Any], width: int, headline: bool):
-    Image, ImageDraw, ImageFilter, ImageFont = mods
+def font_for(ImageFont, features, path: Path, requested: int, width: int):
+    kwargs: dict[str, Any] = {}
+    if has_raqm(features) and hasattr(ImageFont, "Layout"):
+        kwargs["layout_engine"] = ImageFont.Layout.RAQM
+    return ImageFont.truetype(str(path), max(18, round(requested * width / 1600)), **kwargs)
+
+
+def direction_kwargs(language: str, features) -> dict[str, str]:
+    if language_prefix(language) in RTL_LANGS and has_raqm(features):
+        return {"direction": "rtl"}
+    return {}
+
+
+def make_tag(mods, text: str, font_path: Path, language: str, spec: dict[str, Any], width: int, headline: bool):
+    Image, ImageDraw, ImageFilter, ImageFont, features = mods
     size = int(spec.get("font_size", 42 if headline else 31))
-    font = font_for(ImageFont, font_path, size, width)
+    font = font_for(ImageFont, features, font_path, size, width)
+    kwargs = direction_kwargs(language, features)
     probe = ImageDraw.Draw(Image.new("RGBA", (8, 8)))
-    box = probe.textbbox((0, 0), text, font=font)
+    box = probe.textbbox((0, 0), text, font=font, **kwargs)
     tw, th = box[2] - box[0], box[3] - box[1]
     px, py = round(width * (0.017 if headline else 0.012)), round(width * 0.009)
     w, h = tw + px * 2, th + py * 2 + round(width * 0.006)
@@ -91,7 +204,7 @@ def make_tag(mods, text: str, font_path: Path, spec: dict[str, Any], width: int,
     line_y = h + 1
     draw.line((px, line_y, w-px, line_y-1), fill=accent(spec.get("accent", "ink")), width=max(3, round(width*.003)))
     draw.rectangle((w//2-22, 1, w//2+22, 11), fill=(211, 170, 97, 110))
-    draw.text((px, py-1), text, font=font, fill="#49382B", stroke_width=1, stroke_fill="#FFF5DC")
+    draw.text((px, py-1), text, font=font, fill="#49382B", stroke_width=1, stroke_fill="#FFF5DC", **kwargs)
     angle = float(spec.get("angle", 0))
     return tag.rotate(angle, expand=True, resample=Image.Resampling.BICUBIC) if angle else tag
 
@@ -99,7 +212,8 @@ def make_tag(mods, text: str, font_path: Path, spec: dict[str, Any], width: int,
 def line_to_target(ImageDraw, canvas, start: tuple[int, int], target: tuple[int, int], color: str, seed: str):
     draw = ImageDraw.Draw(canvas)
     rnd = random.Random(seed)
-    x1, y1 = start; x2, y2 = target
+    x1, y1 = start
+    x2, y2 = target
     mx, my = (x1+x2)//2 + rnd.randint(-10, 10), (y1+y2)//2 + rnd.randint(-8, 8)
     width = max(3, round(canvas.width * .0025))
     draw.line([(x1, y1), (mx, my), (x2, y2)], fill=color, width=width, joint="curve")
@@ -108,7 +222,7 @@ def line_to_target(ImageDraw, canvas, start: tuple[int, int], target: tuple[int,
 
 
 def place(mods, canvas, tag, spec: dict[str, Any], callout: bool):
-    Image, ImageDraw, _, _ = mods
+    _, ImageDraw, _, _, _ = mods
     x, y = norm(spec["x"], canvas.width), norm(spec["y"], canvas.height)
     margin = max(5, round(canvas.width * .006))
     x = min(max(margin, x), max(margin, canvas.width-tag.width-margin))
@@ -121,13 +235,13 @@ def place(mods, canvas, tag, spec: dict[str, Any], callout: bool):
     canvas.alpha_composite(tag, (x, y))
 
 
-def annotate(mods, image_path: Path, output_path: Path, annotation: dict[str, Any], font_path: Path):
-    Image, _, _, _ = mods
+def annotate(mods, image_path: Path, output_path: Path, annotation: dict[str, Any], font_path: Path, language: str):
+    Image, _, _, _, _ = mods
     canvas = Image.open(image_path).convert("RGBA")
     headline = annotation["headline"]
-    place(mods, canvas, make_tag(mods, headline["text"], font_path, headline, canvas.width, True), headline, False)
+    place(mods, canvas, make_tag(mods, headline["text"], font_path, language, headline, canvas.width, True), headline, False)
     for label in annotation["labels"]:
-        place(mods, canvas, make_tag(mods, label["text"], font_path, label, canvas.width, False), label, True)
+        place(mods, canvas, make_tag(mods, label["text"], font_path, language, label, canvas.width, False), label, True)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     canvas.convert("RGB").save(output_path, quality=95)
 
@@ -142,24 +256,31 @@ def main() -> int:
     parser.add_argument("--allow-draft", action="store_true")
     args = parser.parse_args()
     try:
-        data, mods, font_path = load_manifest(args.manifest), pillow(), find_font(args.font)
+        data, mods = load_manifest(args.manifest), pillow()
         if args.output.exists():
             if not args.force:
                 raise FileExistsError(f"Output exists: {args.output}; pass --force.")
             shutil.rmtree(args.output)
         args.output.mkdir(parents=True)
-        report = {"font": str(font_path), "images": []}
+        article_language = data["article"]["annotation_language"]
+        report = {"article_annotation_language": article_language, "images": []}
         for shot in data["shots"]:
             ann = shot.get("annotation", {})
             if not ann.get("enabled"):
                 continue
             if ann.get("layout_status") != "final" and not args.allow_draft:
                 raise ValueError(f"Shot {shot['id']} annotation layout is not final.")
+            language = ann.get("language") or article_language
+            texts = " ".join([
+                (ann.get("headline") or {}).get("text", ""),
+                *[item.get("text", "") for item in ann.get("labels", []) if isinstance(item, dict)],
+            ])
+            font_path = find_font(args.font, language, texts)
             source, target = args.input / shot["filename"], args.output / shot["filename"]
             if not source.is_file():
                 raise FileNotFoundError(source)
-            annotate(mods, source, target, ann, font_path)
-            report["images"].append(str(target))
+            annotate(mods, source, target, ann, font_path, language)
+            report["images"].append({"path": str(target), "language": language, "font": str(font_path)})
         (args.output / "annotation-render-report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"Annotated {len(report['images'])} image(s) to {args.output}.")

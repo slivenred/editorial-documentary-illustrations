@@ -1,16 +1,26 @@
 # Changelog
 
+## 1.2.0 — 2026-07-29
+
+- Replaced the hard-coded Traditional Chinese annotation default with automatic article-language resolution.
+- Added explicit `article.annotation_language` using concrete BCP 47 tags and rejected unresolved values such as `auto`.
+- Added deterministic precedence rules for user overrides, article metadata, dominant reader-facing prose, mixed-language content, and conversation fallback.
+- Preserved product names, model names, benchmarks, acronyms, versions, numbers, units, and percentages from the source article.
+- Upgraded the manifest to version 3 with language-neutral `alt_text` and `caption` fields.
+- Added validator checks that keep per-shot annotation languages aligned with the article target language, while supporting explicit multilingual output through `mul`.
+- Made the annotation renderer select local fonts by language/script instead of always requiring a CJK font.
+- Added RTL-aware rendering when Pillow has RAQM support.
+- Updated the default Agent prompt, Skill instructions, schema, template, QA rules, tests, README, and notice.
+
 ## 1.1.0 — 2026-07-29
 
 - Changed still-image output from text-free final art to a two-layer workflow: text-free model base image plus deterministic semantic annotation.
 - Added one insight headline and 3–6 contextual callout labels as the default final-image contract.
 - Added `references/annotation-system.md` with semantic writing, color, layout, coordinate, typography, and mobile-readability rules.
 - Upgraded the shot manifest to version 2 with normalized annotation coordinates and callout targets.
-- Added `scripts/annotate_images.py` for reproducible paper-tag annotation rendering with locally installed CJK fonts.
+- Added `scripts/annotate_images.py` for reproducible paper-tag annotation rendering with locally installed fonts.
 - Updated prompt rendering to reserve quiet annotation regions without asking the image model to draw text.
 - Added separate base-image and final-annotation QA gates plus annotation-specific retry strategies.
-- Updated the default Agent prompt, template, schema, validator, tests, README, and package manifest.
-- Added a Pillow dependency file for annotation rendering; no font files are bundled.
 
 ## 1.0.0 — 2026-07-29
 
@@ -19,7 +29,5 @@
 - Added article-level visual bible and immutable style lock.
 - Added static 16:9 documentary cutout prompt mode.
 - Added exactly 10-second, 24fps motion prompt mode.
-- Added JSON Schema, no-dependency validator, and prompt renderer.
-- Added QA scoring and issue-specific retry ladder.
-- Added a reusable manifest template and self-contained tooling tests.
+- Added JSON Schema, validator, prompt renderer, QA scoring, retry ladder, template, and tests.
 - Added MIT attribution for the Ian Xiaohei Illustrations workflow adaptation.

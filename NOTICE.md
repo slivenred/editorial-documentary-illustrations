@@ -21,7 +21,7 @@ third_party/ian-xiaohei-illustrations-LICENSE.txt
 
 ## Font handling
 
-No font files are distributed with this package. The annotation renderer uses a CJK-capable font already installed on the user's system or an explicit local path supplied by the user.
+No font files are distributed with this package. The annotation renderer selects a locally installed font based on the resolved BCP 47 annotation language, or uses an explicit local font path supplied by the user.
 
 ## Vox name and affiliation
 

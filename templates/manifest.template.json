@@ -1,14 +1,15 @@
 {
-  "version": 2,
+  "version": 3,
   "article": {
-    "title": "<文章標題>",
+    "title": "<article title>",
     "slug": "<kebab-case-slug>",
-    "language": "zh-TW",
-    "summary": "<文章一句話摘要，至少二十個字元>",
+    "language": "<detected BCP-47 source language, e.g. en>",
+    "annotation_language": "<resolved BCP-47 annotation language; same as article unless user overrides>",
+    "summary": "<one-sentence article summary of at least twenty characters>",
     "target_count": 5
   },
   "visual_bible": {
-    "world_summary": "<同篇文章的視覺世界>",
+    "world_summary": "<shared visual world for this article>",
     "background": "Warm aged parchment with subtle fiber texture, faint map grid, and two gentle diagonal creases.",
     "palette": [
       "dark ink brown for outlines and structure",
@@ -20,8 +21,8 @@
     ],
     "camera": "top-down-map-15deg",
     "lighting": "Soft warm light from upper left; short soft shadows fall to lower right.",
-    "character_system": "<主角、次要人物與群眾 cluster 的固定規則>",
-    "recurring_motif": "<全篇唯一貫穿意象>",
+    "character_system": "<fixed rules for protagonists, supporting figures, and crowd clusters>",
+    "recurring_motif": "<one recurring motif used across the article>",
     "continuity_rules": [
       "Keep the same parchment tone and grid strength.",
       "Keep the same camera angle.",
@@ -33,30 +34,30 @@
   "shots": [
     {
       "id": "01",
-      "placement_after": "<建議段落>",
-      "anchor": "<原文錨點>",
+      "placement_after": "<recommended paragraph>",
+      "anchor": "<source article anchor>",
       "role": "process-station",
-      "core_idea": "<一件要看懂的事>",
-      "composition": "<主要空間、人物與物件安排，至少三十個字元；同時預留可放標註的安靜區>",
-      "main_subject": "<唯一主焦點>",
+      "core_idea": "<the one thing the reader should understand>",
+      "composition": "<scene, people, objects, and quiet annotation regions; at least thirty characters>",
+      "main_subject": "<single focal subject>",
       "supporting_elements": [
-        "<元素 1>",
-        "<元素 2>"
+        "<element 1>",
+        "<element 2>"
       ],
       "motion_cues": [
-        "<動態暗示 1>"
+        "<motion cue 1>"
       ],
       "density": "low",
       "people_count": 1,
       "filename": "01-topic-name.png",
-      "alt_text_zh_tw": "<至少十二個字元的繁中 alt text>",
-      "caption_zh_tw": "",
+      "alt_text": "<alt text in article.annotation_language>",
+      "caption": "",
       "annotation": {
         "enabled": true,
-        "language": "zh-TW",
+        "language": "<same as article.annotation_language>",
         "layout_status": "draft",
         "headline": {
-          "text": "<這張圖的核心判斷，不是段落標題>",
+          "text": "<core insight in annotation language>",
           "x": 0.42,
           "y": 0.06,
           "accent": "terracotta",
@@ -65,7 +66,7 @@
         },
         "labels": [
           {
-            "text": "<短標註 1>",
+            "text": "<label 1>",
             "x": 0.06,
             "y": 0.18,
             "target_x": 0.24,
@@ -75,17 +76,17 @@
             "angle": -2
           },
           {
-            "text": "<短標註 2>",
+            "text": "<label 2>",
             "x": 0.48,
             "y": 0.28,
             "target_x": 0.58,
-            "target_y": 0.50,
+            "target_y": 0.5,
             "accent": "terracotta",
             "font_size": 32,
             "angle": 1
           },
           {
-            "text": "<短標註 3>",
+            "text": "<label 3>",
             "x": 0.74,
             "y": 0.22,
             "target_x": 0.84,
@@ -97,10 +98,10 @@
         ]
       },
       "motion_beats": [
-        "<0.0–1.5 秒建立場景>",
-        "<1.5–4.0 秒核心轉化>",
-        "<4.0–7.5 秒擴張>",
-        "<7.5–10.0 秒終局>"
+        "<0.0–1.5s establish>",
+        "<1.5–4.0s transform>",
+        "<4.0–7.5s expand>",
+        "<7.5–10.0s resolve>"
       ]
     }
   ]
