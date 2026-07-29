@@ -28,7 +28,7 @@ description: 為各語言文章規劃、生成與修訂 VOX-inspired／現代解
 
 規則：
 
-- 最終 manifest 必須寫入具體 BCP 47 tag，例如 `zh-TW`、`en`、`ja`、`ko`、`es`；不得保留 `auto`。
+- 最終 manifest 必須寫入具體 BCP 47 tag，例如 `zh-TW`、`en`、`ja`、`ko`、`es`；不得保留 `auto` 或 `und`；`mul` 只用於文章層的明確多語輸出。
 - `article.language` 記錄文章主語言，`article.annotation_language` 記錄最終標註語言。
 - 除非使用者明確要求翻譯，兩者預設相同。
 - 同篇文章全部 still 圖預設使用同一標註語言；明確要求多語時才使用 `mul` 並逐張指定。

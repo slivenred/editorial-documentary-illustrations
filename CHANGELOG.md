@@ -3,7 +3,7 @@
 ## 1.2.0 — 2026-07-29
 
 - Replaced the hard-coded Traditional Chinese annotation default with automatic article-language resolution.
-- Added explicit `article.annotation_language` using concrete BCP 47 tags and rejected unresolved values such as `auto`.
+- Added explicit `article.annotation_language` using concrete BCP 47 tags; rejected unresolved `auto`/`und` values and required concrete per-shot languages.
 - Added deterministic precedence rules for user overrides, article metadata, dominant reader-facing prose, mixed-language content, and conversation fallback.
 - Preserved product names, model names, benchmarks, acronyms, versions, numbers, units, and percentages from the source article.
 - Upgraded the manifest to version 3 with language-neutral `alt_text` and `caption` fields.

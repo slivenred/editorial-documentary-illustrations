@@ -37,11 +37,26 @@
         },
         "language": {
           "type": "string",
-          "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$"
+          "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$",
+          "not": {
+            "enum": [
+              "auto",
+              "detect",
+              "automatic"
+            ]
+          }
         },
         "annotation_language": {
           "type": "string",
-          "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$"
+          "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$",
+          "not": {
+            "enum": [
+              "auto",
+              "detect",
+              "automatic",
+              "und"
+            ]
+          }
         },
         "summary": {
           "type": "string",
@@ -238,7 +253,16 @@
               },
               "language": {
                 "type": "string",
-                "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$"
+                "pattern": "^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$",
+                "not": {
+                  "enum": [
+                    "auto",
+                    "detect",
+                    "automatic",
+                    "und",
+                    "mul"
+                  ]
+                }
               },
               "layout_status": {
                 "type": "string",

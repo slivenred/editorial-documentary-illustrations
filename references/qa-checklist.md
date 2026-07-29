@@ -20,7 +20,7 @@ Still 模式分開驗收 Base QA 與 Final Annotation QA。不得只看底圖就
 底圖正確時，以下問題只修改 annotation plan：
 
 - 標註語言不符合 `article.annotation_language` 或使用者指定語言。
-- `auto`、`detect` 等未解析值仍出現在最終 manifest。
+- `auto`、`detect`、`und`，或逐張使用 `mul` 等未解析值仍出現在最終 manifest。
 - 拼字、語法、地區用詞、文字方向、亂碼或字型顯示錯誤。
 - 名稱、比例、數字、單位或專有名詞與文章不一致。
 - headline 只是標題或泛用圖表名稱，沒有核心判斷。

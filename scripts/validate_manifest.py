@@ -55,10 +55,26 @@ def text(parent: dict[str, Any], key: str, path: str, errors: list[str], minimum
     return value.strip()
 
 
-def language(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> str:
+def language(
+    parent: dict[str, Any],
+    key: str,
+    path: str,
+    errors: list[str],
+    *,
+    allow_und: bool = False,
+    allow_mul: bool = False,
+) -> str:
     value = text(parent, key, path, errors, 2)
-    if value and (value.lower() in {"auto", "detect", "automatic"} or not LANGUAGE.fullmatch(value)):
-        errors.append(f"`{path}.{key}` must be a concrete BCP 47 language tag, not {value!r}.")
+    normalized = value.lower()
+    invalid = normalized in {"auto", "detect", "automatic"} or not LANGUAGE.fullmatch(value)
+    invalid = invalid or (normalized == "und" and not allow_und) or (normalized == "mul" and not allow_mul)
+    if value and invalid:
+        allowed = "a concrete BCP 47 language tag"
+        if allow_mul:
+            allowed += " or `mul`"
+        if allow_und:
+            allowed += " or `und`"
+        errors.append(f"`{path}.{key}` must be {allowed}, not {value!r}.")
     return value
 
 
@@ -108,8 +124,8 @@ def validate_manifest(data: Any) -> tuple[list[str], list[str]]:
     article = obj(data, "article", "root", errors)
     title = text(article, "title", "article", errors)
     slug = text(article, "slug", "article", errors)
-    source_language = language(article, "language", "article", errors)
-    annotation_language = language(article, "annotation_language", "article", errors)
+    source_language = language(article, "language", "article", errors, allow_und=True, allow_mul=True)
+    annotation_language = language(article, "annotation_language", "article", errors, allow_mul=True)
     text(article, "summary", "article", errors, 20)
     target = article.get("target_count")
     if not isinstance(target, int) or not 1 <= target <= 9:

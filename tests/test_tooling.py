@@ -75,6 +75,15 @@ class Tests(unittest.TestCase):
         data["shots"][0]["annotation"]["language"] = "zh-TW"
         self.assertTrue(validator.validate_manifest(data)[0])
 
+    def test_undetermined_annotation_language_is_rejected(self):
+        data = manifest("und")
+        self.assertTrue(validator.validate_manifest(data)[0])
+
+    def test_multilingual_shot_still_requires_concrete_language(self):
+        data = manifest("mul")
+        data["shots"][0]["annotation"]["language"] = "mul"
+        self.assertTrue(validator.validate_manifest(data)[0])
+
     def test_multilingual_article_allows_per_shot_language(self):
         data = manifest("mul")
         data["shots"][0]["annotation"]["language"] = "ja"
