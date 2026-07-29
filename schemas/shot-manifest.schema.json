@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/editorial-documentary-shot-manifest.schema.json",
+  "title": "Editorial Documentary Illustration Shot Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "article",
+    "visual_bible",
+    "shots"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "article": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "slug",
+        "language",
+        "summary",
+        "target_count"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 20
+        },
+        "target_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9
+        }
+      }
+    },
+    "visual_bible": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "world_summary",
+        "background",
+        "palette",
+        "camera",
+        "lighting",
+        "character_system",
+        "recurring_motif",
+        "continuity_rules"
+      ],
+      "properties": {
+        "world_summary": {
+          "type": "string",
+          "minLength": 20
+        },
+        "background": {
+          "type": "string",
+          "minLength": 20
+        },
+        "palette": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 7,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "camera": {
+          "type": "string",
+          "enum": [
+            "top-down-map-15deg",
+            "flat-orthographic",
+            "soft-isometric"
+          ]
+        },
+        "lighting": {
+          "type": "string",
+          "minLength": 10
+        },
+        "character_system": {
+          "type": "string",
+          "minLength": 20
+        },
+        "recurring_motif": {
+          "type": "string",
+          "minLength": 10
+        },
+        "continuity_rules": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 12,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        }
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "placement_after",
+          "anchor",
+          "role",
+          "core_idea",
+          "composition",
+          "main_subject",
+          "supporting_elements",
+          "motion_cues",
+          "density",
+          "people_count",
+          "filename",
+          "alt_text_zh_tw",
+          "caption_zh_tw"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9]{2}$"
+          },
+          "placement_after": {
+            "type": "string",
+            "minLength": 3
+          },
+          "anchor": {
+            "type": "string",
+            "minLength": 5
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "process-station",
+              "route-network",
+              "timeline-journey",
+              "before-after",
+              "scale-up-crowd",
+              "cutaway-mechanism",
+              "ecosystem-tableau",
+              "physical-metaphor",
+              "evidence-chain",
+              "origin-map"
+            ]
+          },
+          "core_idea": {
+            "type": "string",
+            "minLength": 10
+          },
+          "composition": {
+            "type": "string",
+            "minLength": 30
+          },
+          "main_subject": {
+            "type": "string",
+            "minLength": 5
+          },
+          "supporting_elements": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "minLength": 2
+            }
+          },
+          "motion_cues": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "minLength": 3
+            }
+          },
+          "density": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "resolved-medium"
+            ]
+          },
+          "people_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30
+          },
+          "filename": {
+            "type": "string",
+            "pattern": "^[0-9]{2}-[a-z0-9-]+\\.png$"
+          },
+          "alt_text_zh_tw": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 160
+          },
+          "caption_zh_tw": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "motion_beats": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "string",
+              "minLength": 5
+            }
+          }
+        }
+      }
+    }
+  }
+}
