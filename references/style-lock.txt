@@ -1,15 +1,11 @@
 ORIGINAL EDITORIAL DOCUMENTARY CUTOUT STYLE LOCK
 
-Create one original wide 16:9 editorial documentary illustration, using the visual grammar of modern explainer journalism without reproducing any existing frame, branded asset, logo, title card, typography, or identifiable composition.
+Create one original wide 16:9 editorial documentary illustration using the visual grammar of modern explainer journalism without reproducing any existing frame, branded asset, logo, title card, typography, or identifiable composition.
 
-The entire world is built on warm aged parchment paper with subtle natural fiber texture, faint low-contrast map grid lines, a few gentle paper creases, and restrained edge wear. Keep the parchment elegant and clean, never dirty or heavily grungy.
+Build the world on warm aged parchment with subtle paper fibers, faint low-contrast map-grid lines, a few gentle creases, and clean restrained wear. All people, objects, modules, buildings, tools, routes, and scenery are hand-drawn paper cutouts or paper-sticker shapes with slightly irregular ink-brown edges and consistent short soft shadows.
 
-All people, objects, buildings, food, tools, routes, and scenery are hand-drawn paper cutouts or paper-sticker shapes with slightly irregular ink-brown edges. Use consistent short, soft shadows falling in the same direction, so every element feels physically placed on the parchment. The view is a calm top-down map/tabletop angle or a very soft orthographic perspective.
+Use a calm top-down map/tabletop view, flat orthographic view, or restrained soft-isometric angle. Use an earthy palette of parchment cream, ink brown, terracotta, mustard ochre, muted sage, dusty indigo, and warm brick red. Keep one clear focal scene and 2–6 key object types.
 
-Human figures are stylized cutouts with simple body shapes and minimal facial detail. No realistic faces, no close-up hands, no detailed fingers, and no anatomically complex gestures. For crowds, use layered silhouette clusters rather than many individually detailed people.
+The scene should feel like one frozen frame from a smooth documentary time-lapse, using staggered objects, partial assembly, routes, repeated states, or visible comparison. Keep it elegant, readable, and premium rather than busy.
 
-Use an earthy natural palette: parchment cream, dark ink brown, terracotta, mustard ochre, muted sage, dusty indigo, and warm brick red. Lighting is softly cinematic and premium, but never glossy, photorealistic, neon, or dramatic.
-
-The image must feel like a frozen keyframe from a smooth time-lapse: routes, staggered positions, partial assembly, repeated shapes, growing queues, converging objects, or expanding clusters should imply motion organically. Keep one clear focal action, readable hierarchy, generous breathing room, and elegant documentary energy.
-
-This is the base-image layer. Do not render any text, letters, numbers, captions, labels, speech bubbles, UI, data dashboards, logos, or watermarks. Leave several calm parchment pockets around the composition so a deterministic post-production step can later add a small number of semantic callout tags without covering the main subject. Do not make a PPT infographic, corporate vector illustration, children's cartoon, anime image, game-like 3D render, clay scene, or realistic photograph.
+Do not render text, letters, numbers, labels, logos, watermarks, UI, dashboards, formal flowchart boxes, or fake writing. Do not make a realistic photograph, cinematic still, plastic 3D render, clay scene, anime image, children's illustration, corporate vector infographic, or game interface.

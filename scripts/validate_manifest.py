@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Validate a version 4 Editorial Documentary Illustrations manifest."""
+"""Validate an Editorial Documentary Illustrations version 5 manifest."""
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -11,64 +12,49 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-CAMERAS = {"top-down-map-15deg", "flat-orthographic", "soft-isometric"}
-ARTICLE_TYPES = {
-    "technical-research", "product-or-company", "historical", "policy-or-economy",
-    "social-or-cultural", "process-or-howto", "general",
-}
-IMAGE_ROLES = {"hero", "inline"}
-VISUALIZATION_MODES = {"literal-technical", "literal-scene", "hybrid-metaphor", "abstract-metaphor"}
-ROLES = {
-    "process-station", "route-network", "timeline-journey", "before-after",
-    "scale-up-crowd", "cutaway-mechanism", "ecosystem-tableau", "physical-metaphor",
-    "evidence-chain", "origin-map", "technical-mechanism", "architecture-stack",
-    "resource-contrast", "claim-comparison",
-}
-TECHNICAL_ROLES = {"technical-mechanism", "architecture-stack", "resource-contrast", "claim-comparison"}
-DENSITIES = {"low", "medium", "high", "resolved-medium"}
-ACCENTS = {"ink", "terracotta", "ochre", "sage", "indigo", "brick"}
-GENERIC_SIGNATURE = {
-    "ai", "artificial intelligence", "model", "models", "system", "systems", "data",
-    "speed", "performance", "efficiency", "technology", "software", "hardware", "network",
-    "process", "workflow", "machine", "people", "flow", "memory",
-    "人工智慧", "人工智能", "模型", "系統", "系统", "資料", "数据", "速度", "效能", "性能",
-    "技術", "技术", "流程", "網路", "网络", "記憶體", "内存", "效率",
-}
-GENERIC_LABELS = {
-    "流程", "結果", "重點", "系統", "資料", "工作流程", "系統架構圖", "重點整理",
-    "flow", "workflow", "process", "result", "results", "key point", "key points",
-    "system", "data", "overview", "diagram", "architecture",
-}
-TECHNICAL_GENERIC_OBJECTS = {
-    "office workers", "workers around", "factory", "server city", "unrelated city",
-    "generic robot", "glowing brain", "decorative gears", "server tower",
-}
+ROOT = Path(__file__).resolve().parents[1]
+RECOMMENDER = ROOT / "scripts" / "recommend_image_count.py"
+
+LANGUAGE = re.compile(r"^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|mul|und)$")
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SHOT_ID = re.compile(r"^[0-9]{2}$")
 FILENAME = re.compile(r"^[0-9]{2}-[a-z0-9-]+\.png$")
-LANGUAGE = re.compile(r"^(?:[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*|und|mul)$")
 HEX = re.compile(r"^#[0-9A-Fa-f]{6}$")
+CAMERAS = {"top-down-map-15deg", "flat-orthographic", "soft-isometric"}
+PURPOSES = {"overview", "mechanism", "process", "comparison", "timeline", "evidence", "result"}
+LAYOUTS = {
+    "hero-explainer", "mechanism-focus", "process-strip",
+    "comparison-split", "timeline-route", "result-board",
+}
+ACCENTS = {"ink", "terracotta", "ochre", "sage", "indigo", "brick"}
+GENERIC_HEADLINES = {
+    "重點", "重點整理", "流程", "流程圖", "結果", "系統架構", "系統架構圖",
+    "overview", "workflow", "process", "result", "architecture", "key points",
+}
+EXPECTED_LAYOUT = {
+    "overview": "hero-explainer",
+    "mechanism": "mechanism-focus",
+    "process": "process-strip",
+    "comparison": "comparison-split",
+    "timeline": "timeline-route",
+    "result": "result-board",
+}
 
 
-def normalized(value: str) -> str:
-    value = unicodedata.normalize("NFKC", value or "").strip().casefold()
-    return re.sub(r"\s+", " ", value)
+def load_recommender():
+    spec = importlib.util.spec_from_file_location("image_count_recommender", RECOMMENDER)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Could not load {RECOMMENDER}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
-def terms_overlap(first: list[str], second: list[str]) -> set[str]:
-    """Return source terms that materially appear in the comparison values."""
-    matches: set[str] = set()
-    right = [normalized(value) for value in second if isinstance(value, str) and value.strip()]
-    for original in first:
-        if not isinstance(original, str) or not original.strip():
-            continue
-        left = normalized(original)
-        if any(left == item or (len(left) >= 3 and left in item) or (len(item) >= 3 and item in left) for item in right):
-            matches.add(original)
-    return matches
+def normalize(value: str) -> str:
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFKC", value or "").strip().casefold())
 
 
-def _dict(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> dict[str, Any]:
+def require_dict(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> dict[str, Any]:
     value = parent.get(key)
     if not isinstance(value, dict):
         errors.append(f"`{path}.{key}` must be an object.")
@@ -76,7 +62,7 @@ def _dict(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> dic
     return value
 
 
-def _list(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> list[Any]:
+def require_list(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> list[Any]:
     value = parent.get(key)
     if not isinstance(value, list):
         errors.append(f"`{path}.{key}` must be an array.")
@@ -84,118 +70,62 @@ def _list(parent: dict[str, Any], key: str, path: str, errors: list[str]) -> lis
     return value
 
 
-def _text(parent: dict[str, Any], key: str, path: str, errors: list[str], minimum: int = 1) -> str:
+def require_text(
+    parent: dict[str, Any],
+    key: str,
+    path: str,
+    errors: list[str],
+    minimum: int = 1,
+    maximum: int | None = None,
+) -> str:
     value = parent.get(key)
     if not isinstance(value, str) or len(value.strip()) < minimum:
-        errors.append(f"`{path}.{key}` must be a string of at least {minimum} characters.")
+        errors.append(f"`{path}.{key}` must be text of at least {minimum} characters.")
         return ""
-    return value.strip()
+    value = value.strip()
+    if maximum is not None and len(value) > maximum:
+        errors.append(f"`{path}.{key}` must be at most {maximum} characters.")
+    return value
 
 
-def _strings(parent: dict[str, Any], key: str, path: str, errors: list[str], low: int, high: int) -> list[str]:
-    values = _list(parent, key, path, errors)
-    if not low <= len(values) <= high:
-        errors.append(f"`{path}.{key}` must contain {low}–{high} items.")
-    result: list[str] = []
-    for index, value in enumerate(values):
-        if not isinstance(value, str) or not value.strip():
-            errors.append(f"`{path}.{key}[{index}]` must be meaningful text.")
-        else:
-            result.append(value.strip())
-    return result
-
-
-def _language(parent: dict[str, Any], key: str, path: str, errors: list[str], *, allow_und=False, allow_mul=False) -> str:
-    value = _text(parent, key, path, errors, 2)
+def require_language(parent: dict[str, Any], key: str, path: str, errors: list[str], *, allow_und=False, allow_mul=False) -> str:
+    value = require_text(parent, key, path, errors, 2)
     lower = value.casefold()
     invalid = lower in {"auto", "detect", "automatic"} or not LANGUAGE.fullmatch(value)
-    invalid |= lower == "und" and not allow_und
-    invalid |= lower == "mul" and not allow_mul
+    invalid = invalid or (lower == "und" and not allow_und) or (lower == "mul" and not allow_mul)
     if value and invalid:
         errors.append(f"`{path}.{key}` must be a resolved BCP 47 language tag, not {value!r}.")
     return value
 
 
-def _number(parent: dict[str, Any], key: str, path: str, errors: list[str], low: float, high: float) -> None:
+def require_int(parent: dict[str, Any], key: str, path: str, errors: list[str], low: int, high: int) -> int | None:
     value = parent.get(key)
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not low <= float(value) <= high:
-        errors.append(f"`{path}.{key}` must be a number from {low} to {high}.")
-
-
-def _annotation_item(item: Any, path: str, errors: list[str], *, headline: bool) -> str:
-    if not isinstance(item, dict):
-        errors.append(f"`{path}` must be an object.")
-        return ""
-    value = _text(item, "text", path, errors, 2 if headline else 1)
-    if len(value) > (80 if headline else 50):
-        errors.append(f"`{path}.text` is too long.")
-    _number(item, "x", path, errors, 0, 1)
-    _number(item, "y", path, errors, 0, 1)
-    if not headline:
-        _number(item, "target_x", path, errors, 0, 1)
-        _number(item, "target_y", path, errors, 0, 1)
-    accent = _text(item, "accent", path, errors)
-    if accent not in ACCENTS and not HEX.fullmatch(accent):
-        errors.append(f"`{path}.accent` is not supported.")
-    size = item.get("font_size")
-    low, high = (28, 56) if headline else (22, 44)
-    if not isinstance(size, int) or not low <= size <= high:
-        errors.append(f"`{path}.font_size` must be {low}–{high}.")
-    _number(item, "angle", path, errors, -4, 4)
+    if not isinstance(value, int) or isinstance(value, bool) or not low <= value <= high:
+        errors.append(f"`{path}.{key}` must be an integer from {low} to {high}.")
+        return None
     return value
 
 
-def _semantic_contract(
-    contract: dict[str, Any], path: str, *, image_role: str, article_type: str,
-    topic_signature: list[str], errors: list[str], warnings: list[str],
-) -> None:
-    source_basis = _strings(contract, "source_basis", path, errors, 1, 4)
-    must_show = _strings(contract, "must_show", path, errors, 2, 6)
-    _strings(contract, "must_not_show", path, errors, 0, 8)
-    specificity = _strings(contract, "specificity_terms", path, errors, 2, 10)
-    blind_caption = _text(contract, "expected_blind_caption", path, errors, 20)
-    hero_artifact = contract.get("hero_artifact")
-    if not isinstance(hero_artifact, str):
-        errors.append(f"`{path}.hero_artifact` must be a string, which may be empty.")
-        hero_artifact = ""
+def require_number(parent: dict[str, Any], key: str, path: str, errors: list[str], low: float, high: float) -> float | None:
+    value = parent.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not low <= float(value) <= high:
+        errors.append(f"`{path}.{key}` must be a number from {low} to {high}.")
+        return None
+    return float(value)
 
-    evidence = _list(contract, "visual_evidence", path, errors)
-    if not 2 <= len(evidence) <= 6:
-        errors.append(f"`{path}.visual_evidence` must contain 2–6 items.")
-    for index, item in enumerate(evidence):
-        item_path = f"{path}.visual_evidence[{index}]"
-        if not isinstance(item, dict):
-            errors.append(f"`{item_path}` must be an object.")
-            continue
-        _text(item, "concept", item_path, errors, 3)
-        _text(item, "visible_form", item_path, errors, 8)
-        _text(item, "relationship", item_path, errors, 8)
 
-    required_overlap = 2 if image_role == "hero" else 1
-    if len(terms_overlap(specificity, topic_signature)) < required_overlap:
-        errors.append(
-            f"`{path}.specificity_terms` must overlap `article.topic_signature` by at least "
-            f"{required_overlap} item(s)."
-        )
-    if len(terms_overlap(topic_signature, [blind_caption])) < required_overlap:
-        errors.append(
-            f"`{path}.expected_blind_caption` must contain at least {required_overlap} "
-            "article-specific topic signature anchor(s)."
-        )
-
-    if image_role == "hero":
-        if len(source_basis) < 2:
-            errors.append(f"`{path}.source_basis` must contain at least 2 grounded claims for a hero image.")
-        if len(must_show) < 3:
-            errors.append(f"`{path}.must_show` must contain at least 3 items for a hero image.")
-        if len(hero_artifact.strip()) < 5:
-            errors.append(f"`{path}.hero_artifact` must name a domain-specific central artifact for a hero image.")
-    elif hero_artifact.strip():
-        warnings.append(f"`{path}.hero_artifact` is set for an inline image; confirm it is necessary.")
-
-    generic = [value for value in specificity if normalized(value) in GENERIC_SIGNATURE]
-    if generic:
-        warnings.append(f"`{path}` contains generic specificity term(s): {', '.join(generic)}.")
+def anchor_matches(anchor: str, context: str) -> bool:
+    left = normalize(anchor)
+    right = normalize(context)
+    if not left or not right:
+        return False
+    if left in right or right in left:
+        return True
+    left_bigrams = {left[index:index + 2] for index in range(max(0, len(left) - 1))}
+    right_bigrams = {right[index:index + 2] for index in range(max(0, len(right) - 1))}
+    if not left_bigrams:
+        return False
+    return len(left_bigrams & right_bigrams) / len(left_bigrams) >= 0.35
 
 
 def validate_manifest(data: Any) -> tuple[list[str], list[str]]:
@@ -203,201 +133,188 @@ def validate_manifest(data: Any) -> tuple[list[str], list[str]]:
     warnings: list[str] = []
     if not isinstance(data, dict):
         return ["Manifest root must be an object."], warnings
-    if data.get("version") != 4:
-        errors.append("`version` must be the integer 4.")
+    if data.get("version") != 5:
+        errors.append("`version` must be the integer 5.")
 
-    article = _dict(data, "article", "root", errors)
-    title = _text(article, "title", "article", errors)
-    slug = _text(article, "slug", "article", errors)
-    source_language = _language(article, "language", "article", errors, allow_und=True, allow_mul=True)
-    annotation_language = _language(article, "annotation_language", "article", errors, allow_mul=True)
-    _text(article, "summary", "article", errors, 20)
-    target_count = article.get("target_count")
-    if not isinstance(target_count, int) or not 1 <= target_count <= 9:
-        errors.append("`article.target_count` must be 1–9.")
+    article = require_dict(data, "article", "root", errors)
+    require_text(article, "title", "article", errors)
+    slug = require_text(article, "slug", "article", errors)
     if slug and not SLUG.fullmatch(slug):
         errors.append("`article.slug` must be lowercase kebab-case.")
-    if len(title) > 160:
-        warnings.append("Article title is unusually long.")
-    article_type = _text(article, "article_type", "article", errors)
-    if article_type not in ARTICLE_TYPES:
-        errors.append("`article.article_type` is unsupported.")
-    visual_thesis = _text(article, "visual_thesis", "article", errors, 20)
-    topic_signature = _strings(article, "topic_signature", "article", errors, 3, 10)
-    global_avoid = _strings(article, "global_must_avoid", "article", errors, 1, 12)
-    if topic_signature and all(normalized(item) in GENERIC_SIGNATURE for item in topic_signature):
-        errors.append("`article.topic_signature` contains only generic terms; add named entities, mechanisms, ratios, or outcomes.")
-    if len({normalized(value) for value in topic_signature}) != len(topic_signature):
-        errors.append("`article.topic_signature` must not contain duplicates.")
-    if len({normalized(value) for value in global_avoid}) != len(global_avoid):
-        errors.append("`article.global_must_avoid` must not contain duplicates.")
-    if len(visual_thesis.split()) < 4:
-        warnings.append("`article.visual_thesis` may be too vague; state a relationship or trade-off.")
+    source_language = require_language(article, "language", "article", errors, allow_und=True, allow_mul=True)
+    annotation_language = require_language(article, "annotation_language", "article", errors, allow_mul=True)
+    require_text(article, "summary", "article", errors, 20, 500)
+    reading_minutes = require_number(article, "reading_minutes", "article", errors, 0.1, 120)
+    section_count = require_int(article, "section_count", "article", errors, 1, 100)
+    image_count_mode = require_text(article, "image_count_mode", "article", errors)
+    if image_count_mode not in {"auto", "fixed"}:
+        errors.append("`article.image_count_mode` must be `auto` or `fixed`.")
+    include_hero = article.get("include_hero")
+    if not isinstance(include_hero, bool):
+        errors.append("`article.include_hero` must be boolean.")
+    anchor_count = require_int(article, "high_value_anchor_count", "article", errors, 1, 30)
+    target_count = require_int(article, "target_count", "article", errors, 1, 8)
+    require_text(article, "count_reason", "article", errors, 12, 320)
     if source_language == "mul" and annotation_language != "mul":
         warnings.append("The article is multilingual; confirm the single annotation language is intentional.")
 
-    visual_bible = _dict(data, "visual_bible", "root", errors)
-    _text(visual_bible, "world_summary", "visual_bible", errors, 20)
-    _text(visual_bible, "background", "visual_bible", errors, 20)
-    palette = _list(visual_bible, "palette", "visual_bible", errors)
+    visual_bible = require_dict(data, "visual_bible", "root", errors)
+    require_text(visual_bible, "background", "visual_bible", errors, 20)
+    palette = require_list(visual_bible, "palette", "visual_bible", errors)
     if not 4 <= len(palette) <= 7:
         errors.append("`visual_bible.palette` must contain 4–7 items.")
-    camera = _text(visual_bible, "camera", "visual_bible", errors)
+    camera = require_text(visual_bible, "camera", "visual_bible", errors)
     if camera not in CAMERAS:
-        errors.append("Unsupported visual_bible camera.")
-    _text(visual_bible, "lighting", "visual_bible", errors, 10)
-    _text(visual_bible, "character_system", "visual_bible", errors, 20)
-    _text(visual_bible, "recurring_motif", "visual_bible", errors, 10)
-    continuity = _list(visual_bible, "continuity_rules", "visual_bible", errors)
+        errors.append("Unsupported `visual_bible.camera`.")
+    require_text(visual_bible, "lighting", "visual_bible", errors, 10)
+    require_text(visual_bible, "cutout_style", "visual_bible", errors, 20)
+    require_text(visual_bible, "typography", "visual_bible", errors, 20)
+    continuity = require_list(visual_bible, "continuity_rules", "visual_bible", errors)
     if not 4 <= len(continuity) <= 12:
         errors.append("`visual_bible.continuity_rules` must contain 4–12 items.")
 
-    shots = _list(data, "shots", "root", errors)
-    if not 1 <= len(shots) <= 9:
-        errors.append("`shots` must contain 1–9 items.")
+    shots = require_list(data, "shots", "root", errors)
+    if not 1 <= len(shots) <= 8:
+        errors.append("`shots` must contain 1–8 items.")
     if isinstance(target_count, int) and len(shots) != target_count:
-        errors.append("target_count does not match shots length.")
+        errors.append("`article.target_count` must equal the number of shots.")
+
+    if (
+        image_count_mode == "auto"
+        and reading_minutes is not None
+        and anchor_count is not None
+        and section_count is not None
+        and isinstance(include_hero, bool)
+        and target_count is not None
+    ):
+        recommended = load_recommender().recommend_count(
+            reading_minutes, anchor_count, section_count, include_hero
+        )["recommended_total"]
+        if target_count != recommended:
+            errors.append(
+                f"Auto image count recommends {recommended}, but `article.target_count` is {target_count}. "
+                "Change the anchor count or use `image_count_mode: fixed` for an explicit override."
+            )
 
     ids: list[str] = []
     filenames: list[str] = []
-    roles: list[str] = []
-    shot_languages: list[str] = []
     hero_indexes: list[int] = []
+    inline_paragraph_indexes: list[int] = []
+    placement_keys: list[tuple[int, int]] = []
 
     for index, shot in enumerate(shots):
         path = f"shots[{index}]"
         if not isinstance(shot, dict):
             errors.append(f"`{path}` must be an object.")
             continue
-        shot_id = _text(shot, "id", path, errors)
+        shot_id = require_text(shot, "id", path, errors)
         ids.append(shot_id)
         if shot_id and not SHOT_ID.fullmatch(shot_id):
             errors.append(f"`{path}.id` must use two digits.")
-        image_role = _text(shot, "image_role", path, errors)
-        if image_role not in IMAGE_ROLES:
-            errors.append(f"Unsupported image role at `{path}`.")
-        if image_role == "hero":
+        kind = require_text(shot, "kind", path, errors)
+        if kind not in {"hero", "inline"}:
+            errors.append(f"`{path}.kind` must be `hero` or `inline`.")
+        if kind == "hero":
             hero_indexes.append(index)
-        visualization_mode = _text(shot, "visualization_mode", path, errors)
-        if visualization_mode not in VISUALIZATION_MODES:
-            errors.append(f"Unsupported visualization mode at `{path}`.")
-        if article_type == "technical-research" and image_role == "hero" and visualization_mode == "abstract-metaphor":
-            errors.append("A technical-research hero may not use `abstract-metaphor`.")
 
-        _text(shot, "placement_after", path, errors, 3)
-        _text(shot, "anchor", path, errors, 5)
-        role = _text(shot, "role", path, errors)
-        roles.append(role)
-        if role not in ROLES:
-            errors.append(f"Unsupported role at `{path}`.")
-        if article_type == "technical-research" and image_role == "hero" and role not in TECHNICAL_ROLES:
-            errors.append(
-                "A technical-research hero must use a domain-faithful role: technical-mechanism, "
-                "architecture-stack, resource-contrast, or claim-comparison."
+        placement = require_dict(shot, "placement", path, errors)
+        require_text(placement, "section_heading", f"{path}.placement", errors, 1, 180)
+        section_index = require_int(placement, "section_index", f"{path}.placement", errors, 0, 100)
+        paragraph_index = require_int(placement, "after_paragraph_index", f"{path}.placement", errors, 0, 1000)
+        require_text(placement, "after_paragraph_excerpt", f"{path}.placement", errors, 5, 240)
+        require_text(placement, "reason", f"{path}.placement", errors, 10, 280)
+        if section_index is not None and paragraph_index is not None:
+            placement_keys.append((section_index, paragraph_index))
+        if kind == "hero" and paragraph_index not in {None, 0}:
+            errors.append(f"`{path}` hero must use `after_paragraph_index: 0`.")
+        if kind == "inline" and paragraph_index is not None:
+            if paragraph_index < 1:
+                errors.append(f"`{path}` inline image must follow a real paragraph.")
+            inline_paragraph_indexes.append(paragraph_index)
+
+        purpose = require_text(shot, "purpose", path, errors)
+        if purpose not in PURPOSES:
+            errors.append(f"Unsupported purpose at `{path}`.")
+        layout = require_text(shot, "layout", path, errors)
+        if layout not in LAYOUTS:
+            errors.append(f"Unsupported layout at `{path}`.")
+        expected_layout = EXPECTED_LAYOUT.get(purpose)
+        if expected_layout and layout != expected_layout:
+            warnings.append(
+                f"`{path}` purpose `{purpose}` usually uses `{expected_layout}`, not `{layout}`."
             )
-        _text(shot, "core_idea", path, errors, 10)
-        composition = _text(shot, "composition", path, errors, 30)
-        main_subject = _text(shot, "main_subject", path, errors, 5)
-        if len(_list(shot, "supporting_elements", path, errors)) > 8:
-            errors.append(f"`{path}.supporting_elements` may contain at most 8 items.")
-        motion_cues = _list(shot, "motion_cues", path, errors)
-        if not 1 <= len(motion_cues) <= 5:
-            errors.append(f"`{path}.motion_cues` must contain 1–5 items.")
-        density = _text(shot, "density", path, errors)
-        if density not in DENSITIES:
-            errors.append(f"Unsupported density at `{path}`.")
-        people_count = shot.get("people_count")
-        if not isinstance(people_count, int) or not 0 <= people_count <= 30:
-            errors.append(f"`{path}.people_count` must be 0–30.")
+        if kind == "hero" and layout != "hero-explainer":
+            warnings.append(f"`{path}` hero usually uses `hero-explainer`.")
 
-        contract = _dict(shot, "semantic_contract", path, errors)
-        _semantic_contract(
-            contract, f"{path}.semantic_contract", image_role=image_role,
-            article_type=article_type, topic_signature=topic_signature,
-            errors=errors, warnings=warnings,
-        )
-        if article_type == "technical-research":
-            composition_text = normalized(f"{composition} {main_subject}")
-            mapped = [*contract.get("must_show", [])]
-            for item in contract.get("visual_evidence", []):
-                if isinstance(item, dict):
-                    mapped.extend([str(item.get("concept", "")), str(item.get("visible_form", ""))])
-            mapped_text = normalized(" ".join(str(value) for value in mapped))
-            unmapped = sorted(term for term in TECHNICAL_GENERIC_OBJECTS if term in composition_text and term not in mapped_text)
-            if unmapped:
-                message = (
-                    f"`{path}.composition` uses unmapped generic technical substitute(s): "
-                    f"{', '.join(unmapped)}. Map them explicitly in visual_evidence or remove them."
+        require_text(shot, "eyebrow", path, errors, 1, 40)
+        headline = require_text(shot, "headline", path, errors, 4, 90)
+        if normalize(headline) in GENERIC_HEADLINES:
+            errors.append(f"`{path}.headline` is generic; write a conclusion or relationship.")
+        require_text(shot, "subheadline", path, errors, 8, 180)
+        visual_story = require_text(shot, "visual_story", path, errors, 40, 1200)
+        key_elements = require_list(shot, "key_elements", path, errors)
+        if not 2 <= len(key_elements) <= 6:
+            errors.append(f"`{path}.key_elements` must contain 2–6 items.")
+        if len({normalize(str(value)) for value in key_elements}) != len(key_elements):
+            errors.append(f"`{path}.key_elements` contains duplicates.")
+
+        explainers = require_list(shot, "explainers", path, errors)
+        if not 2 <= len(explainers) <= 4:
+            errors.append(f"`{path}.explainers` must contain 2–4 items.")
+        explainer_titles: list[str] = []
+        context = visual_story + " " + " ".join(str(value) for value in key_elements)
+        for explainer_index, explainer in enumerate(explainers):
+            item_path = f"{path}.explainers[{explainer_index}]"
+            if not isinstance(explainer, dict):
+                errors.append(f"`{item_path}` must be an object.")
+                continue
+            title = require_text(explainer, "title", item_path, errors, 1, 60)
+            explainer_titles.append(normalize(title))
+            require_text(explainer, "body", item_path, errors, 4, 150)
+            accent = require_text(explainer, "accent", item_path, errors)
+            if accent not in ACCENTS and not HEX.fullmatch(accent):
+                errors.append(f"`{item_path}.accent` is unsupported.")
+            anchor = require_text(explainer, "visual_anchor", item_path, errors, 3, 160)
+            if anchor and context and not anchor_matches(anchor, context):
+                warnings.append(
+                    f"`{item_path}.visual_anchor` is not clearly present in `visual_story` or `key_elements`."
                 )
-                (errors if image_role == "hero" else warnings).append(message)
+        if len(set(explainer_titles)) != len(explainer_titles):
+            errors.append(f"`{path}` repeats explainer titles.")
 
-        filename = _text(shot, "filename", path, errors)
+        motion_cues = require_list(shot, "motion_cues", path, errors)
+        if not 1 <= len(motion_cues) <= 4:
+            errors.append(f"`{path}.motion_cues` must contain 1–4 items.")
+        filename = require_text(shot, "filename", path, errors)
         filenames.append(filename)
         if filename and not FILENAME.fullmatch(filename):
             errors.append(f"`{path}.filename` must be lowercase kebab-case PNG.")
         if shot_id and filename and not filename.startswith(shot_id + "-"):
             errors.append(f"`{path}.filename` must start with `{shot_id}-`.")
-        alt_text = _text(shot, "alt_text", path, errors, 12)
-        if len(alt_text) > 240:
-            errors.append(f"`{path}.alt_text` must be ≤240 characters.")
+        require_text(shot, "alt_text", path, errors, 12, 240)
         caption = shot.get("caption")
         if not isinstance(caption, str) or len(caption) > 300:
-            errors.append(f"`{path}.caption` must be a string ≤300 characters.")
+            errors.append(f"`{path}.caption` must be text of at most 300 characters.")
 
-        annotation = _dict(shot, "annotation", path, errors)
-        enabled = annotation.get("enabled")
-        if not isinstance(enabled, bool):
-            errors.append(f"`{path}.annotation.enabled` must be boolean.")
-        shot_language = _language(annotation, "language", f"{path}.annotation", errors)
-        shot_languages.append(shot_language)
-        if annotation_language and annotation_language != "mul" and shot_language.casefold() != annotation_language.casefold():
-            errors.append(
-                f"`{path}.annotation.language` ({shot_language}) must match "
-                f"`article.annotation_language` ({annotation_language})."
-            )
-        status = _text(annotation, "layout_status", f"{path}.annotation", errors)
-        if status not in {"draft", "final"}:
-            errors.append(f"`{path}.annotation.layout_status` must be draft or final.")
-        if enabled:
-            headline = _annotation_item(annotation.get("headline"), f"{path}.annotation.headline", errors, headline=True)
-            labels = annotation.get("labels")
-            if not isinstance(labels, list) or not 3 <= len(labels) <= 7:
-                errors.append(f"`{path}.annotation.labels` must contain 3–7 items.")
-                labels = []
-            label_texts = [
-                _annotation_item(item, f"{path}.annotation.labels[{label_index}]", errors, headline=False)
-                for label_index, item in enumerate(labels)
-            ]
-            if normalized(headline) in GENERIC_LABELS:
-                warnings.append(f"`{path}` headline is generic; write a concrete insight.")
-            for value in label_texts:
-                if normalized(value) in GENERIC_LABELS:
-                    warnings.append(f"`{path}` contains generic label `{value}`.")
-            normalized_labels = [normalized(value) for value in label_texts if value]
-            if len(set(normalized_labels)) != len(normalized_labels):
-                warnings.append(f"`{path}` repeats annotation labels.")
+    if isinstance(include_hero, bool):
+        if include_hero and hero_indexes != [0]:
+            errors.append("When `article.include_hero` is true, exactly one hero must be the first shot.")
+        if not include_hero and hero_indexes:
+            errors.append("When `article.include_hero` is false, no shot may use `kind: hero`.")
 
-        motion_beats = shot.get("motion_beats")
-        if motion_beats is not None and (not isinstance(motion_beats, list) or len(motion_beats) != 4):
-            errors.append(f"`{path}.motion_beats` must contain exactly 4 items.")
+    if len(set(placement_keys)) != len(placement_keys):
+        errors.append("Two shots use the same section and paragraph placement.")
+    for previous, current in zip(inline_paragraph_indexes, inline_paragraph_indexes[1:]):
+        if current <= previous:
+            errors.append("Inline image paragraph indexes must increase through the article.")
+        elif current - previous < 2:
+            errors.append("Inline images must be separated by at least two paragraph indexes.")
 
-    if len(hero_indexes) > 1:
-        errors.append("At most one shot may use `image_role: hero`.")
-    if hero_indexes and hero_indexes[0] != 0:
-        errors.append("The hero shot must be the first shot in the manifest.")
     for label, values in (("shot id", ids), ("filename", filenames)):
         duplicates = [value for value, count in Counter(values).items() if value and count > 1]
         if duplicates:
             errors.append(f"Duplicate {label}(s): {', '.join(duplicates)}.")
-    for role, count in Counter(roles).items():
-        if role and count > 2:
-            warnings.append(f"Role `{role}` is used {count} times; vary composition patterns.")
-    if annotation_language == "mul" and len({value.casefold() for value in shot_languages if value}) < 2:
-        warnings.append("`article.annotation_language` is `mul`, but fewer than two shot languages are used.")
-    if shots and shots[0].get("density") not in {"low", "medium"}:
-        warnings.append("The first calibration shot should be low/medium density.")
-    if shots and isinstance(shots[0].get("people_count"), int) and shots[0]["people_count"] > 5:
-        warnings.append("The calibration shot should usually contain ≤5 people.")
+
     return errors, warnings
 
 

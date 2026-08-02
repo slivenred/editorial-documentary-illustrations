@@ -1,91 +1,55 @@
 # QA Checklist
 
-Still mode requires three gates:
+## 1. Planning QA
 
-1. **Semantic Preflight** before generation.
-2. **Base QA** on the text-free image.
-3. **Annotation QA** on the final image.
+- 圖片數量符合閱讀時間容量。
+- 每張都對應 7 分以上且不重複的視覺錨點。
+- Hero 計入總數。
+- Inline 圖至少間隔兩個正文段落。
+- 插入位置引用真實段落片段。
 
-## Semantic Preflight hard failures
+## 2. Base Image QA
 
-- `visual_thesis` is a topic label instead of a relationship or claim.
-- `topic_signature` contains only generic terms.
-- A shot has fewer than 2 must-show items; a hero has fewer than 3.
-- A hero has no domain-specific `hero_artifact`.
-- A technical-research hero uses `abstract-metaphor`.
-- Visual evidence does not map the article concepts to visible forms and relationships.
-- The planned composition could fit many unrelated articles after changing labels.
+硬性失敗：
 
-## Base QA hard failures
+- 與對應段落沒有直接關係。
+- 主視覺只是泛用 AI、機器人、腦、伺服器城市或裝飾齒輪。
+- 關鍵物件和 `key_elements`、`visual_anchor` 不一致。
+- 畫面太像精密論文架構圖或企業 PPT。
+- 主焦點不明或資訊過多。
+- 沒有為選定版型保留文字安全區。
+- 圖像模型生成文字、數字、logo、UI 或亂碼。
+- 與同篇其他圖片的羊皮紙、色盤、鏡頭或陰影明顯漂移。
 
-- The image is not safely usable as 16:9.
-- It contains model-generated text, numbers, logo, watermark, UI, or fake writing.
-- It copies an existing frame or branded asset.
-- It leaves the locked parchment-cutout world without a justified user override.
-- It has severe anatomy or object failures.
-- It becomes a generic PPT, corporate vector scene, game-like 3D render, anime image, or children's illustration.
-- Cross-image palette, camera, paper, scale, or shadow direction drifts.
-- Any `must_show` item is missing or visually unreadable.
-- The visible relationships contradict `visual_evidence`.
-- The hero does not center the `hero_artifact`.
-- The base image only becomes relevant after annotations are added.
-- The blind caption does not match `expected_blind_caption` or fails to mention at least two article-specific anchors.
-- The same image could illustrate a neighboring article by replacing the labels.
-- Technical research is replaced by generic robots, brains, factories, cities, workers, gears, server towers, shields, or roads without an explicit semantic mapping.
-- There is no calm region for deterministic annotation.
+## 3. Final Explainer QA
 
-## Label-off test
+硬性失敗：
 
-Hide every annotation. Ask:
+- Headline 不是結論，只是主題名稱。
+- Subheadline 重複 headline 或太長。
+- 解釋卡和底圖可見物件無關。
+- 名稱、數字、單位或專有名詞與文章不一致。
+- 文字語言不符合 `article.annotation_language`。
+- 文字遮住主視覺。
+- 卡片太多、太密、像資訊牆。
+- 閱讀順序不清楚。
+- 行動裝置縮小後主要文字不可讀。
 
-- What mechanism or relationship is visible?
-- Which two details make this image specific to the article?
-- What would be lost if the labels were removed?
+## 100 分制
 
-If the answer is only “a system processes information,” “people operate a machine,” or similar generic language, fail the base image.
+1. 上下文相關性 — 25
+2. 核心訊息清楚度 — 20
+3. 圖文配合 — 15
+4. 構圖與閱讀順序 — 12
+5. VOX-inspired 剪紙一致性 — 10
+6. 圖片數量與位置 — 8
+7. 文字正確性 — 7
+8. 生成品質 — 3
 
-## Blind-caption test
+交付門檻：
 
-Write a one-sentence description without reading the prompt. Compare it with `expected_blind_caption`.
-
-Pass only when the description contains:
-
-- at least two specificity anchors; and
-- the intended relationship, sequence, trade-off, or change.
-
-## Final Annotation QA hard failures
-
-When the base is correct, fix only the annotation plan for:
-
-- unresolved or incorrect language;
-- spelling, grammar, regional wording, direction, or font errors;
-- names, ratios, numbers, units, or terms that disagree with the article;
-- a generic headline;
-- labels pointing to missing, wrong, or semantically empty objects;
-- labels that rename generic decoration instead of identifying meaningful visual evidence;
-- text covering the hero artifact, must-show elements, people, or core relationships;
-- crossing callout lines, excessive labels, PPT-like density, or unreadable mobile scale.
-
-## 100-point score
-
-1. Semantic contract coverage — 25
-2. Article specificity — 15
-3. Relationship and causal fidelity — 15
-4. Paragraph or article-role relevance — 10
-5. Style lock — 10
-6. Composition and readability — 8
-7. Cross-image continuity — 7
-8. Generation quality — 5
-9. Annotation semantic quality — 3
-10. Annotation layout quality — 2
-
-## Delivery threshold
-
-- no hard failure;
-- total at least 88;
-- semantic contract coverage at least 22/25;
-- article specificity at least 12/15;
-- relationship fidelity at least 12/15;
-- style lock at least 8/10.
-
-Style cannot compensate for low semantic fidelity.
+- 無硬性失敗。
+- 總分至少 86。
+- 上下文相關性至少 22／25。
+- 核心訊息至少 17／20。
+- 圖文配合至少 13／15。

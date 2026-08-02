@@ -9,121 +9,79 @@
   <a href="README.es.md">Español</a>
 </p>
 
-> 把文章的機制、對比、因果鏈與結果，轉成語意正確、風格一致，並帶有可讀標註的 16:9 羊皮紙剪紙文內圖。
+> 依文章長度與內容，自動選擇最佳圖片數量與插入位置，再生成符合上下文、帶有整合式解釋文字的 VOX-inspired 羊皮紙剪紙文內圖。
 
-**Editorial Documentary Illustrations** 是可安裝到 Codex，以及其他能執行 `SKILL.md` 工作流程之 AI Agent 的文章配圖 Skill。它不會再把「看起來像 VOX」視為完成，而是先為每張圖建立可驗證的文章語意合約，強制無字底圖本身呈現文章專屬的實體、機制與關係。
+這是一個可安裝到 Codex，以及其他能執行 `SKILL.md` 工作流程之 AI Agent 的文章配圖 Skill。
 
-## 這次解決的核心問題
-
-羊皮紙、剪紙、土色系與俯視鏡頭可以很漂亮，但如果只要換掉標籤，同一張圖就能套到幾十篇其他文章，代表它只是風格正確，內容並不正確。
-
-新版 Skill 將工作拆成六層：
-
-- **Article Map 與認知錨點**：找出真正需要被看見的機制、關係、取捨、變化與結果。
-- **文章級語意基礎**：固定 `article_type`、`visual_thesis`、`topic_signature` 與 `global_must_avoid`。
-- **每張圖的 Semantic Contract**：定義來源依據、必須看見的內容、視覺證據映射、文章專屬詞、盲測描述與 Hero Artifact。
-- **Visual Bible 與 Style Lock**：只負責統一材質、色盤、鏡頭、光線、比例與標註樣式，不得取代文章機制。
-- **語言感知的確定性標註**：先生成無字底圖，再使用文章或目標讀者語言後製文字。
-- **三階段 QA**：Semantic Preflight、Base QA、Annotation QA。
-
-## 語意優先於風格
-
-拿掉所有標註後，圖片仍必須看得出文章專屬機制。標註只能命名已存在的視覺證據，不能把泛用機器、城市、工廠、機器人、腦、伺服器塔、道路、盾牌或工作人員，事後硬解釋成文章中的技術架構。
-
-技術研究預設優先順序：
-
-1. `literal-technical`
-2. `hybrid-metaphor`
-3. `literal-scene`
-4. 只有無法忠實呈現時才使用 `abstract-metaphor`
-
-`technical-research` 的精選圖片禁止使用 `abstract-metaphor`。
-
-## 工作流程
+每張最終圖片使用固定資訊層級：
 
 ```text
-文章與主要來源
-  ↓
-Article Map + 文章類型
-  ↓
-Visual Thesis + Topic Signature
-  ↓
-Version 4 Semantic Contract
-  ↓
-Semantic Preflight
-  ↓
-無字 Calibration Frame
-  ↓
-Label-off + Blind-caption + Neighbor-article 測試
-  ↓
-其餘語意正確的無字底圖
-  ↓
-語言解析 + Annotation Plan
-  ↓
-確定性紙片標註渲染
-  ↓
-Final Annotation QA
+小標 → 核心判斷 → 一行補充 → 剪紙主視覺 → 2–4 張解釋卡
 ```
 
-## Semantic Contract 包含什麼
+圖片和文字共同完成解釋，不再要求無字底圖單獨塞入全部技術細節，也不使用散亂標籤替泛用 AI 圖硬找意義。
 
-每張圖必須包含：
+## Version 5 改了什麼
 
-- `image_role`：`hero` 或 `inline`
-- `visualization_mode`
-- `source_basis`
-- `must_show`
-- `must_not_show`
-- `visual_evidence`：概念 → 可見形式 → 必須成立的關係
-- `specificity_terms`
-- `expected_blind_caption`
-- Hero 圖必填 `hero_artifact`
+上一版過度強調語意合約、盲測、括號、比較線與技術結構，容易產生「看起來嚴謹，實際更難讀」的圖片。
 
-Hero 必須是第一張且全篇只能有一張，至少包含三個 `must_show`，並至少有兩個文章專屬詞和 `topic_signature` 重疊。
+新版改為：
 
-## 三項強制語意測試
+- 圖片數量自動計算，不固定 5 張。
+- 插入位置綁定真實段落片段。
+- 一張圖只回答一個問題。
+- 主場景只保留 2–6 類關鍵物件。
+- Headline、subheadline 與解釋卡採固定版面。
+- 精確名稱、比例、數字與限制放在短卡片中。
+- 不使用大量散落貼紙與交叉 callout 線。
 
-### Label-off Test
+## 自動決定圖片數量
 
-隱藏全部標註後，底圖仍要看得出機制與關係。
+| 閱讀時間 | 圖片總數上限 |
+|---|---:|
+| 1–2 分鐘 | 1 |
+| 3–4 分鐘 | 3 |
+| 5–6 分鐘 | 4 |
+| 7–9 分鐘 | 5 |
+| 10–12 分鐘 | 6 |
+| 13–16 分鐘 | 7 |
+| 17 分鐘以上 | 8 |
 
-### Blind-caption Test
-
-不看 Prompt 與標註，只描述底圖一句話。Hero 的描述必須自然包含至少兩個文章專屬錨點，以及正確的關係或取捨。
-
-### Neighbor-article Test
-
-只換標籤就能套用到另一篇文章，判定失敗。
-
-## 標註語言解析
-
-依序使用：
-
-1. 使用者明確指定。
-2. 文章 frontmatter、locale 或 `lang`。
-3. 標題、導言、段落標題與主要正文的主導語言。
-4. 混合語言文章以多數解說正文為準，忽略程式碼、網址、引文、參考資料、品牌名與專有名詞。
-5. 只有文章太短或無法判斷時，才使用對話語言。
-
-最終使用具體 BCP 47 tag，例如 `zh-TW`、`en`、`ja`、`ko`、`es`。不得保留 `auto` 或 `und`。產品名、模型名、benchmark、縮寫、版本、數字、百分比與單位保留原文，除非使用者明確要求翻譯。
-
-## 預設輸出
-
-- 16:9 橫式文章文內圖。
-- 一篇通常 3–7 張，長文最多 9 張。
-- 每張成品包含一個核心判斷與 3–6 個短標註。
-- 無字底圖與最終標註圖分開保存。
+最終數量：
 
 ```text
-assets/<article-slug>-editorial-documentary/
-├── manifest.json
-├── annotation-plan.json
-├── prompts/
-├── images/
-│   ├── raw/
-│   └── 01-*.png
-└── delivery.md
+min(閱讀時間容量, 7 分以上且互不重複的視覺錨點數)
 ```
+
+Hero 也計入總數。沒有足夠內容時，不為了湊數硬配圖。
+
+```bash
+python3 scripts/recommend_image_count.py \
+  --reading-minutes 4 \
+  --anchors 4 \
+  --sections 5 \
+  --include-hero
+```
+
+四分鐘左右的 Kimi Linear 文章會建議 3 張，而不是 4–5 張。
+
+## 自動決定插入位置
+
+- Hero 放在文章標題後。
+- Inline 圖放在概念第一次完整說明的段落後。
+- 不直接放在章節標題後、第一句前。
+- 兩張 Inline 至少間隔兩個正文段落。
+- 不在 FAQ、參考資料、作者資訊或文章尾端硬塞圖。
+- Manifest 保存章節、段落索引、真實段落片段與放置理由。
+
+## 六種版型
+
+- `hero-explainer`：上方結論、中間主視覺、下方三張卡。
+- `mechanism-focus`：左側機制、右側解釋卡。
+- `process-strip`：中間流程、下方階段卡。
+- `comparison-split`：左右對比、下方兩側說明與總結。
+- `timeline-route`：彎曲時間路徑與階段卡。
+- `result-board`：結果場景與數字／決策卡。
 
 ## 安裝
 
@@ -134,7 +92,7 @@ cp -R ./editorial-documentary-illustrations \
 python3 -m pip install -r requirements-annotation.txt
 ```
 
-本套件不附帶任何字型檔。渲染器會依 `article.annotation_language` 選擇本機字型，也可用 `--font` 指定。
+本套件不附帶任何字型檔。渲染器會依 `article.annotation_language` 尋找本機字型，也可用 `--font` 指定。
 
 ## 使用方式
 
@@ -142,8 +100,8 @@ python3 -m pip install -r requirements-annotation.txt
 
 ```text
 Use $editorial-documentary-illustrations
-分析文章與主要來源，建立 5 張圖片的 version 4 manifest。
-選構圖前先決定 article_type、visual_thesis、topic_signature、global_must_avoid，並替每張圖建立 semantic_contract。
+分析這篇文章，自動決定最佳圖片數量與插入位置。
+每個被選中的段落建立一張 version 5 shot，使用整合式圖解版型。
 先不要生成圖片。
 
 <文章內容>
@@ -153,32 +111,22 @@ Use $editorial-documentary-illustrations
 
 ```text
 Use $editorial-documentary-illustrations
-替文章生成 5 張 16:9 羊皮紙剪紙文內圖。
-語意優先於風格；拿掉標註後，底圖仍須呈現文章專屬機制，並通過 Label-off、Blind-caption、Neighbor-article 三項測試。
-先生成無字底圖，再依目標讀者語言加入經校對的標註。
+依文章內容自動生成最佳數量的 16:9 VOX-inspired 羊皮紙剪紙文內圖。
+不要固定生成 5 張。每張圖必須直接對應所在段落，並以文章語言加入一個 headline、一行 subheadline 與 2–4 張短解釋卡。
+先生成無字底圖，再渲染整合式文字版面。
 
 <文章內容>
 ```
 
-### 技術研究文章
-
-```text
-Use $editorial-documentary-illustrations
-這是 technical-research 文章。規劃精選圖片前，先讀 abstract、architecture／method figure、method、results 與 limitations。
-Hero 必須使用文章領域中的真實架構 Artifact，不得用泛用工作人員、工廠、城市、機器人、腦、齒輪或伺服器塔取代技術機制。
-```
-
-## 驗證、語意預檢、Prompt 與標註
+## 指令
 
 ```bash
 python3 scripts/validate_manifest.py path/to/manifest.json
 
-python3 scripts/semantic_preflight.py path/to/manifest.json
-
 python3 scripts/render_prompts.py \
   path/to/manifest.json \
   --mode still \
-  --output path/to/prompts-still
+  --output path/to/prompts
 
 python3 scripts/annotate_images.py \
   path/to/manifest.json \
@@ -187,51 +135,7 @@ python3 scripts/annotate_images.py \
   --force
 ```
 
-## Version 4 重點
-
-```json
-{
-  "version": 4,
-  "article": {
-    "article_type": "technical-research",
-    "visual_thesis": "3:1 混合堆疊保留精確檢索，同時用固定狀態取代大部分持續成長的 KV cache。",
-    "topic_signature": [
-      "固定遞迴狀態",
-      "全注意力檢索層",
-      "3:1 分層比例",
-      "持續成長的 KV cache"
-    ],
-    "global_must_avoid": [
-      "泛用 AI 機器人或發光大腦",
-      "與架構無關的工作人員操作機器"
-    ]
-  },
-  "shots": [
-    {
-      "image_role": "hero",
-      "visualization_mode": "literal-technical",
-      "role": "architecture-stack",
-      "semantic_contract": {
-        "source_basis": ["來源主張一", "來源主張二"],
-        "must_show": ["必要架構", "必要關係", "必要資源對比"],
-        "must_not_show": ["沒有架構映射的泛用機器"],
-        "visual_evidence": [
-          {
-            "concept": "3:1 分層比例",
-            "visible_form": "單一四層堆疊，三個赤陶色模組與一個靛藍色模組",
-            "relationship": "四個模組交錯組成同一個架構"
-          }
-        ],
-        "specificity_terms": ["3:1 分層比例", "固定遞迴狀態"],
-        "expected_blind_caption": "四層混合架構將固定狀態和持續成長的 KV cache 放在同一個對比中。",
-        "hero_artifact": "一個交錯式四層注意力架構堆疊"
-      }
-    }
-  ]
-}
-```
-
-完整格式請查看 [`templates/manifest.template.json`](templates/manifest.template.json)、[`schemas/shot-manifest.schema.json`](schemas/shot-manifest.schema.json) 與 [`references/semantic-grounding.md`](references/semantic-grounding.md)。
+完整格式請查看 [`templates/manifest.template.json`](templates/manifest.template.json) 與 [`schemas/shot-manifest.schema.json`](schemas/shot-manifest.schema.json)。
 
 ## 專案結構
 
@@ -240,25 +144,19 @@ python3 scripts/annotate_images.py \
 ├── SKILL.md
 ├── README*.md
 ├── references/
-│   ├── semantic-grounding.md
-│   ├── article-analysis.md
-│   ├── composition-patterns.md
-│   ├── prompt-template.md
-│   ├── qa-checklist.md
-│   └── ...
 ├── schemas/shot-manifest.schema.json
 ├── templates/manifest.template.json
 ├── scripts/
-│   ├── semantic_preflight.py
+│   ├── recommend_image_count.py
 │   ├── validate_manifest.py
 │   ├── render_prompts.py
 │   └── annotate_images.py
 └── tests/test_tooling.py
 ```
 
-## 出處與授權
+## 授權與聲明
 
 - 本專案採用 [MIT License](LICENSE)。
 - 多步驟工作流程參考並改寫自 Ian 的 [`ian-xiaohei-illustrations`](https://github.com/helloianneo/ian-xiaohei-illustrations)，詳見 [`NOTICE.md`](NOTICE.md)。
-- 本 repo 不包含原專案的小黑 IP、範例圖片、複製提示詞或字型檔。
-- 本專案與 Vox Media 無關，也未獲其背書。請勿複製特定影片影格、logo、標題卡、字體或品牌素材。
+- 不包含原專案的小黑 IP、範例圖片、複製提示詞或字型檔。
+- 本專案與 Vox Media 無關；VOX-inspired 只描述一般解說新聞剪紙語法。

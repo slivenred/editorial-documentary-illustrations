@@ -21,6 +21,7 @@ def load(name: str, path: Path):
     return module
 
 
+recommender = load("recommender", ROOT / "scripts/recommend_image_count.py")
 validator = load("validator", ROOT / "scripts/validate_manifest.py")
 renderer = load("renderer", ROOT / "scripts/render_prompts.py")
 annotator = load("annotator", ROOT / "scripts/annotate_images.py")
@@ -30,192 +31,152 @@ def manifest() -> dict:
     return json.loads((ROOT / "templates/manifest.template.json").read_text(encoding="utf-8"))
 
 
-class SemanticGroundingTests(unittest.TestCase):
-    def test_valid_version_four_manifest(self):
+class PlanningTests(unittest.TestCase):
+    def test_kimi_four_minute_article_recommends_three_images(self):
+        result = recommender.recommend_count(4, 4, 5, True)
+        self.assertEqual(result["recommended_total"], 3)
+
+    def test_short_article_is_not_forced_to_five_images(self):
+        result = recommender.recommend_count(2, 7, 6, True)
+        self.assertEqual(result["recommended_total"], 1)
+
+    def test_long_article_caps_at_eight(self):
+        result = recommender.recommend_count(30, 20, 20, True)
+        self.assertEqual(result["recommended_total"], 8)
+
+    def test_valid_template(self):
         errors, warnings = validator.validate_manifest(manifest())
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
 
-    def test_old_manifest_version_is_rejected(self):
+    def test_old_version_is_rejected(self):
         data = manifest()
-        data["version"] = 3
+        data["version"] = 4
         errors, _ = validator.validate_manifest(data)
         self.assertTrue(any("version" in error for error in errors))
 
-    def test_generic_topic_signature_is_rejected(self):
+    def test_auto_count_rejects_overproduction(self):
         data = manifest()
-        data["article"]["topic_signature"] = ["AI", "model", "data"]
+        extra = copy.deepcopy(data["shots"][-1])
+        extra["id"] = "04"
+        extra["filename"] = "04-extra-image.png"
+        extra["placement"]["section_index"] = 5
+        extra["placement"]["after_paragraph_index"] = 11
+        extra["placement"]["after_paragraph_excerpt"] = "Extra paragraph for an unnecessary image."
+        data["shots"].append(extra)
+        data["article"]["target_count"] = 4
         errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("generic terms" in error for error in errors))
+        self.assertTrue(any("Auto image count recommends 3" in error for error in errors))
 
-    def test_hero_requires_three_must_show_items(self):
+    def test_fixed_mode_allows_explicit_override(self):
         data = manifest()
-        data["shots"][0]["semantic_contract"]["must_show"] = ["bounded state", "retrieval layer"]
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("at least 3 items" in error for error in errors))
-
-    def test_technical_hero_cannot_use_abstract_metaphor(self):
-        data = manifest()
-        data["shots"][0]["visualization_mode"] = "abstract-metaphor"
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("abstract-metaphor" in error for error in errors))
-
-    def test_technical_hero_requires_domain_faithful_role(self):
-        data = manifest()
-        data["shots"][0]["role"] = "physical-metaphor"
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("domain-faithful role" in error for error in errors))
-
-    def test_hero_requires_topic_signature_overlap(self):
-        data = manifest()
-        contract = data["shots"][0]["semantic_contract"]
-        contract["specificity_terms"] = ["unrelated object one", "unrelated object two"]
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("specificity_terms" in error for error in errors))
-
-    def test_blind_caption_requires_article_specific_anchors(self):
-        data = manifest()
-        data["shots"][0]["semantic_contract"]["expected_blind_caption"] = (
-            "A generic machine processes information through a clean paper scene."
-        )
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("expected_blind_caption" in error for error in errors))
-
-    def test_only_one_hero_and_hero_is_first(self):
-        data = manifest()
-        second = copy.deepcopy(data["shots"][0])
-        second["id"] = "02"
-        second["filename"] = "02-second-hero.png"
+        data["article"]["image_count_mode"] = "fixed"
         data["article"]["target_count"] = 2
-        data["shots"].append(second)
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("At most one" in error for error in errors))
-
-    def test_annotation_language_must_match_article_target(self):
-        data = manifest()
-        data["shots"][0]["annotation"]["language"] = "zh-TW"
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("annotation.language" in error for error in errors))
-
-    def test_unmapped_generic_factory_is_rejected_for_technical_hero(self):
-        data = manifest()
-        data["shots"][0]["composition"] = (
-            "A generic factory with office workers around a machine, leaving quiet space at the top."
-        )
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("unmapped generic technical substitute" in error for error in errors))
-
-    def test_kimi_linear_regression_contract_is_specific(self):
-        data = manifest()
-        data["article"].update({
-            "title": "Kimi Linear",
-            "slug": "kimi-linear",
-            "visual_thesis": (
-                "A 3:1 KDA–MLA interleave keeps exact retrieval in selected layers while replacing most growing KV cache with fixed recurrent state."
-            ),
-            "topic_signature": [
-                "KDA", "MLA", "3:1 layer ratio", "fixed recurrent state",
-                "growing KV cache", "1M-token decoding",
-            ],
-        })
-        shot = data["shots"][0]
-        shot["core_idea"] = "Three KDA layers and one MLA layer form one hybrid stack with bounded state and reduced KV growth."
-        shot["semantic_contract"].update({
-            "source_basis": [
-                "Kimi Linear interleaves KDA and MLA in a 3:1 layer ratio.",
-                "KDA uses fixed recurrent state while full attention retains a context-growing KV cache.",
-            ],
-            "must_show": [
-                "one four-layer stack containing three KDA modules and one MLA module",
-                "a fixed recurrent-state capsule beside a growing KV cache trail",
-                "one token stream passing through the interleaved KDA and MLA stack",
-            ],
-            "visual_evidence": [
-                {
-                    "concept": "3:1 layer ratio",
-                    "visible_form": "one stack with three terracotta KDA modules and one indigo MLA module",
-                    "relationship": "all four modules are interleaved inside the same model stack",
-                },
-                {
-                    "concept": "fixed recurrent state",
-                    "visible_form": "one compact state capsule that does not lengthen",
-                    "relationship": "the capsule stays bounded while the comparison KV trail grows",
-                },
-                {
-                    "concept": "growing KV cache",
-                    "visible_form": "a visibly lengthening trail of memory cards",
-                    "relationship": "the trail expands with context beside the fixed KDA state",
-                },
-            ],
-            "specificity_terms": ["KDA", "MLA", "3:1 layer ratio", "fixed recurrent state"],
-            "expected_blind_caption": (
-                "A Kimi Linear stack interleaves three KDA modules with one MLA module while fixed recurrent state is contrasted with a growing KV cache trail."
-            ),
-            "hero_artifact": "one interleaved Kimi Linear KDA–MLA four-layer stack",
-        })
+        data["shots"] = data["shots"][:2]
         errors, warnings = validator.validate_manifest(data)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
 
-    def test_prompt_places_meaning_before_style(self):
+    def test_inline_images_need_two_paragraph_gap(self):
+        data = manifest()
+        data["shots"][2]["placement"]["after_paragraph_index"] = 5
+        errors, _ = validator.validate_manifest(data)
+        self.assertTrue(any("at least two paragraph" in error for error in errors))
+
+    def test_hero_must_be_first_when_enabled(self):
+        data = manifest()
+        data["shots"][0], data["shots"][1] = data["shots"][1], data["shots"][0]
+        errors, _ = validator.validate_manifest(data)
+        self.assertTrue(any("exactly one hero must be the first" in error for error in errors))
+
+    def test_generic_headline_is_rejected(self):
+        data = manifest()
+        data["shots"][0]["headline"] = "重點整理"
+        errors, _ = validator.validate_manifest(data)
+        self.assertTrue(any("headline" in error and "generic" in error for error in errors))
+
+
+class PromptTests(unittest.TestCase):
+    def test_still_prompt_is_context_first_and_not_semantic_contract_heavy(self):
         data = manifest()
         style_lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
-        output = renderer.render_still(
-            style_lock, data["article"], data["visual_bible"], data["shots"][0]
-        )
-        semantic_index = output.index("NON-NEGOTIABLE SEMANTIC CONTRACT")
-        style_index = output.index("ORIGINAL EDITORIAL DOCUMENTARY CUTOUT STYLE LOCK")
-        self.assertLess(semantic_index, style_index)
-        self.assertIn("MEANING OVERRIDES STYLE", output)
-        self.assertIn("3:1 layer ratio", output)
-        self.assertIn("Expected blind caption", output)
+        prompt = renderer.render_still(style_lock, data["article"], data["visual_bible"], data["shots"][0])
+        self.assertIn("ARTICLE CONTEXT", prompt)
+        self.assertIn("EXPLAINER-TO-VISUAL MAPPING", prompt)
+        self.assertIn("hero-explainer", prompt)
+        self.assertNotIn("NON-NEGOTIABLE SEMANTIC CONTRACT", prompt)
+        self.assertNotIn("Blind-caption", prompt)
+        self.assertIn("Do not over-engineer", prompt)
 
-    def test_prompt_does_not_leak_annotation_text(self):
+    def test_prompt_preserves_final_text_meaning_but_forbids_rendered_text(self):
         data = manifest()
         style_lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
-        output = renderer.render_still(
-            style_lock, data["article"], data["visual_bible"], data["shots"][0]
-        )
-        self.assertNotIn("3 bounded-state layers", output)
-        self.assertNotIn("Most layers keep state compact", output)
-        self.assertIn("Do not render text", output)
+        prompt = renderer.render_still(style_lock, data["article"], data["visual_bible"], data["shots"][0])
+        self.assertIn(data["shots"][0]["headline"], prompt)
+        self.assertIn("No text, letters, numbers", prompt)
 
-    def test_annotation_plan_carries_semantic_contract(self):
+    def test_motion_prompt(self):
         data = manifest()
-        plan = renderer.annotation_plan(data)
-        self.assertIn("semantic_contract", plan["images"][0])
-        self.assertEqual(plan["images"][0]["image_role"], "hero")
+        style_lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
+        prompt = renderer.render_motion(style_lock, data["article"], data["visual_bible"], data["shots"][0])
+        self.assertIn("exactly 10-second", prompt)
+        self.assertIn("No voiceover", prompt)
 
-    def test_annotator_requires_version_four(self):
+    def test_render_cli_smoke(self):
         with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "manifest.json"
-            path.write_text(json.dumps(manifest()), encoding="utf-8")
-            loaded = annotator.load_manifest(path)
-            self.assertEqual(loaded["version"], 4)
+            temp = Path(directory)
+            manifest_path = temp / "manifest.json"
+            output = temp / "out"
+            manifest_path.write_text(json.dumps(manifest(), ensure_ascii=False), encoding="utf-8")
+            result = subprocess.run(
+                [
+                    "python3", str(ROOT / "scripts/render_prompts.py"), str(manifest_path),
+                    "--mode", "still", "--output", str(output),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((output / "01-kimi-linear-overview-still.txt").is_file())
+            self.assertTrue((output / "delivery.md").is_file())
 
-    def test_font_group_follows_annotation_language(self):
+
+class AnnotationTests(unittest.TestCase):
+    def test_font_groups(self):
         self.assertEqual(annotator.font_group("zh-TW"), "zh")
         self.assertEqual(annotator.font_group("ja"), "ja")
         self.assertEqual(annotator.font_group("ar"), "arabic")
         self.assertEqual(annotator.font_group("en"), "latin")
 
-    def test_render_cli_smoke(self):
-        data = manifest()
+    def test_layout_boxes(self):
+        hero = annotator.card_boxes(1600, 900, "hero-explainer", 3)
+        mechanism = annotator.card_boxes(1600, 900, "mechanism-focus", 3)
+        self.assertEqual(len(hero), 3)
+        self.assertEqual(len(mechanism), 3)
+        self.assertGreater(hero[1][0], hero[0][0])
+        self.assertGreater(mechanism[1][1], mechanism[0][1])
+
+    def test_annotator_requires_version_five(self):
         with tempfile.TemporaryDirectory() as directory:
-            directory_path = Path(directory)
-            manifest_path = directory_path / "manifest.json"
-            output_path = directory_path / "out"
-            manifest_path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
-            result = subprocess.run(
-                [
-                    "python", str(ROOT / "scripts/render_prompts.py"), str(manifest_path),
-                    "--mode", "still", "--output", str(output_path),
-                ],
-                capture_output=True, text=True, check=False,
-            )
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertTrue((output_path / "01-hybrid-attention-stack-still.txt").is_file())
-            self.assertTrue((output_path / "annotation-plan.json").is_file())
+            path = Path(directory) / "manifest.json"
+            data = manifest()
+            path.write_text(json.dumps(data), encoding="utf-8")
+            self.assertEqual(annotator.load_manifest(path)["version"], 5)
+
+    def test_annotation_render_smoke(self):
+        mods = annotator.pillow()
+        Image = mods[0]
+        with tempfile.TemporaryDirectory() as directory:
+            temp = Path(directory)
+            source = temp / "source.png"
+            target = temp / "target.png"
+            Image.new("RGB", (1600, 900), "#DFC99B").save(source)
+            font = annotator.find_font(None, "zh-TW", "測試文字")
+            annotator.annotate_image(mods, source, target, manifest()["shots"][0], font, "zh-TW")
+            self.assertTrue(target.is_file())
+            with Image.open(target) as image:
+                self.assertEqual(image.size, (1600, 900))
 
 
 if __name__ == "__main__":

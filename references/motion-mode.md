@@ -1,61 +1,23 @@
 # Motion Mode — Exactly 10 Seconds
 
-Motion mode inherits the same `semantic_contract` as the approved still image. It may animate the mechanism, but it may not replace or simplify it into generic activity.
+動畫沿用已通過 QA 的 `visual_story` 與 Visual Bible。
 
-## Fixed specification
+## 固定規格
 
-- exactly 10 seconds;
-- smooth 24fps;
-- one continuous scene;
-- no voiceover, dialogue, subtitles, text overlays, logo, or watermark;
-- only subtle ambient sound is implied;
-- preserve the same Visual Bible, hero artifact, must-show items, component identity, counts, order, comparisons, and resource behavior;
-- camera locked or one slow subtle drift;
-- final 0.5–0.8 seconds holds on a stable tableau.
+- exactly 10 seconds
+- smooth 24fps
+- one continuous scene
+- no voiceover
+- no subtitles or text overlays
+- only subtle ambient sound implied
+- camera locked or very slow drift
+- final 0.5–0.8 seconds hold
 
-## Four beats
+## 四個節拍
 
-### 0.0–1.5 seconds — Establish
+- 0.0–1.5 秒：建立主物件與場景。
+- 1.5–4.0 秒：開始核心動作或轉化。
+- 4.0–7.5 秒：擴張流程、對比或結果。
+- 7.5–10.0 秒：形成穩定終局。
 
-Reveal the article-specific artifact and the initial state. Do not open with generic parchment decoration.
-
-### 1.5–4.0 seconds — Transform
-
-Animate the central mechanism, state transition, comparison, or causal action defined by `visual_evidence`.
-
-### 4.0–7.5 seconds — Expand
-
-Make the scale, resource, route, ordering, or result change visible. Technical research should animate component behavior, not add decorative crowds.
-
-### 7.5–10.0 seconds — Resolve
-
-Resolve the visual thesis into one readable relationship. Hold the final frame long enough to inspect.
-
-## Semantic tests
-
-- Pause the animation at 5–7 seconds and run the Label-off test.
-- The final frame must still approach `expected_blind_caption`.
-- Replacing labels must not make the animation suitable for a neighboring article.
-- Every must-show item must appear long enough to be understood.
-
-## Prompt order
-
-1. Non-negotiable Semantic Contract.
-2. Visual Evidence Mapping.
-3. Technical-research instruction when applicable.
-4. Style Lock.
-5. Visual Bible.
-6. Story beats.
-7. Motion and output constraints.
-
-The renderer in `scripts/render_prompts.py` follows this order automatically.
-
-## Common failures
-
-- style-consistent animation with an unrelated mechanism;
-- generic people moving around a machine instead of the actual architecture;
-- ten hard cuts inside ten seconds;
-- counts, order, ratios, state size, or comparison conditions changing between frames;
-- fast advertising-style zooms and transitions;
-- final tableau too brief to inspect;
-- text cards or voiceover used to explain a semantically weak scene.
+不要把靜態圖的 headline 與卡片燒進動畫。需要文字時由影片剪輯層處理。

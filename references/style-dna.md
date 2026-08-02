@@ -1,49 +1,30 @@
 # Style DNA
 
-## One sentence
+## 目標
 
-Original modern explainer-journalism and historical-documentary cutout visuals: warm aged parchment, paper-cut objects, restrained earthy color, soft shadows, and time-lapse energy—while preserving the article's actual mechanism and evidence.
+現代解說新聞與歷史紀錄片的羊皮紙剪紙視覺：手工、清楚、溫暖，有故事感，但不犧牲閱讀與上下文。
 
-## Priority
+## 固定視覺
 
-1. semantic fidelity;
-2. readable relationship;
-3. composition;
-4. cross-image continuity;
-5. decorative style.
+- 16:9 橫式。
+- 暖米褐羊皮紙、淡網格、2–4 條自然摺痕。
+- 手繪 paper cutout／paper sticker 物件。
+- 短而柔的同方向落影。
+- 俯視地圖、平面正投影或克制的輕微等角視角。
+- 土色系：ink brown、terracotta、ochre、sage、indigo、brick red。
+- 一張圖一個主焦點。
 
-A beautiful parchment scene that could fit another article is a failure.
+## 場景原則
 
-## Immutable visual core
+- 使用文章中的具體物件、人物、材料、模組或結果。
+- 技術題材可以抽象，但須看得出對比或流程。
+- 不要求精密工程圖；保持簡單和可讀。
+- 人物只有在文章真的涉及人物或社會行為時才加入。
 
-- 16:9 horizontal.
-- Warm aged parchment with visible but restrained fibers, faint grid, and 2–4 gentle creases.
-- Hand-drawn cutout or paper-sticker objects with short soft shadows.
-- Top-down map, flat orthographic, or restrained soft-isometric view.
-- One core claim per image.
-- Original composition with no copied frame or brand asset.
-- Text-free base image; deterministic annotations are added later.
+## 避免
 
-## Domain fidelity
-
-The paper world may contain technical modules, tokens, state cells, layer cards, memory trails, scientific apparatus, policy documents, geographic forms, or real social actors when the article requires them. Do not force every topic into the same market, road, factory, city, worker, gear, robot, brain, server, or shield vocabulary.
-
-## Palette
-
-Use 4–6 colors from parchment cream, dark ink brown, terracotta, mustard ochre, muted sage, dusty indigo, and warm brick red. Color semantics must remain stable within one article.
-
-## Density
-
-- low: 1–3 people, 3–6 major objects, 40–55% breathing room;
-- medium: 3–8 people or 6–12 major objects, 25–40% breathing room;
-- high: use clusters or repeated modules, at least 18% breathing room.
-
-For technical research, repeated modules and state changes are often more informative than people.
-
-## Avoid
-
-- photorealism, cinematic stills, plastic 3D, clay, anime, children's illustration;
-- corporate vector art, dashboards, generic flowcharts;
-- generic AI symbolism used in place of the article mechanism;
-- style motifs that erase counts, order, comparisons, or causal relationships;
-- model-generated text or numbers in the base image.
+- 寫實攝影、塑膠 3D、黏土、動漫、兒童繪本。
+- 企業扁平向量圖、正式流程圖、資料儀表板。
+- 泛用 AI 機器人、發光大腦、伺服器城市、裝飾性齒輪。
+- 過多物件、箭頭、括號、圖例和比較線。
+- 圖像模型生成文字。

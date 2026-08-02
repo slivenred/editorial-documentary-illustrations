@@ -1,42 +1,55 @@
-# Semantic Annotation System
+# Integrated Explainer Text System
 
-## Core rule
+## 核心原則
 
-Annotations explain visible evidence; they do not manufacture relevance.
+文字是版面的一部分，不是事後散貼在插畫上的補丁。最終圖片採固定閱讀順序：
 
-The base image must already communicate the article-specific mechanism or relationship. A label may name a KDA layer, MLA layer, cache trail, gate, benchmark condition, person, location, or outcome only when that target is visibly designed to represent it.
+```text
+eyebrow → headline → subheadline → visual → explainer cards
+```
 
-Do not place a label such as `KDA`, `75% less KV cache`, or `full attention` on a generic gear, tower, road, or machine that has no explicit semantic mapping.
+## Headline
 
-## Output contract
+- 表達結論、因果、取捨或結果。
+- 不寫「系統架構」「流程圖」「重點整理」。
+- 中文建議 8–22 字；英文 5–14 words。
+- 一張圖只保留一個 headline。
 
-Each final still normally contains:
+## Subheadline
 
-- one insight headline;
-- 3–6 concise labels;
-- short callout lines and target dots;
-- language resolved from `article.annotation_language`;
-- terminology, names, ratios, units, and benchmark values grounded in the article.
+- 一句補充條件或解釋。
+- 中文建議 18–45 字；英文 10–28 words。
+- 不重複 headline。
 
-## Writing labels
+## Explainer Cards
 
-Every label must:
+每張 2–4 個：
 
-1. have source support;
-2. point to a visible object;
-3. add cognitive value;
-4. agree with `semantic_contract.visual_evidence`;
-5. preserve product names, model names, benchmarks, acronyms, versions, numbers, and units.
+- `title`：名稱、階段、比例或數字。
+- `body`：一句作用、原因、限制或結果。
+- `visual_anchor`：底圖中對應的可見物件。
+- `accent`：全篇固定色彩語意。
 
-The headline states the shot's conclusion or relationship. It is not a generic section title.
+卡片不必使用 callout line。版型位置已建立關聯；需要指向時，只允許 1–3 條短線且不可交叉。
 
-## Layout
+## 文字和場景如何配合
 
-Use normalized coordinates. Place labels in quiet regions without covering the hero artifact, must-show items, decisive comparisons, main route, or people. Reduce labels before shrinking them below readable mobile size.
+- 先確定文字要說什麼，再要求底圖出現相對應的物件。
+- 技術細節可由卡片解釋，底圖只需清楚呈現簡化關係。
+- 不要求底圖在完全無字時就包含所有術語與數字。
+- 但底圖不能與文字無關；每張卡的 `visual_anchor` 必須真的出現在場景中。
 
-## Final checks
+## 色彩語意
 
-- hide annotations and re-run the blind-caption test;
-- verify each target against `visual_evidence`;
-- remove any label that merely renames decoration;
-- correct language, terminology, numbers, and pointing errors without regenerating a correct base image.
+- `ink`：一般結構。
+- `terracotta`：主要機制或主角。
+- `ochre`：流程、路徑、規模。
+- `sage`：完成、安全、改善。
+- `indigo`：對照組、基礎設施、完整注意力。
+- `brick`：風險、成本、瓶頸。
+
+## 字體與檔案
+
+- 使用本機可讀字型，不在 repo 內附帶字型檔。
+- 文字後製由 Pillow 完成。
+- 圖像模型不得生成文字、數字、logo 或假 UI。

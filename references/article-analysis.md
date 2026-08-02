@@ -1,130 +1,75 @@
-# Article Analysis
+# Article Analysis and Automatic Image Planning
 
-## Goal
+## 目標
 
-Do not ask “what can be drawn for each paragraph?” Ask:
+圖片數量與位置由文章決定，不由固定配額決定。先找真正需要被圖解的段落，再依閱讀時間限制總數。
 
-1. What must a reader understand?
-2. Which article-specific mechanism, relationship, or change is difficult to imagine?
-3. What visible evidence would make that claim recognizable without relying on labels?
+## 1. 建立 Article Map
 
-Read `semantic-grounding.md` before planning shots.
+用六句以內回答：
 
-## 1. Build the Article Map
+1. 文章最重要的結論是什麼？
+2. 哪個機制或過程最難靠文字想像？
+3. 哪個對比或取捨最重要？
+4. 哪組數字需要被放在同一個畫面理解？
+5. 哪個時間、規模或狀態變化值得視覺化？
+6. 讀者看完後應記住什麼？
 
-Answer in six lines or fewer:
+## 2. 候選視覺錨點
 
-1. What is the article's thesis?
-2. What starts the event or system?
-3. What changes in the middle?
-4. Which hidden mechanism determines the outcome?
-5. Where do scale, speed, cost, power, memory, or emotion change?
-6. What result or limitation should the reader remember?
+每個候選段落依五項各給 0–2 分：
 
-## 2. Classify the article
-
-Set `article.article_type` before choosing a composition. Technical research, product news, history, policy, social analysis, and how-to content need different levels of literalness.
-
-For technical research, read the primary abstract, architecture figure, method, result figure, and limitations before inventing a metaphor.
-
-## 3. Write the Visual Thesis
-
-`article.visual_thesis` is one visual proposition the entire image set should prove. It must include a relationship, trade-off, sequence, or change.
-
-Weak: `This article is about linear attention.`
-
-Strong: `A 3:1 KDA–MLA hybrid preserves selective full-attention retrieval while replacing most growing KV cache with compact recurrent state.`
-
-## 4. Extract the Topic Signature
-
-Choose 3–10 specific anchors:
-
-- named entities;
-- architecture or mechanism;
-- relationship, ratio, or sequence;
-- result, benchmark, or constraint.
-
-Do not use only broad nouns such as AI, model, data, speed, system, people, or growth.
-
-## 5. Select cognitive anchors
-
-Prioritize:
-
-- origin;
-- assembly;
-- transformation;
-- path;
-- hidden mechanism;
-- contrast;
-- bottleneck;
-- scale change;
-- verified result;
-- limitation or boundary.
-
-Score each candidate from 0–10 using 0–2 points for:
-
-- `explanatory_value`
-- `visual_action`
-- `narrative_change`
-- `article_specificity`
+- `comprehension_gain`
+- `visual_structure`
+- `context_specificity`
+- `non_redundancy`
 - `placement_value`
 
-Only keep candidates scoring 7 or above. `article_specificity` is mandatory: a visually attractive but generic scene should not pass.
+只保留 7 分以上。若兩張圖說同一件事，保留分數較高者或合併。
 
-## 6. Decide literalness before metaphor
+## 3. 閱讀時間容量
 
-Use this priority:
+- 1–2 分鐘：1 張。
+- 3–4 分鐘：最多 3 張。
+- 5–6 分鐘：最多 4 張。
+- 7–9 分鐘：最多 5 張。
+- 10–12 分鐘：最多 6 張。
+- 13–16 分鐘：最多 7 張。
+- 17 分鐘以上：最多 8 張。
 
-1. `literal-technical` for architecture, algorithms, hardware, scientific mechanisms, and benchmarks.
-2. `literal-scene` for people, places, events, and physical processes.
-3. `hybrid-metaphor` when a literal mechanism needs one controlled analogy.
-4. `abstract-metaphor` only for genuinely abstract arguments.
+最終數量：
 
-Do not default to markets, roads, factories, cities, workers, gears, robots, brains, shields, or pipelines. These are reusable style objects, not evidence of relevance.
+```text
+min(容量, 7 分以上且互不重複的錨點數)
+```
 
-## 7. Build a Semantic Contract for every shot
+Hero 也計入總數。
 
-Every shot must specify:
+## 4. Hero 是否需要
 
-- source basis;
-- image role;
-- visualization mode;
-- must-show items;
-- must-not-show substitutions;
-- visual evidence mappings;
-- specificity terms;
-- expected blind caption;
-- hero artifact when applicable.
+使用者要求精選圖片、文章完整圖片套件或社群分享圖時，通常包含 hero。只要求文內圖時，不強制建立 hero。
 
-The first hero shot must cover the article thesis, not merely introduce the visual world.
+Hero 必須總結文章主張，不是把全部細節塞進同一張。
 
-## 8. Number of images
+## 5. 插入位置
 
-- under 800 words: 1–3;
-- 800–2,500 words: 3–5;
-- 2,500–5,000 words: 5–7;
-- over 5,000 words: 6–9.
+- Hero：文章標題後。
+- Inline：概念完成第一次解釋的段落後。
+- 不直接放在章節標題後。
+- 兩張 inline 至少間隔兩個正文段落。
+- 不在 FAQ、參考資料、作者資訊後配圖。
+- 一個短章節最多一張。
+- 第一張 inline 通常落在文章約 20–35% 處。
+- 最後一張通常在結論前，不在結論後。
 
-Do not distribute images at fixed word intervals.
+Manifest 必須保存：章節標題、段落索引、段落片段與放置理由。
 
-## 9. Narrative rhythm
+## 6. Kimi Linear 類型的合理規劃
 
-A five-image set may use:
+四分鐘左右、五個章節的技術文章，通常是 3 張而不是 4–5 張：
 
-1. thesis-bearing hero or article-specific world;
-2. core mechanism;
-3. hidden relationship;
-4. scale, resource, or performance change;
-5. result, limitation, or decision consequence.
+1. Hero：3:1 KDA／MLA 混合與核心取捨。
+2. Inline：KDA 如何以細粒度閘控管理固定狀態。
+3. Inline：KV cache、1M context 與吞吐量結果。
 
-Avoid three consecutive generic left-to-right flows.
-
-## Not worth illustrating
-
-- a definition already clear in one sentence;
-- repeated conclusions;
-- isolated numbers with no relationship;
-- generic people added only for decoration;
-- scenes that require long labels to become relevant;
-- a metaphor whose mapping cannot be stated explicitly;
-- a base image that could fit many neighboring articles after relabeling.
+將重複的「架構介紹」合併，不為每個小節各做一張。

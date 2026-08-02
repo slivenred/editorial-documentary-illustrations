@@ -1,119 +1,70 @@
-# Composition Patterns
+# Explainer Composition Patterns
 
-Choose one primary pattern and at most one supporting pattern. Semantic grounding comes first; a pattern is only a spatial tool.
+參考清楚的產品與媒體圖示：先給讀者一句結論，再用一個主視覺與少量解釋卡完成閱讀。版型服務內容，不追求複雜藝術構圖。
 
-## Technical patterns
+## 共通骨架
 
-### 1. Technical Mechanism
+- Header：eyebrow、headline、subheadline。
+- Visual：VOX-inspired 羊皮紙剪紙主場景。
+- Explainers：2–4 張短卡，具有固定順序。
+- 文字面積通常不超過 30–35%。
+- 一張圖只回答一個問題。
 
-Best for: algorithms, memory systems, model internals, scientific mechanisms, hardware paths.
+## 1. Hero Explainer
 
-- Show 2–5 domain-faithful modules.
-- Make inputs, state changes, retrieval, or outputs physically visible.
-- Use tokens, layer cards, state cells, memory cards, gates, or source-specific artifacts.
-- Preserve the article's actual component relationships.
+適合：精選圖片、整篇主張、重要新產品或研究。
 
-Avoid: generic server rooms, operators around a machine, decorative circuitry, or unlabeled boxes that could represent anything.
+- Header 約 22%。
+- 中央主視覺約 52–58%。
+- 下方 3 張卡約 20–24%。
+- 不把所有章節塞入 hero；只留一個主張和三個支點。
 
-### 2. Architecture Stack
+## 2. Mechanism Focus
 
-Best for: repeated layers, ratios, interleaving, hierarchy, model blocks.
+適合：演算法、內部機制、RAG、記憶、推薦。
 
-- Use repeated paper modules with visible rhythm.
-- Encode ratios through count and order, not only later labels.
-- Show that modules belong to one stack.
-- Keep one input and one output path.
+- Header 在上。
+- 主機制位於左側約 60%。
+- 右側垂直排列 2–4 張卡。
+- 卡片對應可見元件，但不使用交叉 callout 線。
 
-Avoid: separating one architecture into unrelated buildings or replacing layer count with arbitrary crowds.
+## 3. Process Strip
 
-### 3. Resource Contrast
+適合：3–5 個步驟的流程。
 
-Best for: memory growth, latency, throughput, cost, energy, storage.
+- 中間以一條剪紙路徑串起階段。
+- 下方卡片依左到右順序排列。
+- 每張卡只寫階段名稱和一句作用。
 
-- Compare the same workload on two visible tracks.
-- Show the resource that grows, stays bounded, or changes slope.
-- Keep workload and scale conditions visually matched.
-- Use containers, card trails, queues, or repeated tokens only when their mapping is explicit.
+## 4. Comparison Split
 
-Avoid: coin piles or speed lines with no visible connection to the measured resource.
+適合：舊／新、A／B、成本／品質、滿注意力／混合注意力。
 
-### 4. Claim Comparison
+- 中央左右對比，條件盡量一致。
+- 下方兩張主要卡對應左右兩側。
+- 可加第三張居中的總結卡。
+- 不使用密集長條圖、圖例與多層括號。
 
-Best for: baseline versus proposed method, before/after evaluation, fair comparison.
+## 5. Timeline Route
 
-- Keep inputs and conditions visibly matched.
-- Change only the mechanism being compared.
-- Show both quality and efficiency only if both are part of the source claim.
-- Prefer one decisive relationship over a collage of benchmark symbols.
+適合：歷史、產品演進、從小到大。
 
-Avoid: trophy imagery, podiums, generic winners, or unequal input conditions.
+- 一條彎曲路徑穿過 3–4 個場景。
+- 下方卡片對應階段。
+- 不做硬切四格簡報。
 
-## General patterns
+## 6. Result Board
 
-### 5. Process Station
+適合：研究結果、指標、決策建議。
 
-Best for: food making, editing, retrieval, assembly, raw material becoming an output.
+- 中央保留一個結果場景或簡單比較。
+- 下方 2–4 張卡突出關鍵數字與條件。
+- 數字必須保留單位與限制，不只畫獎盃或上升箭頭。
 
-Use a central workbench or machine only when its input, transformation, and output map directly to the article.
+## 避免
 
-### 6. Route Network
-
-Best for: people, information, goods, money, or influence moving across real or conceptual locations.
-
-Do not use a route merely because the visual style contains map lines.
-
-### 7. Timeline Journey
-
-Best for: history, product evolution, family-to-market change, lifecycle.
-
-Use one continuous route through 3–4 scenes, not slide panels.
-
-### 8. Before / After Landscape
-
-Best for: disorder/order, fragmented/concentrated, manual/automated, quiet/crowded.
-
-Keep conditions comparable and connect the two states through one visible cause.
-
-### 9. Scale-up Crowd
-
-Best for: adoption, demand, queues, public response.
-
-Use crowd clusters and physical evidence of scale. Do not use crowds for technical model architecture.
-
-### 10. Cutaway Mechanism
-
-Best for: RAG, search, recommendation, supply chain, black-box systems.
-
-For technical research, use domain-faithful modules instead of generic rooms or people unless humans are actual actors.
-
-### 11. Ecosystem Tableau
-
-Best for: markets and social systems with multiple real actors.
-
-Do not use it as a default hero for a paper about an internal algorithm.
-
-### 12. Physical Metaphor
-
-Best for: trust, authority, risk, attention, compounding, or other abstract arguments.
-
-A metaphor is valid only when each important source concept has an explicit visible mapping in `semantic_contract.visual_evidence`.
-
-### 13. Evidence Chain
-
-Best for: research argument, GEO citations, verification, trust.
-
-Use source artifacts that converge into a result. Do not replace the studied mechanism with a pile of generic documents.
-
-### 14. Origin Map
-
-Best for: food, culture, language, technology, or product diffusion across places.
-
-Use only when geographic movement is part of the article.
-
-## Anti-repetition and anti-drift
-
-- A pattern cannot override `must_show`.
-- The same pattern should not be used more than twice per article.
-- A recurring motif may unify images, but it must not replace article-specific artifacts.
-- If two shots can use the same generic composition, merge them or make their semantic contracts more specific.
-- For technical research, people are optional and usually secondary; do not anthropomorphize a mechanism by default.
+- 散落在畫面四周的十幾張標籤。
+- 大量交叉 callout 線。
+- 一張圖同時使用流程、時間軸、比較與生態全景。
+- 把技術文章畫成精密論文架構圖。
+- 泛用機器人、腦、伺服器城市、齒輪工廠。

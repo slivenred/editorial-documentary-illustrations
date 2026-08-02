@@ -1,55 +1,43 @@
 # Article Visual Bible
 
-The Visual Bible keeps an article's images in one world, but continuity must never override semantic fidelity.
+Visual Bible 只負責讓同篇文章看起來屬於同一套作品，不要求每張圖使用相同構圖。
 
-## Required fields
+## 必填
 
-- `world_summary`
 - `background`
 - `palette`
 - `camera`
 - `lighting`
-- `character_system`
-- `recurring_motif`
+- `cutout_style`
+- `typography`
 - `continuity_rules`
 
-## Semantic relationship
+## 固定項目
 
-Build the visual world **after** resolving:
+- 羊皮紙色與紋理強度。
+- 色彩語意。
+- 鏡頭角度。
+- 剪紙邊緣與陰影。
+- Headline、subheadline 與卡片樣式。
+- 同類物件的比例與材質。
 
-- article type;
-- visual thesis;
-- topic signature;
-- hero artifact;
-- global must-avoid list.
+## 可變項目
 
-The recurring motif should connect article-specific evidence, not replace it. For example, an ochre route may connect KDA and MLA modules, but it cannot stand in for the 3:1 layer relationship.
+- 主視覺。
+- 版型。
+- 物件與人物數量。
+- 路徑方向。
+- 卡片數量。
+- 密度。
 
-## Calibration frame
+## Calibration Frame
 
-The first frame tests material, palette, camera, cutout edges, shadows, scale, and annotation space. It must also pass semantic QA:
+第一張應同時測試：
 
-- all must-show items are visible;
-- the base image passes the blind-caption test;
-- the scene cannot be repurposed for a neighboring article by relabeling.
+- 羊皮紙。
+- 主物件。
+- 剪紙材質。
+- 一條路徑或一組關係。
+- Header 與卡片的安全區。
 
-A visually consistent but semantically generic calibration frame must be rejected before batch generation.
-
-## Fixed across the article
-
-- parchment world;
-- camera and lighting;
-- cutout edge and shadow treatment;
-- color semantics;
-- annotation style;
-- recurring motif;
-- proportions of repeated domain artifacts.
-
-## Allowed to change
-
-- main subject;
-- article-specific mechanism;
-- resource or scale behavior;
-- composition role;
-- density and people count;
-- direction and placement of routes.
+若畫風錯誤先修正；若內容錯誤，重寫該張 `visual_story`，不要用更多標籤補救。

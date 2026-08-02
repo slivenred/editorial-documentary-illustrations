@@ -1,169 +1,191 @@
 {
-  "version": 4,
+  "version": 5,
   "article": {
-    "title": "Hybrid attention architecture study",
-    "slug": "hybrid-attention-architecture-study",
-    "language": "en",
-    "annotation_language": "en",
-    "summary": "A hybrid architecture uses mostly bounded-state attention layers and a smaller number of precise retrieval layers to reduce long-context memory costs without losing critical recall.",
-    "target_count": 1,
-    "article_type": "technical-research",
-    "visual_thesis": "A 3:1 hybrid stack retains selective full-attention retrieval while replacing most growing KV cache with compact recurrent state.",
-    "topic_signature": [
-      "bounded recurrent state",
-      "full-attention retrieval layer",
-      "3:1 layer ratio",
-      "growing KV cache",
-      "long-context decoding"
-    ],
-    "global_must_avoid": [
-      "generic AI robot or glowing brain",
-      "unrelated office workers operating a machine",
-      "server city, factory, or decorative gears with no architecture mapping"
-    ]
+    "title": "Kimi Linear 混合線性注意力",
+    "slug": "kimi-linear-hybrid-attention",
+    "language": "zh-TW",
+    "annotation_language": "zh-TW",
+    "summary": "Kimi Linear 以三層 KDA 搭配一層 MLA，在維持精確檢索能力的同時降低長上下文 KV cache 與解碼成本。",
+    "reading_minutes": 4,
+    "section_count": 5,
+    "image_count_mode": "auto",
+    "include_hero": true,
+    "high_value_anchor_count": 4,
+    "target_count": 3,
+    "count_reason": "四分鐘文章容量最多三張；合併重複架構段落後，保留總覽、KDA 機制與長上下文結果三個互不重複的視覺錨點。"
   },
   "visual_bible": {
-    "world_summary": "A domain-faithful paper-cutout model architecture built from layered attention modules, state capsules, token ribbons, and comparison tracks on one restrained parchment field.",
-    "background": "Warm aged parchment with subtle fiber texture, faint map grid, and two gentle diagonal creases.",
+    "background": "Warm aged parchment with restrained fibers, a faint grid, and two gentle diagonal creases.",
     "palette": [
-      "dark ink brown for outlines and structure",
-      "terracotta for bounded-state attention modules",
+      "dark ink brown for structure and text",
+      "terracotta for KDA and the primary mechanism",
+      "dusty indigo for MLA and the comparison path",
       "mustard ochre for token flow",
-      "muted sage for retained compact state",
-      "dusty indigo for full-attention retrieval and KV comparison",
-      "warm brick red for growing memory cost"
+      "muted sage for efficiency gains",
+      "warm brick red for growing cache cost"
     ],
     "camera": "top-down-map-15deg",
-    "lighting": "Soft warm light from upper left; short soft shadows fall to lower right.",
-    "character_system": "No human figures by default; architecture modules, token cards, memory capsules, and comparison tracks carry the narrative.",
-    "recurring_motif": "one ochre token ribbon passing through every architecture module",
+    "lighting": "Soft warm light from upper left with short lower-right shadows.",
+    "cutout_style": "Hand-drawn paper modules, token cards, memory trails, and simple physical metaphors with slightly irregular ink-brown edges.",
+    "typography": "One compact eyebrow, one strong headline, one short subheadline, and two to four restrained parchment explainer cards.",
     "continuity_rules": [
-      "Keep the same parchment tone and grid strength.",
-      "Keep the same camera angle and short lower-right shadows.",
-      "Keep terracotta for bounded-state modules and indigo for full-attention modules.",
-      "Do not render text in the base image.",
-      "Keep the same paper-tag annotation style and color semantics.",
-      "Semantic component identity outranks decorative style choices."
+      "Keep the same parchment and grid strength.",
+      "Keep the same camera and shadow direction.",
+      "Use terracotta for KDA and indigo for MLA across all images.",
+      "Keep the same header and explainer-card treatment.",
+      "Do not render text in the base image."
     ]
   },
   "shots": [
     {
       "id": "01",
-      "image_role": "hero",
-      "visualization_mode": "literal-technical",
-      "placement_after": "Article header",
-      "anchor": "The architecture interleaves three bounded-state layers with one full-attention retrieval layer.",
-      "role": "architecture-stack",
-      "core_idea": "The hybrid stack preserves precise retrieval in one layer while shifting most layers to compact recurrent state.",
-      "composition": "Center one four-module paper architecture stack: three terracotta bounded-state modules and one indigo full-attention retrieval module interleaved in a single stack. An ochre token ribbon passes through all four modules. Beside the stack, contrast a compact sage state capsule with a visibly lengthening brick-red KV card trail. Reserve quiet parchment pockets above and at the outer sides without hiding the layer topology.",
-      "main_subject": "four-layer hybrid attention stack",
-      "supporting_elements": [
-        "ochre token ribbon",
-        "compact recurrent-state capsule",
-        "growing KV-card trail",
-        "long-context comparison track"
+      "kind": "hero",
+      "placement": {
+        "section_heading": "Article header",
+        "section_index": 0,
+        "after_paragraph_index": 0,
+        "after_paragraph_excerpt": "Article header",
+        "reason": "精選圖片需要在讀者進入正文前先建立 3:1 混合架構與效率／品質取捨。"
+      },
+      "purpose": "overview",
+      "layout": "hero-explainer",
+      "eyebrow": "KIMI LINEAR",
+      "headline": "多數層走線性，少數層保留精確檢索",
+      "subheadline": "3:1 的 KDA／MLA 混合，把長上下文的記憶體優勢與全注意力的精確比對放進同一個架構。",
+      "visual_story": "在羊皮紙中央建立一組簡潔的四層剪紙堆疊：三個赤陶色 KDA 模組與一個靛藍色 MLA 模組，赭黃色 token 紙帶依序穿過。左下角以小型固定狀態盒表示有限記憶，右側以逐漸拉長的 KV 紙卡軌跡表示全注意力成本。保持場景簡潔，不加入人物、工廠、伺服器城市或精密論文括號。",
+      "key_elements": [
+        "三個赤陶色 KDA 模組",
+        "一個靛藍色 MLA 模組",
+        "穿過四層的 token 紙帶",
+        "固定狀態盒與增長 KV 紙卡的簡單對比"
+      ],
+      "explainers": [
+        {
+          "title": "3:1 分層混合",
+          "body": "每四層有三層 KDA、一層 MLA。",
+          "accent": "terracotta",
+          "visual_anchor": "中央四層剪紙堆疊"
+        },
+        {
+          "title": "固定狀態",
+          "body": "KDA 把歷史壓進有限容量的遞迴記憶。",
+          "accent": "sage",
+          "visual_anchor": "左下角固定大小的狀態盒"
+        },
+        {
+          "title": "保留精確檢索",
+          "body": "少量 MLA 層補回需要直接比對的能力。",
+          "accent": "indigo",
+          "visual_anchor": "四層中的靛藍色 MLA 模組"
+        }
       ],
       "motion_cues": [
-        "token cards enter the first module at staggered positions",
-        "the compact state capsule remains fixed while the KV-card trail grows",
-        "the single indigo retrieval layer reconnects distant token cards"
+        "token 紙卡依序穿過四個模組",
+        "固定狀態盒保持大小不變",
+        "KV 紙卡軌跡逐漸拉長"
       ],
-      "density": "medium",
-      "people_count": 0,
-      "semantic_contract": {
-        "source_basis": [
-          "Three bounded-state attention layers are interleaved with one full-attention retrieval layer.",
-          "The bounded-state path keeps recurrent memory compact while the full-attention comparison accumulates KV cache with context length."
-        ],
-        "must_show": [
-          "one four-layer stack containing three bounded-state modules and one full-attention module",
-          "a token stream crossing the interleaved modules in sequence",
-          "a compact recurrent state contrasted with a growing KV cache trail"
-        ],
-        "must_not_show": [
-          "four disconnected machines that do not form one model stack",
-          "generic workers, robot, brain, server city, or decorative factory"
-        ],
-        "visual_evidence": [
-          {
-            "concept": "3:1 layer ratio",
-            "visible_form": "one four-module stack with three terracotta modules and one indigo module",
-            "relationship": "the four modules are interleaved in one repeated architecture rather than shown as separate systems"
-          },
-          {
-            "concept": "bounded recurrent state",
-            "visible_form": "one compact sage state capsule that remains the same physical size",
-            "relationship": "the capsule receives the token flow without lengthening as context grows"
-          },
-          {
-            "concept": "growing KV cache",
-            "visible_form": "a brick-red trail of token-memory cards that becomes visibly longer",
-            "relationship": "the trail grows beside the fixed state capsule to make the resource contrast observable"
-          }
-        ],
-        "specificity_terms": [
-          "3:1 layer ratio",
-          "bounded recurrent state",
-          "growing KV cache",
-          "full-attention retrieval layer"
-        ],
-        "expected_blind_caption": "A 3:1 layer stack sends tokens through three bounded recurrent-state modules and one full-attention retrieval layer while a fixed state capsule is contrasted with a growing KV cache trail.",
-        "hero_artifact": "one interleaved four-layer hybrid attention stack"
+      "filename": "01-kimi-linear-overview.png",
+      "alt_text": "羊皮紙剪紙圖以三個 KDA 模組和一個 MLA 模組呈現 Kimi Linear 的 3:1 混合架構，旁邊比較固定狀態與持續增長的 KV cache。",
+      "caption": "Kimi Linear 把多數層放在線性注意力路徑，只保留少量全注意力層維持精確檢索。"
+    },
+    {
+      "id": "02",
+      "kind": "inline",
+      "placement": {
+        "section_heading": "KDA：用更細的閘控精煉 Gated DeltaNet",
+        "section_index": 2,
+        "after_paragraph_index": 4,
+        "after_paragraph_excerpt": "KDA 進一步把閘控的粒度切細，等於給同一個工作區更精準的寫入、保留、遺忘控制。",
+        "reason": "該段第一次完整說明 KDA 的核心機制，讀者此時最需要一張寫入／保留／遺忘的直觀圖。"
       },
-      "filename": "01-hybrid-attention-stack.png",
-      "alt_text": "A four-layer paper architecture uses three bounded-state modules and one full-attention layer, beside a fixed state capsule and a growing KV cache trail.",
-      "caption": "The hybrid keeps most layers on a bounded-state path while retaining one precise retrieval layer.",
-      "annotation": {
-        "enabled": true,
-        "language": "en",
-        "layout_status": "draft",
-        "headline": {
-          "text": "Most layers keep state compact; one layer restores exact retrieval",
-          "x": 0.3,
-          "y": 0.05,
+      "purpose": "mechanism",
+      "layout": "mechanism-focus",
+      "eyebrow": "KDA GATING",
+      "headline": "同一塊有限記憶，用更細的閘控分配",
+      "subheadline": "KDA 不增加無限記憶，而是更精準地決定哪些資訊寫入、保留或遺忘。",
+      "visual_story": "左側是一個固定大小的剪紙記憶盒，數條不同粗細的 token 紙帶經過三個小型閘門後進入盒中；部分紙片被保留、部分覆寫、部分淡出。畫面只呈現有限記憶與細粒度控制，不畫大腦、機器人或複雜公式。右側保留乾淨區給三張解釋卡。",
+      "key_elements": [
+        "固定大小的記憶盒",
+        "三個細粒度閘門",
+        "寫入、保留與淡出的 token 紙片"
+      ],
+      "explainers": [
+        {
+          "title": "寫入",
+          "body": "新資訊依通道決定進入多少。",
           "accent": "terracotta",
-          "font_size": 40,
-          "angle": 0
+          "visual_anchor": "進入記憶盒的 token 紙帶"
         },
-        "labels": [
-          {
-            "text": "3 bounded-state layers",
-            "x": 0.05,
-            "y": 0.2,
-            "target_x": 0.42,
-            "target_y": 0.45,
-            "accent": "terracotta",
-            "font_size": 28,
-            "angle": -1
-          },
-          {
-            "text": "1 retrieval layer",
-            "x": 0.7,
-            "y": 0.18,
-            "target_x": 0.57,
-            "target_y": 0.42,
-            "accent": "indigo",
-            "font_size": 28,
-            "angle": 1
-          },
-          {
-            "text": "Fixed state vs growing KV",
-            "x": 0.62,
-            "y": 0.7,
-            "target_x": 0.55,
-            "target_y": 0.72,
-            "accent": "brick",
-            "font_size": 28,
-            "angle": -1
-          }
-        ]
+        {
+          "title": "保留",
+          "body": "仍有用的狀態留在固定工作區。",
+          "accent": "sage",
+          "visual_anchor": "記憶盒內保留的紙片"
+        },
+        {
+          "title": "遺忘",
+          "body": "低價值內容逐步淡出，騰出有限容量。",
+          "accent": "brick",
+          "visual_anchor": "閘門旁逐漸淡出的紙片"
+        }
+      ],
+      "motion_cues": [
+        "不同 token 紙帶通過各自閘門",
+        "部分紙片進入、覆寫或淡出"
+      ],
+      "filename": "02-kda-gating.png",
+      "alt_text": "固定大小的剪紙記憶盒前有多個細粒度閘門，分別控制資訊寫入、保留與遺忘。",
+      "caption": "KDA 的重點不是擴大記憶，而是更精準地使用有限狀態。"
+    },
+    {
+      "id": "03",
+      "kind": "inline",
+      "placement": {
+        "section_heading": "75%、6 倍與 6.3 倍：長上下文推論的實際意義",
+        "section_index": 4,
+        "after_paragraph_index": 8,
+        "after_paragraph_excerpt": "KV cache 最多降低 75%；在 1M token 的上下文，解碼吞吐提升 6 倍。",
+        "reason": "這一段聚集文章最重要的部署結果，適合用一張結果板統整數字與適用條件。"
       },
-      "motion_beats": [
-        "The four interleaved modules and token ribbon appear.",
-        "Tokens pass through three bounded-state modules and one retrieval module.",
-        "The recurrent state stays compact while the comparison KV trail lengthens.",
-        "The architecture holds as one readable resource-and-retrieval trade-off."
-      ]
+      "purpose": "result",
+      "layout": "result-board",
+      "eyebrow": "LONG-CONTEXT RESULT",
+      "headline": "上下文越長，混合線性注意力的優勢越明顯",
+      "subheadline": "核心收益來自 KV cache 不再隨多數層持續膨脹，但數字仍取決於測試條件。",
+      "visual_story": "中間以同一批 token 紙卡分成兩條簡單軌跡：Kimi Linear 路徑維持短而穩定的記憶堆疊，MLA 路徑隨上下文向右拉長。不要畫複雜長條圖、圖例、分組括號或大量折線；只保留一個直觀的長度與速度差異。下方留出三張結果卡。",
+      "key_elements": [
+        "短而穩定的 Kimi Linear 記憶軌跡",
+        "隨上下文拉長的 MLA KV 軌跡",
+        "同一批 token 作為比較起點"
+      ],
+      "explainers": [
+        {
+          "title": "KV cache 最多 -75%",
+          "body": "最佳值出現在特定長上下文條件。",
+          "accent": "sage",
+          "visual_anchor": "較短的 Kimi Linear 記憶軌跡"
+        },
+        {
+          "title": "1M 解碼最高 6×",
+          "body": "長上下文時，吞吐量差距被放大。",
+          "accent": "ochre",
+          "visual_anchor": "Kimi Linear 路徑的快速輸出紙卡"
+        },
+        {
+          "title": "仍需實機重測",
+          "body": "實際收益會隨硬體、批次與工作負載改變。",
+          "accent": "brick",
+          "visual_anchor": "兩條比較軌跡的共同起點"
+        }
+      ],
+      "motion_cues": [
+        "兩條路徑從同一批 token 開始",
+        "MLA KV 軌跡持續拉長",
+        "Kimi Linear 路徑保持短而穩定"
+      ],
+      "filename": "03-long-context-results.png",
+      "alt_text": "兩條剪紙記憶軌跡比較 Kimi Linear 與 MLA：前者保持短而穩定，後者隨上下文持續拉長，並以三張卡說明 KV cache、1M 解碼和測試限制。",
+      "caption": "長上下文把記憶體與解碼成本差距放大，但最佳數字仍需在實際工作負載中驗證。"
     }
   ]
 }

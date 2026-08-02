@@ -1,6 +1,6 @@
 interface:
-  display_name: "紀錄片剪紙文章配圖"
-  short_description: "先鎖定文章專屬機制，再生成羊皮紙剪紙底圖與語意標註"
-  default_prompt: "Use $editorial-documentary-illustrations 為這篇文章規劃並生成 5 張 16:9 紀錄片剪紙正文配圖。先解析文章語言、visual thesis、topic signature 與每張圖的 semantic contract；無字底圖本身必須通過 label-off、blind-caption 與 neighbor-article 測試，不能靠後製文字把泛用圖片硬解釋成文章內容。通過 Base QA 後，再依文章或指定讀者語言加入一個核心判斷與 3–6 個短標註。"
+  display_name: "VOX 剪紙文章圖解"
+  short_description: "依文章長度與內容，自動產生最佳數量、位置與解釋文字的剪紙文內圖"
+  default_prompt: "Use $editorial-documentary-illustrations 分析文章長度、章節與視覺錨點，自動決定最佳圖片數量與插入位置。每張成品使用 VOX-inspired 羊皮紙剪紙場景，並整合一個核心結論、一行補充說明與 2–4 個短解釋卡；圖片與文字共同解釋上下文，不生成泛用 AI 圖，也不使用散亂 callout。"
 policy:
   allow_implicit_invocation: true

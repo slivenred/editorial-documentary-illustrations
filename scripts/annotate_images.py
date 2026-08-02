@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Add deterministic language-aware semantic paper-tag annotations to text-free base images."""
+"""Render integrated editorial headlines and explainer cards onto version 5 base images."""
 from __future__ import annotations
 
 import argparse
 import json
 import os
-import random
 import shutil
 import subprocess
 import sys
@@ -13,8 +12,12 @@ from pathlib import Path
 from typing import Any
 
 ACCENTS = {
-    "ink": "#49382B", "terracotta": "#A84E3E", "ochre": "#C58B2D",
-    "sage": "#607B59", "indigo": "#4C617C", "brick": "#A74636",
+    "ink": "#49382B",
+    "terracotta": "#A84E3E",
+    "ochre": "#C58B2D",
+    "sage": "#607B59",
+    "indigo": "#4C617C",
+    "brick": "#A74636",
 }
 RTL_LANGS = {"ar", "fa", "he", "ur", "yi", "ps"}
 FONT_GROUPS = {
@@ -22,7 +25,7 @@ FONT_GROUPS = {
         "/System/Library/Fonts/PingFang.ttc",
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-        "C:/Windows/Fonts/msjh.ttc", "C:/Windows/Fonts/msjhbd.ttc",
+        "C:/Windows/Fonts/msjh.ttc",
     ],
     "ja": [
         "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
@@ -56,7 +59,8 @@ FONT_GROUPS = {
         "/Library/Fonts/Arial.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
-        "C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/segoeui.ttf",
+        "C:/Windows/Fonts/arial.ttf",
+        "C:/Windows/Fonts/segoeui.ttf",
     ],
     "universal": [
         "/Library/Fonts/Arial Unicode.ttf",
@@ -79,10 +83,10 @@ FONT_QUERIES = {
 
 def pillow():
     try:
-        from PIL import Image, ImageDraw, ImageFilter, ImageFont, features
+        from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps, features
     except ImportError as exc:
         raise RuntimeError("Install Pillow with `python3 -m pip install -r requirements-annotation.txt`.") from exc
-    return Image, ImageDraw, ImageFilter, ImageFont, features
+    return Image, ImageDraw, ImageFilter, ImageFont, ImageOps, features
 
 
 def language_prefix(language: str) -> str:
@@ -110,15 +114,15 @@ def font_group(language: str, sample_text: str = "") -> str:
     return "latin"
 
 
-def find_font(explicit: str | None, language: str = "und", sample_text: str = "") -> Path:
+def find_font(explicit: str | None, language: str, sample_text: str) -> Path:
     if explicit:
         path = Path(explicit).expanduser()
         if not path.is_file():
             raise RuntimeError(f"Explicit font does not exist: {path}")
         return path
-    env_font = os.getenv("EDITORIAL_ANNOTATION_FONT")
-    if env_font:
-        path = Path(env_font).expanduser()
+    environment_font = os.getenv("EDITORIAL_ANNOTATION_FONT")
+    if environment_font:
+        path = Path(environment_font).expanduser()
         if path.is_file():
             return path
         raise RuntimeError(f"EDITORIAL_ANNOTATION_FONT does not exist: {path}")
@@ -128,15 +132,17 @@ def find_font(explicit: str | None, language: str = "und", sample_text: str = ""
         path = Path(value)
         if path.is_file():
             return path
-
     try:
         for query in [*FONT_QUERIES.get(group, []), *FONT_QUERIES["universal"]]:
-            value = subprocess.run(
-                ["fc-match", query, "-f", "%{file}"], capture_output=True,
-                text=True, timeout=5, check=False,
+            result = subprocess.run(
+                ["fc-match", query, "-f", "%{file}"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
             ).stdout.strip()
-            if value and Path(value).is_file():
-                return Path(value)
+            if result and Path(result).is_file():
+                return Path(result)
     except (FileNotFoundError, subprocess.SubprocessError):
         pass
     raise RuntimeError(
@@ -147,17 +153,9 @@ def find_font(explicit: str | None, language: str = "und", sample_text: str = ""
 
 def load_manifest(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
-    if data.get("version") != 4 or not isinstance(data.get("shots"), list):
-        raise ValueError("Expected a version 4 manifest with shots.")
+    if data.get("version") != 5 or not isinstance(data.get("shots"), list):
+        raise ValueError("Expected a version 5 manifest with shots.")
     return data
-
-
-def norm(value: float, extent: int) -> int:
-    return round(float(value) * extent)
-
-
-def accent(value: str) -> str:
-    return ACCENTS.get(value, value)
 
 
 def has_raqm(features) -> bool:
@@ -167,110 +165,298 @@ def has_raqm(features) -> bool:
         return False
 
 
-def font_for(ImageFont, features, path: Path, requested: int, width: int):
-    kwargs: dict[str, Any] = {}
-    if has_raqm(features) and hasattr(ImageFont, "Layout"):
-        kwargs["layout_engine"] = ImageFont.Layout.RAQM
-    return ImageFont.truetype(str(path), max(18, round(requested * width / 1600)), **kwargs)
-
-
 def direction_kwargs(language: str, features) -> dict[str, str]:
     if language_prefix(language) in RTL_LANGS and has_raqm(features):
         return {"direction": "rtl"}
     return {}
 
 
-def make_tag(mods, text: str, font_path: Path, language: str, spec: dict[str, Any], width: int, headline: bool):
-    Image, ImageDraw, ImageFilter, ImageFont, features = mods
-    size = int(spec.get("font_size", 42 if headline else 31))
-    font = font_for(ImageFont, features, font_path, size, width)
-    kwargs = direction_kwargs(language, features)
+def font_for(ImageFont, features, path: Path, size: int):
+    kwargs: dict[str, Any] = {}
+    if has_raqm(features) and hasattr(ImageFont, "Layout"):
+        kwargs["layout_engine"] = ImageFont.Layout.RAQM
+    return ImageFont.truetype(str(path), max(10, size), **kwargs)
+
+
+def is_cjk(language: str, text: str) -> bool:
+    if language_prefix(language) in {"zh", "ja", "ko"}:
+        return True
+    return any("\u4e00" <= character <= "\u9fff" for character in text)
+
+
+def text_width(draw, text: str, font, kwargs: dict[str, str]) -> float:
+    if not text:
+        return 0
+    box = draw.textbbox((0, 0), text, font=font, **kwargs)
+    return box[2] - box[0]
+
+
+def wrap_text(draw, text: str, font, max_width: int, language: str, kwargs: dict[str, str]) -> list[str]:
+    if not text:
+        return []
+    tokens = list(text) if is_cjk(language, text) else text.split()
+    separator = "" if is_cjk(language, text) else " "
+    lines: list[str] = []
+    current = ""
+    for token in tokens:
+        candidate = token if not current else current + separator + token
+        if text_width(draw, candidate, font, kwargs) <= max_width or not current:
+            current = candidate
+        else:
+            lines.append(current)
+            current = token
+    if current:
+        lines.append(current)
+    return lines
+
+
+def fit_wrapped_text(
+    mods,
+    text: str,
+    font_path: Path,
+    language: str,
+    max_width: int,
+    max_lines: int,
+    start_size: int,
+    min_size: int,
+):
+    Image, ImageDraw, _, ImageFont, _, features = mods
     probe = ImageDraw.Draw(Image.new("RGBA", (8, 8)))
-    box = probe.textbbox((0, 0), text, font=font, **kwargs)
-    text_width, text_height = box[2] - box[0], box[3] - box[1]
-    padding_x = round(width * (0.017 if headline else 0.012))
-    padding_y = round(width * 0.009)
-    tag_width = text_width + padding_x * 2
-    tag_height = text_height + padding_y * 2 + round(width * 0.006)
-    tag = Image.new("RGBA", (tag_width + 16, tag_height + 16), (0, 0, 0, 0))
-    shadow = Image.new("RGBA", tag.size, (0, 0, 0, 0))
+    kwargs = direction_kwargs(language, features)
+    for size in range(start_size, min_size - 1, -1):
+        font = font_for(ImageFont, features, font_path, size)
+        lines = wrap_text(probe, text, font, max_width, language, kwargs)
+        if len(lines) <= max_lines:
+            return font, lines, kwargs
+    font = font_for(ImageFont, features, font_path, min_size)
+    lines = wrap_text(probe, text, font, max_width, language, kwargs)
+    if len(lines) > max_lines:
+        lines = lines[:max_lines]
+        if lines:
+            lines[-1] = lines[-1].rstrip("…") + "…"
+    return font, lines, kwargs
+
+
+def draw_lines(draw, xy: tuple[int, int], lines: list[str], font, fill: str, spacing: int, kwargs: dict[str, str]) -> int:
+    x, y = xy
+    current_y = y
+    for line in lines:
+        draw.text((x, current_y), line, font=font, fill=fill, **kwargs)
+        box = draw.textbbox((x, current_y), line, font=font, **kwargs)
+        current_y = box[3] + spacing
+    return current_y
+
+
+def add_panel(mods, canvas, box: tuple[int, int, int, int], radius: int, fill, outline, shadow_offset: int = 6):
+    Image, ImageDraw, ImageFilter, _, _, _ = mods
+    x1, y1, x2, y2 = box
+    shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
     shadow_draw = ImageDraw.Draw(shadow)
     shadow_draw.rounded_rectangle(
-        (9, 10, tag_width + 7, tag_height + 7),
-        radius=max(7, round(width * .008)), fill=(55, 35, 20, 55),
+        (x1 + shadow_offset, y1 + shadow_offset, x2 + shadow_offset, y2 + shadow_offset),
+        radius=radius,
+        fill=(57, 39, 22, 50),
     )
-    tag.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(max(3, round(width * .004)))))
-    draw = ImageDraw.Draw(tag)
-    randomizer = random.Random(text)
-    jitter = [randomizer.randint(-3, 3) for _ in range(8)]
-    polygon = [
-        (5 + jitter[0], 5 + jitter[1]),
-        (tag_width + 6 + jitter[2], 4 + jitter[3]),
-        (tag_width + 8 + jitter[4], tag_height + 6 + jitter[5]),
-        (6 + jitter[6], tag_height + 7 + jitter[7]),
-    ]
-    draw.polygon(polygon, fill="#F1DDB1", outline="#B98A4D")
-    line_y = tag_height + 1
-    draw.line(
-        (padding_x, line_y, tag_width - padding_x, line_y - 1),
-        fill=accent(spec.get("accent", "ink")), width=max(3, round(width * .003)),
-    )
-    draw.rectangle((tag_width // 2 - 22, 1, tag_width // 2 + 22, 11), fill=(211, 170, 97, 110))
-    draw.text(
-        (padding_x, padding_y - 1), text, font=font, fill="#49382B",
-        stroke_width=1, stroke_fill="#FFF5DC", **kwargs,
-    )
-    angle = float(spec.get("angle", 0))
-    return tag.rotate(angle, expand=True, resample=Image.Resampling.BICUBIC) if angle else tag
-
-
-def line_to_target(ImageDraw, canvas, start: tuple[int, int], target: tuple[int, int], color: str, seed: str):
+    canvas.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(max(3, radius // 5))))
     draw = ImageDraw.Draw(canvas)
-    randomizer = random.Random(seed)
-    x1, y1 = start
-    x2, y2 = target
-    middle_x = (x1 + x2) // 2 + randomizer.randint(-10, 10)
-    middle_y = (y1 + y2) // 2 + randomizer.randint(-8, 8)
-    width = max(3, round(canvas.width * .0025))
-    draw.line([(x1, y1), (middle_x, middle_y), (x2, y2)], fill=color, width=width, joint="curve")
-    radius = max(5, round(canvas.width * .0035))
-    draw.ellipse((x2 - radius, y2 - radius, x2 + radius, y2 + radius), fill=color)
+    draw.rounded_rectangle(box, radius=radius, fill=fill, outline=outline, width=max(1, radius // 8))
 
 
-def place(mods, canvas, tag, spec: dict[str, Any], callout: bool):
-    _, ImageDraw, _, _, _ = mods
-    x, y = norm(spec["x"], canvas.width), norm(spec["y"], canvas.height)
-    margin = max(5, round(canvas.width * .006))
-    x = min(max(margin, x), max(margin, canvas.width - tag.width - margin))
-    y = min(max(margin, y), max(margin, canvas.height - tag.height - margin))
-    if callout:
-        target_x, target_y = norm(spec["target_x"], canvas.width), norm(spec["target_y"], canvas.height)
-        line_x = x + (0 if target_x < x else tag.width if target_x > x + tag.width else tag.width // 2)
-        line_y = y + tag.height // 2
-        line_to_target(
-            ImageDraw, canvas, (line_x, line_y), (target_x, target_y),
-            accent(spec.get("accent", "ink")), spec["text"],
-        )
-    canvas.alpha_composite(tag, (x, y))
+def header_box(width: int, height: int, layout: str) -> tuple[int, int, int, int]:
+    margin_x = round(width * 0.04)
+    top = round(height * 0.035)
+    bottom = round(height * (0.235 if layout == "hero-explainer" else 0.215))
+    return margin_x, top, width - margin_x, bottom
 
 
-def annotate(mods, image_path: Path, output_path: Path, annotation: dict[str, Any], font_path: Path, language: str):
-    Image, _, _, _, _ = mods
-    canvas = Image.open(image_path).convert("RGBA")
-    headline = annotation["headline"]
-    place(
-        mods, canvas,
-        make_tag(mods, headline["text"], font_path, language, headline, canvas.width, True),
-        headline, False,
+def card_boxes(width: int, height: int, layout: str, count: int) -> list[tuple[int, int, int, int]]:
+    margin = round(width * 0.04)
+    gap = round(width * 0.014)
+    if layout == "mechanism-focus":
+        x1 = round(width * 0.665)
+        x2 = width - margin
+        top = round(height * 0.25)
+        bottom = height - round(height * 0.04)
+        total_gap = gap * (count - 1)
+        card_height = (bottom - top - total_gap) // count
+        return [
+            (x1, top + index * (card_height + gap), x2, top + index * (card_height + gap) + card_height)
+            for index in range(count)
+        ]
+
+    top = round(height * (0.735 if layout == "hero-explainer" else 0.72))
+    bottom = height - round(height * 0.035)
+    available = width - margin * 2 - gap * (count - 1)
+    card_width = available // count
+    return [
+        (margin + index * (card_width + gap), top, margin + index * (card_width + gap) + card_width, bottom)
+        for index in range(count)
+    ]
+
+
+def render_header(mods, canvas, shot: dict[str, Any], font_path: Path, language: str):
+    _, ImageDraw, _, _, _, features = mods
+    draw = ImageDraw.Draw(canvas)
+    width, height = canvas.size
+    box = header_box(width, height, shot["layout"])
+    radius = round(width * 0.012)
+    add_panel(mods, canvas, box, radius, (244, 228, 196, 235), (169, 124, 72, 180))
+    x1, y1, x2, y2 = box
+    padding_x = round(width * 0.018)
+    padding_y = round(height * 0.018)
+    scale = width / 1600
+    kwargs = direction_kwargs(language, features)
+
+    accent_color = ACCENTS.get(shot["explainers"][0]["accent"], shot["explainers"][0]["accent"])
+    draw.rounded_rectangle(
+        (x1 + padding_x, y1 + padding_y, x1 + padding_x + round(width * 0.035), y1 + padding_y + max(5, round(height * 0.007))),
+        radius=3,
+        fill=accent_color,
     )
-    for label in annotation["labels"]:
-        place(
-            mods, canvas,
-            make_tag(mods, label["text"], font_path, language, label, canvas.width, False),
-            label, True,
-        )
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    canvas.convert("RGB").save(output_path, quality=95)
+    eyebrow_font = font_for(mods[3], features, font_path, round(19 * scale))
+    draw.text(
+        (x1 + padding_x + round(width * 0.045), y1 + padding_y - round(height * 0.004)),
+        shot["eyebrow"],
+        font=eyebrow_font,
+        fill=accent_color,
+        **kwargs,
+    )
+
+    content_width = x2 - x1 - padding_x * 2
+    headline_font, headline_lines, headline_kwargs = fit_wrapped_text(
+        mods,
+        shot["headline"],
+        font_path,
+        language,
+        content_width,
+        2,
+        round(44 * scale),
+        round(28 * scale),
+    )
+    headline_y = y1 + padding_y + round(height * 0.035)
+    next_y = draw_lines(
+        draw,
+        (x1 + padding_x, headline_y),
+        headline_lines,
+        headline_font,
+        "#2F261F",
+        max(2, round(height * 0.006)),
+        headline_kwargs,
+    )
+    sub_font, sub_lines, sub_kwargs = fit_wrapped_text(
+        mods,
+        shot["subheadline"],
+        font_path,
+        language,
+        content_width,
+        2,
+        round(23 * scale),
+        round(16 * scale),
+    )
+    draw_lines(
+        draw,
+        (x1 + padding_x, min(next_y + round(height * 0.004), y2 - round(height * 0.05))),
+        sub_lines,
+        sub_font,
+        "#6A5542",
+        max(2, round(height * 0.004)),
+        sub_kwargs,
+    )
+
+
+def render_card(mods, canvas, box, item: dict[str, Any], index: int, font_path: Path, language: str, layout: str):
+    _, ImageDraw, _, _, _, features = mods
+    draw = ImageDraw.Draw(canvas)
+    width, height = canvas.size
+    radius = round(width * 0.011)
+    add_panel(mods, canvas, box, radius, (246, 232, 205, 242), (177, 137, 86, 190), shadow_offset=max(3, round(width * 0.003)))
+    x1, y1, x2, y2 = box
+    padding_x = round(width * 0.013)
+    padding_y = round(height * 0.013)
+    scale = width / 1600
+    accent_color = ACCENTS.get(item["accent"], item["accent"])
+    kwargs = direction_kwargs(language, features)
+
+    circle_radius = max(10, round(width * 0.011))
+    circle_x = x1 + padding_x + circle_radius
+    circle_y = y1 + padding_y + circle_radius
+    draw.ellipse(
+        (circle_x - circle_radius, circle_y - circle_radius, circle_x + circle_radius, circle_y + circle_radius),
+        fill=accent_color,
+    )
+    index_font = font_for(mods[3], features, font_path, max(12, round(17 * scale)))
+    index_text = f"{index:02d}"
+    index_box = draw.textbbox((0, 0), index_text, font=index_font, **kwargs)
+    draw.text(
+        (circle_x - (index_box[2] - index_box[0]) / 2, circle_y - (index_box[3] - index_box[1]) / 2 - 1),
+        index_text,
+        font=index_font,
+        fill="#FFF7E7",
+        **kwargs,
+    )
+
+    text_x = x1 + padding_x
+    title_y = y1 + padding_y + circle_radius * 2 + round(height * 0.008)
+    max_width = x2 - x1 - padding_x * 2
+    start_title = 34 if layout == "result-board" else 28
+    title_font, title_lines, title_kwargs = fit_wrapped_text(
+        mods,
+        item["title"],
+        font_path,
+        language,
+        max_width,
+        2,
+        round(start_title * scale),
+        round(17 * scale),
+    )
+    body_y = draw_lines(
+        draw,
+        (text_x, title_y),
+        title_lines,
+        title_font,
+        accent_color,
+        max(2, round(height * 0.004)),
+        title_kwargs,
+    )
+    body_font, body_lines, body_kwargs = fit_wrapped_text(
+        mods,
+        item["body"],
+        font_path,
+        language,
+        max_width,
+        3 if layout == "mechanism-focus" else 2,
+        round(20 * scale),
+        round(13 * scale),
+    )
+    draw_lines(
+        draw,
+        (text_x, body_y + round(height * 0.005)),
+        body_lines,
+        body_font,
+        "#5B493A",
+        max(2, round(height * 0.004)),
+        body_kwargs,
+    )
+
+
+def normalize_aspect(mods, image):
+    _, _, _, _, ImageOps, _ = mods
+    width, height = image.size
+    target_height = round(width * 9 / 16)
+    if abs(height - target_height) <= max(2, round(target_height * 0.01)):
+        return image
+    return ImageOps.fit(image, (width, target_height), method=mods[0].Resampling.LANCZOS, centering=(0.5, 0.5))
+
+
+def annotate_image(mods, source: Path, target: Path, shot: dict[str, Any], font_path: Path, language: str):
+    Image, _, _, _, _, _ = mods
+    canvas = normalize_aspect(mods, Image.open(source).convert("RGBA"))
+    render_header(mods, canvas, shot, font_path, language)
+    boxes = card_boxes(canvas.width, canvas.height, shot["layout"], len(shot["explainers"]))
+    for index, (box, item) in enumerate(zip(boxes, shot["explainers"]), start=1):
+        render_card(mods, canvas, box, item, index, font_path, language, shot["layout"])
+    target.parent.mkdir(parents=True, exist_ok=True)
+    canvas.convert("RGB").save(target, quality=95)
 
 
 def main() -> int:
@@ -280,46 +466,50 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--font")
     parser.add_argument("--force", action="store_true")
-    parser.add_argument("--allow-draft", action="store_true")
     args = parser.parse_args()
+
     try:
-        data, mods = load_manifest(args.manifest), pillow()
+        data = load_manifest(args.manifest)
+        mods = pillow()
         if args.output.exists():
             if not args.force:
                 raise FileExistsError(f"Output exists: {args.output}; pass --force.")
             shutil.rmtree(args.output)
         args.output.mkdir(parents=True)
-        article_language = data["article"]["annotation_language"]
-        report = {"manifest_version": data["version"], "article_annotation_language": article_language, "images": []}
+        language = data["article"]["annotation_language"]
+        sample_text = " ".join(
+            text
+            for shot in data["shots"]
+            for text in [
+                shot["eyebrow"],
+                shot["headline"],
+                shot["subheadline"],
+                *[item["title"] + " " + item["body"] for item in shot["explainers"]],
+            ]
+        )
+        font_path = find_font(args.font, language, sample_text)
+        report = {
+            "manifest_version": 5,
+            "annotation_language": language,
+            "font": str(font_path),
+            "images": [],
+        }
         for shot in data["shots"]:
-            annotation = shot.get("annotation", {})
-            if not annotation.get("enabled"):
-                continue
-            if annotation.get("layout_status") != "final" and not args.allow_draft:
-                raise ValueError(f"Shot {shot['id']} annotation layout is not final.")
-            language = annotation.get("language") or article_language
-            texts = " ".join([
-                (annotation.get("headline") or {}).get("text", ""),
-                *[
-                    item.get("text", "")
-                    for item in annotation.get("labels", [])
-                    if isinstance(item, dict)
-                ],
-            ])
-            font_path = find_font(args.font, language, texts)
             source = args.input / shot["filename"]
             target = args.output / shot["filename"]
             if not source.is_file():
                 raise FileNotFoundError(source)
-            annotate(mods, source, target, annotation, font_path, language)
-            report["images"].append({
-                "path": str(target),
-                "language": language,
-                "font": str(font_path),
-                "semantic_contract": shot.get("semantic_contract", {}),
-            })
+            annotate_image(mods, source, target, shot, font_path, language)
+            report["images"].append(
+                {
+                    "path": str(target),
+                    "layout": shot["layout"],
+                    "explainer_count": len(shot["explainers"]),
+                }
+            )
         (args.output / "annotation-render-report.json").write_text(
-            json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
         )
         print(f"Annotated {len(report['images'])} image(s) to {args.output}.")
         return 0

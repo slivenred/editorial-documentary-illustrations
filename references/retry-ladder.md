@@ -1,55 +1,43 @@
 # Retry Ladder
 
-Diagnose the failure before changing the prompt. Use the smallest targeted correction.
+## 1. Context Reset
 
-## 1. Semantic Reset
+症狀：圖片漂亮但像任何 AI 文章都能用。
 
-Use when the image is stylish but unrelated, generic, or dependent on labels.
+修正：重寫 `visual_story`，只保留該段落中的人物、物件、機制與結果；刪除泛用科技裝飾。
 
-```text
-Regenerate from scratch. Preserve the article visual thesis and semantic contract before applying style. Include every must-show item and the defined relationships. Remove generic substitute objects that are not explicitly mapped. The unannotated base image must pass the blind-caption and neighbor-article tests.
-```
+## 2. Simplify Scene
 
-## 2. Source-Fidelity Reset
+症狀：畫面太技術、太滿或像論文架構圖。
 
-Use for technical research when the mechanism was invented or anthropomorphized.
+修正：把關鍵物件降到 2–4 類，只呈現一個關係；把精確名稱、比例與數字移到解釋卡。
 
-```text
-Return to the primary architecture or method description. Rebuild the image from domain-faithful modules, ordering, counts, state changes, comparison conditions, and resource behavior. Do not use office workers, a city, a factory, generic servers, gears, robots, brains, or a road unless the source concept explicitly maps to them.
-```
+## 3. Layout Reset
 
-## 3. Hero Rebuild
+症狀：文字遮住畫面或卡片太亂。
 
-Use when a featured image is generic or does not compress the article thesis.
+修正：換固定 layout，不手動散放標籤；優先使用 header + bottom cards 或 header + right cards。
 
-```text
-Rebuild the hero around the declared hero artifact. Make at least three must-show elements visible and encode one decisive relationship or trade-off. Do not produce a generic world-establishing scene.
-```
+## 4. Text Rewrite
 
-## 4. Style Reset
+症狀：文字像段落摘要、太長或沒有判斷。
 
-Use when semantic content is correct but material, palette, cutout edges, shadows, or camera drift.
+修正：headline 改成一句結論；每張卡只保留名稱／數字和一句解釋。
 
-## 5. Prompt Compression
+## 5. Card Reduction
 
-Reduce supporting elements to 3–5, halve people count, remove secondary routes, preserve one action, and lower density.
+症狀：手機縮小後不可讀。
 
-## 6. Anatomy Simplification
+修正：由 4 張卡降為 3 張，再降為 2 張；不要縮小到難讀。
 
-Replace detailed gestures with simple silhouettes and express action through object position, route, and staggered states.
+## 6. Style Restore
 
-## 7. De-PPT Rewrite
+症狀：羊皮紙、剪紙、色盤、鏡頭或陰影漂移。
 
-Keep the technical relationships, but convert formal boxes into paper modules, layer cards, state cells, matched tracks, or one physical cutaway. Do not delete the semantic contract.
+修正：使用 calibration frame 鎖材質，不複製構圖。
 
-## 8. Motion Clarification
+## 7. Image Merge
 
-Freeze the decisive middle moment using partial assembly, staggered states, converging routes, or resource growth.
+症狀：兩張圖內容相似。
 
-## 9. Continuity Restore
-
-Match the calibration frame only for material and visual language. Never copy its composition or replace a later shot's article-specific content.
-
-## 10. Annotation-only correction
-
-When the base image passes semantic QA, change only label text, placement, target, font size, or callout routing. An annotation must not relabel an unrelated object as if it were meaningful evidence.
+修正：合併成一張更清楚的圖，降低整篇圖片總數。
