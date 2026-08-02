@@ -1,148 +1,119 @@
 # Composition Patterns
 
-一張圖選一個主要 pattern，最多加一個輔助 pattern。不要把所有結構混進同一張。
+Choose one primary pattern and at most one supporting pattern. Semantic grounding comes first; a pattern is only a spatial tool.
 
-## 1. Process Station
+## Technical patterns
 
-適合：食物製作、編輯、檢索、組裝、原料變產品。
+### 1. Technical Mechanism
 
-畫法：
+Best for: algorithms, memory systems, model internals, scientific mechanisms, hardware paths.
 
-- 中央一個工作台、廚房、編輯桌、機器或攤位。
-- 輸入從 2–3 個方向進來，成品從另一側出現。
-- 主角正在操作核心步驟。
-- 使用拋物線、半成品與成品暗示 time-lapse。
+- Show 2–5 domain-faithful modules.
+- Make inputs, state changes, retrieval, or outputs physically visible.
+- Use tokens, layer cards, state cells, memory cards, gates, or source-specific artifacts.
+- Preserve the article's actual component relationships.
 
-避免：方框 + 箭頭、每步都有文字、十幾個細節。
+Avoid: generic server rooms, operators around a machine, decorative circuitry, or unlabeled boxes that could represent anything.
 
-## 2. Route Network
+### 2. Architecture Stack
 
-適合：人流、資訊流、供應鏈、傳播、多來源匯聚、地理移動。
+Best for: repeated layers, ratios, interleaving, hierarchy, model blocks.
 
-畫法：
+- Use repeated paper modules with visible rhythm.
+- Encode ratios through count and order, not only later labels.
+- Show that modules belong to one stack.
+- Keep one input and one output path.
 
-- 俯視羊皮紙地圖。
-- 一條主路徑與少量分支。
-- 角色或物件沿路徑移動。
-- 中心有明確目的地。
-- 路徑由淡到深、由細到粗表達成長。
+Avoid: separating one architecture into unrelated buildings or replacing layer count with arbitrary crowds.
 
-避免：複雜地鐵圖、每個節點標名稱、大量箭頭。
+### 3. Resource Contrast
 
-## 3. Timeline Journey
+Best for: memory growth, latency, throughput, cost, energy, storage.
 
-適合：歷史演變、家庭到街頭、手工到工業、產品生命週期。
+- Compare the same workload on two visible tracks.
+- Show the resource that grows, stays bounded, or changes slope.
+- Keep workload and scale conditions visually matched.
+- Use containers, card trails, queues, or repeated tokens only when their mapping is explicit.
 
-畫法：
+Avoid: coin piles or speed lines with no visible connection to the measured resource.
 
-- 一條彎曲路徑穿過 3–4 個場景。
-- 場景自然嵌在同一張地圖，不是四格投影片。
-- 物件逐步增加、變形或變大。
+### 4. Claim Comparison
 
-避免：正式年份刻度、硬切四格漫畫、每段有標題。
+Best for: baseline versus proposed method, before/after evaluation, fair comparison.
 
-## 4. Before / After Landscape
+- Keep inputs and conditions visibly matched.
+- Change only the mechanism being compared.
+- Show both quality and efficiency only if both are part of the source claim.
+- Prefer one decisive relationship over a collage of benchmark symbols.
 
-適合：混亂／有序、分散／聚集、沒有系統／有系統、冷清／熱鬧。
+Avoid: trophy imagery, podiums, generic winners, or unequal input conditions.
 
-畫法：
+## General patterns
 
-- 左右或上下兩個自然區域。
-- 中間由道路、河流、門或機械連接。
-- 同一 recurring motif 在兩側呈現不同狀態。
-- 角色數與密度形成對比。
+### 5. Process Station
 
-避免：大字寫 BEFORE / AFTER、簡報模板式對稱、兩邊畫風不同。
+Best for: food making, editing, retrieval, assembly, raw material becoming an output.
 
-## 5. Scale-up Crowd
+Use a central workbench or machine only when its input, transformation, and output map directly to the article.
 
-適合：熱門、採用、需求成長、排隊、群眾效應。
+### 6. Route Network
 
-畫法：
+Best for: people, information, goods, money, or influence moving across real or conceptual locations.
 
-- 中央主體保持清楚。
-- 人物從不同方向沿路徑進入。
-- 前景 2–3 個清楚人物，其餘為群眾 cluster。
-- 用桌椅、盤子、車輛、建築或紙片數量增加表示規模。
+Do not use a route merely because the visual style contains map lines.
 
-避免：要求 30 張清楚臉孔、每個人都做複雜交換動作、群眾遮住主體。
+### 7. Timeline Journey
 
-## 6. Cutaway Mechanism
+Best for: history, product evolution, family-to-market change, lifecycle.
 
-適合：RAG、搜尋、推薦、供應鏈內部、黑箱機制。
+Use one continuous route through 3–4 scenes, not slide panels.
 
-畫法：
+### 8. Before / After Landscape
 
-- 一個大型紙製裝置被剖開。
-- 內部只保留 3–5 個可理解區域。
-- 紙片、卡片、食材或角色沿內部路徑移動。
-- 主角在其中一個關鍵區域工作。
+Best for: disorder/order, fragmented/concentrated, manual/automated, quiet/crowded.
 
-避免：真實軟體架構圖、資料庫圓柱與 API 方框、密集技術文字。
+Keep conditions comparable and connect the two states through one visible cause.
 
-## 7. Ecosystem Tableau
+### 9. Scale-up Crowd
 
-適合：多角色市場、社會場景、最終結果定格。
+Best for: adoption, demand, queues, public response.
 
-畫法：
+Use crowd clusters and physical evidence of scale. Do not use crowds for technical model architecture.
 
-- 中央主體 + 周圍 3–5 個行為群組。
-- 使用桌子、攤位、道路、建築或地形自然分區。
-- 每組只做一個簡單動作。
-- 適合作為一組圖片結尾。
+### 10. Cutaway Mechanism
 
-避免：主體不明、每個角落塞資訊、變成找找看遊戲。
+Best for: RAG, search, recommendation, supply chain, black-box systems.
 
-## 8. Physical Metaphor
+For technical research, use domain-faithful modules instead of generic rooms or people unless humans are actual actors.
 
-適合：信任、權威、風險、注意力、內容複利等抽象觀點。
+### 11. Ecosystem Tableau
 
-畫法：
+Best for: markets and social systems with multiple real actors.
 
-1. 把抽象名詞換成物理材料。
-2. 把關係換成一個動作。
-3. 把系統換成低科技場景。
-4. 讓人物真的完成動作。
+Do not use it as a default hero for a paper about an internal algorithm.
 
-例：
+### 12. Physical Metaphor
 
-- 權威 → 多張證據紙片搭成可通行的橋。
-- 注意力 → 四面路徑匯入逐漸擁擠的市場。
-- 檢索 → 紙片從檔案小屋沿輸送帶進入編輯台。
-- 內容複利 → 一張紙片經過壓印機後變成多個用途的紙件。
+Best for: trust, authority, risk, attention, compounding, or other abstract arguments.
 
-避免：泛用燈泡、火箭、拼圖；只有象徵沒有動作；把隱喻名稱寫在圖上。
+A metaphor is valid only when each important source concept has an explicit visible mapping in `semantic_contract.visual_evidence`.
 
-## 9. Evidence Chain
+### 13. Evidence Chain
 
-適合：GEO、AI 引用、研究論證、信任建立。
+Best for: research argument, GEO citations, verification, trust.
 
-畫法：
+Use source artifacts that converge into a result. Do not replace the studied mechanism with a pile of generic documents.
 
-- 不同來源以報紙剪片、印章、檔案卡、書頁或路標呈現。
-- 它們沿路徑匯聚或搭建成橋、階梯、屋頂。
-- 最終結果站在結構上，而不是旁邊。
+### 14. Origin Map
 
-避免：連結鏈圖示、品牌 logo 牆、真實搜尋結果截圖。
+Best for: food, culture, language, technology, or product diffusion across places.
 
-## 10. Origin Map
+Use only when geographic movement is part of the article.
 
-適合：食物、文化、語言、技術、商品的來源與傳播。
+## Anti-repetition and anti-drift
 
-畫法：
-
-- 只畫必要地理輪廓，不做精準政治地圖。
-- 起點有清楚物件或人物。
-- 路徑往 2–4 個方向擴散。
-- 地方差異用物件變化，不用文字標籤。
-
-避免：國界爭議的精確宣稱、旗幟堆疊、地圖細節搶走主題。
-
-## 反重複規則
-
-同一篇文章：
-
-- 同一 pattern 最多使用 2 次。
-- 不連續使用兩張完全相同的左進右出構圖。
-- recurring motif 要持續，但主物件與動作要變化。
-- 若兩張 shot 的 core idea 可用同一構圖表達，合併或刪除其中一張。
+- A pattern cannot override `must_show`.
+- The same pattern should not be used more than twice per article.
+- A recurring motif may unify images, but it must not replace article-specific artifacts.
+- If two shots can use the same generic composition, merge them or make their semantic contracts more specific.
+- For technical research, people are optional and usually secondary; do not anthropomorphize a mechanism by default.

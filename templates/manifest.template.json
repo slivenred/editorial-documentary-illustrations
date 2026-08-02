@@ -1,107 +1,168 @@
 {
-  "version": 3,
+  "version": 4,
   "article": {
-    "title": "<article title>",
-    "slug": "<kebab-case-slug>",
-    "language": "<detected BCP-47 source language, e.g. en>",
-    "annotation_language": "<resolved BCP-47 annotation language; same as article unless user overrides>",
-    "summary": "<one-sentence article summary of at least twenty characters>",
-    "target_count": 5
+    "title": "Hybrid attention architecture study",
+    "slug": "hybrid-attention-architecture-study",
+    "language": "en",
+    "annotation_language": "en",
+    "summary": "A hybrid architecture uses mostly bounded-state attention layers and a smaller number of precise retrieval layers to reduce long-context memory costs without losing critical recall.",
+    "target_count": 1,
+    "article_type": "technical-research",
+    "visual_thesis": "A 3:1 hybrid stack retains selective full-attention retrieval while replacing most growing KV cache with compact recurrent state.",
+    "topic_signature": [
+      "bounded recurrent state",
+      "full-attention retrieval layer",
+      "3:1 layer ratio",
+      "growing KV cache",
+      "long-context decoding"
+    ],
+    "global_must_avoid": [
+      "generic AI robot or glowing brain",
+      "unrelated office workers operating a machine",
+      "server city, factory, or decorative gears with no architecture mapping"
+    ]
   },
   "visual_bible": {
-    "world_summary": "<shared visual world for this article>",
+    "world_summary": "A domain-faithful paper-cutout model architecture built from layered attention modules, state capsules, token ribbons, and comparison tracks on one restrained parchment field.",
     "background": "Warm aged parchment with subtle fiber texture, faint map grid, and two gentle diagonal creases.",
     "palette": [
       "dark ink brown for outlines and structure",
-      "terracotta for the main actor and primary action",
-      "mustard ochre for the main route",
-      "muted sage for verified or safe outcomes",
-      "dusty indigo for infrastructure or comparison",
-      "warm brick red for risk or escalation"
+      "terracotta for bounded-state attention modules",
+      "mustard ochre for token flow",
+      "muted sage for retained compact state",
+      "dusty indigo for full-attention retrieval and KV comparison",
+      "warm brick red for growing memory cost"
     ],
     "camera": "top-down-map-15deg",
     "lighting": "Soft warm light from upper left; short soft shadows fall to lower right.",
-    "character_system": "<fixed rules for protagonists, supporting figures, and crowd clusters>",
-    "recurring_motif": "<one recurring motif used across the article>",
+    "character_system": "No human figures by default; architecture modules, token cards, memory capsules, and comparison tracks carry the narrative.",
+    "recurring_motif": "one ochre token ribbon passing through every architecture module",
     "continuity_rules": [
       "Keep the same parchment tone and grid strength.",
-      "Keep the same camera angle.",
-      "Keep the same cutout edge and shadow direction.",
+      "Keep the same camera angle and short lower-right shadows.",
+      "Keep terracotta for bounded-state modules and indigo for full-attention modules.",
       "Do not render text in the base image.",
-      "Keep the same paper-tag annotation style and color semantics."
+      "Keep the same paper-tag annotation style and color semantics.",
+      "Semantic component identity outranks decorative style choices."
     ]
   },
   "shots": [
     {
       "id": "01",
-      "placement_after": "<recommended paragraph>",
-      "anchor": "<source article anchor>",
-      "role": "process-station",
-      "core_idea": "<the one thing the reader should understand>",
-      "composition": "<scene, people, objects, and quiet annotation regions; at least thirty characters>",
-      "main_subject": "<single focal subject>",
+      "image_role": "hero",
+      "visualization_mode": "literal-technical",
+      "placement_after": "Article header",
+      "anchor": "The architecture interleaves three bounded-state layers with one full-attention retrieval layer.",
+      "role": "architecture-stack",
+      "core_idea": "The hybrid stack preserves precise retrieval in one layer while shifting most layers to compact recurrent state.",
+      "composition": "Center one four-module paper architecture stack: three terracotta bounded-state modules and one indigo full-attention retrieval module interleaved in a single stack. An ochre token ribbon passes through all four modules. Beside the stack, contrast a compact sage state capsule with a visibly lengthening brick-red KV card trail. Reserve quiet parchment pockets above and at the outer sides without hiding the layer topology.",
+      "main_subject": "four-layer hybrid attention stack",
       "supporting_elements": [
-        "<element 1>",
-        "<element 2>"
+        "ochre token ribbon",
+        "compact recurrent-state capsule",
+        "growing KV-card trail",
+        "long-context comparison track"
       ],
       "motion_cues": [
-        "<motion cue 1>"
+        "token cards enter the first module at staggered positions",
+        "the compact state capsule remains fixed while the KV-card trail grows",
+        "the single indigo retrieval layer reconnects distant token cards"
       ],
-      "density": "low",
-      "people_count": 1,
-      "filename": "01-topic-name.png",
-      "alt_text": "<alt text in article.annotation_language>",
-      "caption": "",
+      "density": "medium",
+      "people_count": 0,
+      "semantic_contract": {
+        "source_basis": [
+          "Three bounded-state attention layers are interleaved with one full-attention retrieval layer.",
+          "The bounded-state path keeps recurrent memory compact while the full-attention comparison accumulates KV cache with context length."
+        ],
+        "must_show": [
+          "one four-layer stack containing three bounded-state modules and one full-attention module",
+          "a token stream crossing the interleaved modules in sequence",
+          "a compact recurrent state contrasted with a growing KV cache trail"
+        ],
+        "must_not_show": [
+          "four disconnected machines that do not form one model stack",
+          "generic workers, robot, brain, server city, or decorative factory"
+        ],
+        "visual_evidence": [
+          {
+            "concept": "3:1 layer ratio",
+            "visible_form": "one four-module stack with three terracotta modules and one indigo module",
+            "relationship": "the four modules are interleaved in one repeated architecture rather than shown as separate systems"
+          },
+          {
+            "concept": "bounded recurrent state",
+            "visible_form": "one compact sage state capsule that remains the same physical size",
+            "relationship": "the capsule receives the token flow without lengthening as context grows"
+          },
+          {
+            "concept": "growing KV cache",
+            "visible_form": "a brick-red trail of token-memory cards that becomes visibly longer",
+            "relationship": "the trail grows beside the fixed state capsule to make the resource contrast observable"
+          }
+        ],
+        "specificity_terms": [
+          "3:1 layer ratio",
+          "bounded recurrent state",
+          "growing KV cache",
+          "full-attention retrieval layer"
+        ],
+        "expected_blind_caption": "A 3:1 layer stack sends tokens through three bounded recurrent-state modules and one full-attention retrieval layer while a fixed state capsule is contrasted with a growing KV cache trail.",
+        "hero_artifact": "one interleaved four-layer hybrid attention stack"
+      },
+      "filename": "01-hybrid-attention-stack.png",
+      "alt_text": "A four-layer paper architecture uses three bounded-state modules and one full-attention layer, beside a fixed state capsule and a growing KV cache trail.",
+      "caption": "The hybrid keeps most layers on a bounded-state path while retaining one precise retrieval layer.",
       "annotation": {
         "enabled": true,
-        "language": "<same as article.annotation_language>",
+        "language": "en",
         "layout_status": "draft",
         "headline": {
-          "text": "<core insight in annotation language>",
-          "x": 0.42,
-          "y": 0.06,
+          "text": "Most layers keep state compact; one layer restores exact retrieval",
+          "x": 0.3,
+          "y": 0.05,
           "accent": "terracotta",
-          "font_size": 42,
+          "font_size": 40,
           "angle": 0
         },
         "labels": [
           {
-            "text": "<label 1>",
-            "x": 0.06,
-            "y": 0.18,
-            "target_x": 0.24,
-            "target_y": 0.34,
-            "accent": "indigo",
-            "font_size": 31,
-            "angle": -2
+            "text": "3 bounded-state layers",
+            "x": 0.05,
+            "y": 0.2,
+            "target_x": 0.42,
+            "target_y": 0.45,
+            "accent": "terracotta",
+            "font_size": 28,
+            "angle": -1
           },
           {
-            "text": "<label 2>",
-            "x": 0.48,
-            "y": 0.28,
-            "target_x": 0.58,
-            "target_y": 0.5,
-            "accent": "terracotta",
-            "font_size": 32,
+            "text": "1 retrieval layer",
+            "x": 0.7,
+            "y": 0.18,
+            "target_x": 0.57,
+            "target_y": 0.42,
+            "accent": "indigo",
+            "font_size": 28,
             "angle": 1
           },
           {
-            "text": "<label 3>",
-            "x": 0.74,
-            "y": 0.22,
-            "target_x": 0.84,
-            "target_y": 0.48,
-            "accent": "sage",
-            "font_size": 31,
+            "text": "Fixed state vs growing KV",
+            "x": 0.62,
+            "y": 0.7,
+            "target_x": 0.55,
+            "target_y": 0.72,
+            "accent": "brick",
+            "font_size": 28,
             "angle": -1
           }
         ]
       },
       "motion_beats": [
-        "<0.0–1.5s establish>",
-        "<1.5–4.0s transform>",
-        "<4.0–7.5s expand>",
-        "<7.5–10.0s resolve>"
+        "The four interleaved modules and token ribbon appear.",
+        "Tokens pass through three bounded-state modules and one retrieval module.",
+        "The recurrent state stays compact while the comparison KV trail lengthens.",
+        "The architecture holds as one readable resource-and-retrieval trade-off."
       ]
     }
   ]

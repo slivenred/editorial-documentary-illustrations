@@ -1,89 +1,91 @@
 # QA Checklist
 
-## 兩階段驗收
+Still mode requires three gates:
 
-Still 模式分開驗收 Base QA 與 Final Annotation QA。不得只看底圖就交付，也不得用標註掩蓋錯誤底圖。
+1. **Semantic Preflight** before generation.
+2. **Base QA** on the text-free image.
+3. **Annotation QA** on the final image.
 
-## Base QA 硬性失敗項
+## Semantic Preflight hard failures
 
-- 不是橫式或無法安全裁成 16:9。
-- 底圖出現任何模型生成的標題、字幕、文字、數字、logo、浮水印或 UI。
-- 複製或高度近似既有影片影格或品牌資產。
-- 背景不是羊皮紙世界，或變成寫實場景。
-- 人物出現嚴重肢體、手指或臉部畸形。
-- 變成 PPT、企業向量插畫、遊戲式 3D render、動漫或兒童繪本。
-- 同篇文章的色盤、鏡頭、紙張、人物比例或陰影方向明顯漂移。
-- 主焦點不明、和段落無關，或沒有足夠安靜區容納標註。
+- `visual_thesis` is a topic label instead of a relationship or claim.
+- `topic_signature` contains only generic terms.
+- A shot has fewer than 2 must-show items; a hero has fewer than 3.
+- A hero has no domain-specific `hero_artifact`.
+- A technical-research hero uses `abstract-metaphor`.
+- Visual evidence does not map the article concepts to visible forms and relationships.
+- The planned composition could fit many unrelated articles after changing labels.
 
-## Final Annotation QA 硬性失敗項
+## Base QA hard failures
 
-底圖正確時，以下問題只修改 annotation plan：
+- The image is not safely usable as 16:9.
+- It contains model-generated text, numbers, logo, watermark, UI, or fake writing.
+- It copies an existing frame or branded asset.
+- It leaves the locked parchment-cutout world without a justified user override.
+- It has severe anatomy or object failures.
+- It becomes a generic PPT, corporate vector scene, game-like 3D render, anime image, or children's illustration.
+- Cross-image palette, camera, paper, scale, or shadow direction drifts.
+- Any `must_show` item is missing or visually unreadable.
+- The visible relationships contradict `visual_evidence`.
+- The hero does not center the `hero_artifact`.
+- The base image only becomes relevant after annotations are added.
+- The blind caption does not match `expected_blind_caption` or fails to mention at least two article-specific anchors.
+- The same image could illustrate a neighboring article by replacing the labels.
+- Technical research is replaced by generic robots, brains, factories, cities, workers, gears, server towers, shields, or roads without an explicit semantic mapping.
+- There is no calm region for deterministic annotation.
 
-- 標註語言不符合 `article.annotation_language` 或使用者指定語言。
-- `auto`、`detect`、`und`，或逐張使用 `mul` 等未解析值仍出現在最終 manifest。
-- 拼字、語法、地區用詞、文字方向、亂碼或字型顯示錯誤。
-- 名稱、比例、數字、單位或專有名詞與文章不一致。
-- headline 只是標題或泛用圖表名稱，沒有核心判斷。
-- label 指向不存在、錯誤物件或空白位置。
-- 文字遮住人物、主體、核心路徑或關鍵證據。
-- callout line 大量交叉。
-- 超過 7 個 labels 或出現長段文字。
-- 標註樣式跨圖漂移、畫面變成 PPT，或行動裝置縮小後不可讀。
+## Label-off test
 
-## 100 分制
+Hide every annotation. Ask:
 
-1. 段落相關性 — 18
-2. 風格鎖定 — 17
-3. 敘事與動態暗示 — 13
-4. 構圖與可讀性 — 12
-5. 跨圖連續性 — 12
-6. 生成品質 — 10
-7. 標註語意品質 — 10
-8. 標註版面品質 — 8
+- What mechanism or relationship is visible?
+- Which two details make this image specific to the article?
+- What would be lost if the labels were removed?
 
-## 交付門檻
+If the answer is only “a system processes information,” “people operate a machine,” or similar generic language, fail the base image.
 
-- 無任何硬性失敗項。
-- 總分至少 85。
-- 段落相關性至少 15／18。
-- 風格鎖定至少 15／17。
-- 標註語意品質至少 8／10。
-- 標註版面品質至少 7／8。
-- 跨圖連續性至少 10／12。
+## Blind-caption test
 
-## 檢查順序
+Write a one-sentence description without reading the prompt. Compare it with `expected_blind_caption`.
 
-1. 驗收無字底圖。
-2. 和 calibration frame 並排檢查連續性。
-3. 回到原文確認場景真的幫助理解。
-4. 檢查 `article.language`、`article.annotation_language` 與每張 `annotation.language`。
-5. 檢查文字事實、語法、專有名詞與數字。
-6. 檢查每條線的 target。
-7. 縮到約 360–420px 寬確認可讀性。
-8. 記錄失敗類型，再進 retry ladder。
+Pass only when the description contains:
 
-## 標註內容檢查
+- at least two specificity anchors; and
+- the intended relationship, sequence, trade-off, or change.
 
-- headline 是判斷，不是圖表類型。
-- labels 通常 3–6 個，且各自指向可見物件。
-- 數字、比例、模型名稱與階段名和原文一致。
-- 使用 `article.annotation_language` 的自然語法與地區用詞。
-- 若標註語言是 `zh-TW`，使用台灣繁體中文與台灣用詞；其他語言不得套用繁中規則。
-- 專有名詞、模型名、benchmark、縮寫與版本號保留原文，除非文章本身已有標準譯名。
-- 沒有把 caption 或整段正文搬進圖片。
+## Final Annotation QA hard failures
 
-## 群眾場景額外檢查
+When the base is correct, fix only the annotation plan for:
 
-- 主體仍可辨識。
-- 群眾由 cluster、隊伍、物件或建築數量共同表達。
-- 沒有大量交疊手臂與奇怪肢體。
-- labels 不逐一標註群眾個體，只標規模、方向或群組角色。
+- unresolved or incorrect language;
+- spelling, grammar, regional wording, direction, or font errors;
+- names, ratios, numbers, units, or terms that disagree with the article;
+- a generic headline;
+- labels pointing to missing, wrong, or semantically empty objects;
+- labels that rename generic decoration instead of identifying meaningful visual evidence;
+- text covering the hero artifact, must-show elements, people, or core relationships;
+- crossing callout lines, excessive labels, PPT-like density, or unreadable mobile scale.
 
-## 動畫額外檢查
+## 100-point score
 
-- exactly 10 seconds。
-- 24fps 或等效流暢。
-- 一個連續場景。
-- camera locked 或僅微幅漂移。
-- 無 voiceover、字幕、文字卡。
-- 最後至少 0.5 秒穩定停留。
+1. Semantic contract coverage — 25
+2. Article specificity — 15
+3. Relationship and causal fidelity — 15
+4. Paragraph or article-role relevance — 10
+5. Style lock — 10
+6. Composition and readability — 8
+7. Cross-image continuity — 7
+8. Generation quality — 5
+9. Annotation semantic quality — 3
+10. Annotation layout quality — 2
+
+## Delivery threshold
+
+- no hard failure;
+- total at least 88;
+- semantic contract coverage at least 22/25;
+- article specificity at least 12/15;
+- relationship fidelity at least 12/15;
+- style lock at least 8/10.
+
+Style cannot compensate for low semantic fidelity.

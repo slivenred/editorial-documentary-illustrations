@@ -1,5 +1,9 @@
 # Character and Object System
 
+## Semantic priority
+
+People are optional. They may appear only when people are real actors in the article or when a controlled metaphor explicitly maps their role. For technical research, model components, layers, token streams, state cells, memory trails, comparison tracks, and scientific artifacts should usually carry the narrative. Do not add office workers around a generic machine to make an algorithm look active.
+
 ## 人物目標
 
 人物是敘事單位，不是肖像。要能看懂誰在做什麼，但不需要精細五官、手指、肌肉或寫實服裝。

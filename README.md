@@ -9,73 +9,111 @@
   <a href="README.es.md">Español</a>
 </p>
 
-> Turn an article’s key judgments, timelines, causal chains, hidden mechanisms, and changes in scale into a consistent series of annotated 16:9 parchment cutout illustrations.
+> Turn an article’s mechanisms, comparisons, causal chains, and results into a consistent series of semantically grounded 16:9 parchment-cutout illustrations with reviewed annotations.
 
-**Editorial Documentary Illustrations** is an installable Skill for Codex and other AI agents that can follow `SKILL.md` workflows. It reads an article, selects the passages that genuinely benefit from visualization, builds an article-level Visual Bible, generates text-free base images, and then adds reviewed semantic annotations in the language that best matches the source article or the user’s target audience.
+**Editorial Documentary Illustrations** is an installable Skill for Codex and other agents that can follow `SKILL.md`. It does not treat a recognizable visual style as proof of relevance. Before generation, every image receives a source-grounded semantic contract that defines what the unannotated base image must visibly show, how the concepts relate, and which generic substitutions are forbidden.
 
-## Why this Skill exists
+## The failure this update addresses
 
-A single long image prompt often fails in predictable ways:
+A polished parchment-cutout image can still be useless when it could illustrate dozens of unrelated articles after changing only the labels. This happens when the workflow locks style but leaves article meaning as free-form prose.
 
-1. Images from the same article drift into different visual styles.
-2. Abstract ideas become slide-like diagrams instead of narrative scenes.
-3. The images look attractive but do not help the reader understand the text.
-4. Asking an image model to typeset labels produces misspellings, fake numbers, or unreadable text.
-5. Labels are hard-coded to one language even when the article or audience uses another.
+The Skill now separates six responsibilities:
 
-This Skill addresses those problems with five layers:
+- **Article map and cognitive anchors** — identify the mechanism, relationship, trade-off, change, or result worth visualizing.
+- **Article semantic foundation** — define `article_type`, `visual_thesis`, `topic_signature`, and `global_must_avoid`.
+- **Per-shot semantic contract** — define source claims, must-show evidence, visual mappings, specificity terms, blind-caption target, and hero artifact.
+- **Article Visual Bible and Style Lock** — keep material, palette, camera, lighting, proportions, and annotation style consistent without replacing the article mechanism.
+- **Language-aware deterministic annotations** — generate text-free images, then add reviewed labels in the resolved article or audience language.
+- **Three-stage QA** — Semantic Preflight, Base QA, and Annotation QA.
 
-- **Cognitive anchors** — illustrate only the passages that contain a meaningful mechanism, contrast, journey, bottleneck, scale change, or conclusion.
-- **Article Visual Bible** — lock the parchment, palette, camera, lighting, character proportions, recurring motif, and annotation style for the whole article.
-- **Immutable Style Lock** — repeat the same visual constraints in every base-image prompt.
-- **Language-aware annotation pipeline** — generate a text-free image first, then add deterministic, reviewed labels in post-production.
-- **QA and retry ladder** — validate base images and final annotated images separately.
+## Meaning overrides style
 
-## How it works
+The unannotated image must already be article-specific. An annotation may name a visible component, but it may not turn a generic machine, city, factory, robot, brain, server tower, road, shield, or group of workers into a technical mechanism after the fact.
+
+For technical research, the default priority is:
+
+1. `literal-technical`
+2. `hybrid-metaphor`
+3. `literal-scene`
+4. `abstract-metaphor` only when no domain-faithful structure is possible
+
+A technical-research hero may not use `abstract-metaphor`.
+
+## Workflow
 
 ```text
-Article
+Article and primary sources
   ↓
-Article map and cognitive anchors
+Article map + article type
   ↓
-Article Visual Bible
+Visual thesis + topic signature
   ↓
-Version 3 shot manifest
+Version 4 semantic contracts
+  ↓
+Semantic Preflight
   ↓
 Text-free calibration image
   ↓
-Remaining text-free images with style reference
+Label-off + Blind-caption + Neighbor-article tests
   ↓
-Language resolution and annotation planning
+Remaining grounded base images
+  ↓
+Language resolution + annotation plan
   ↓
 Deterministic paper-tag rendering
   ↓
-Base-image QA + annotation QA
+Final Annotation QA
 ```
+
+## The semantic contract
+
+Every shot includes:
+
+- `image_role`: `hero` or `inline`
+- `visualization_mode`
+- `source_basis`
+- `must_show`
+- `must_not_show`
+- `visual_evidence`: concept → visible form → required relationship
+- `specificity_terms`
+- `expected_blind_caption`
+- `hero_artifact` for a hero image
+
+A hero must be first, must be unique, must contain at least three must-show items, and must overlap the article topic signature with at least two specificity terms.
+
+## Three mandatory semantic tests
+
+### Label-off test
+
+Hide every annotation. The mechanism and relationship must still be visible.
+
+### Blind-caption test
+
+Describe the unannotated image in one sentence. The description must contain at least two article-specific anchors for a hero and preserve the intended relationship.
+
+### Neighbor-article test
+
+If changing labels alone would make the same image suitable for another article, the base image fails.
 
 ## Annotation language resolution
 
-The Skill resolves the final annotation language in this order:
+The Skill resolves the target language in this order:
 
-1. An explicit language requested by the user.
-2. Article metadata such as frontmatter, locale, or `lang`.
-3. The dominant reader-facing language in the title, introduction, headings, and body.
-4. For mixed-language articles, the majority explanatory prose; code, URLs, quotations, references, brand names, and proper nouns are ignored.
-5. The conversation language only when the article is too short or ambiguous.
+1. explicit user instruction;
+2. article frontmatter, locale, or `lang` metadata;
+3. dominant reader-facing language in title, introduction, headings, and body;
+4. majority explanatory prose for mixed-language articles, ignoring code, URLs, quotations, references, brands, and proper nouns;
+5. conversation language only when the article is too short or ambiguous.
 
-The result must be stored as a concrete BCP 47 tag such as `zh-TW`, `en`, `ja`, `ko`, or `es`. Unresolved values such as `auto` and `und` are rejected. `mul` is reserved for explicitly multilingual article-level output, while every individual image must still use a concrete language.
-
-Product names, model names, benchmark names, acronyms, versions, numbers, units, and percentages remain in their original source form unless the user explicitly requests otherwise.
+The result is a concrete BCP 47 tag such as `zh-TW`, `en`, `ja`, `ko`, or `es`. `auto` and `und` are rejected. Product names, model names, benchmarks, acronyms, versions, numbers, units, and percentages remain in their source form unless the user requests otherwise.
 
 ## Default output
 
-- 16:9 horizontal inline article illustrations.
-- Usually 3–7 images per article; up to 9 for long-form content.
-- One insight headline and 3–6 short semantic callouts per final image.
-- Text-free base images generated by the image model.
-- Deterministic annotation rendering with callout lines and target dots.
-- `alt_text`, `caption`, and image annotations in the resolved target language.
-- Separate storage for raw and annotated assets:
+- 16:9 horizontal article illustrations.
+- Usually 3–7 images; up to 9 for long-form content.
+- One insight headline and 3–6 short callouts per final image.
+- Text-free base images plus deterministic annotated images.
+- Separate raw and final assets:
 
 ```text
 assets/<article-slug>-editorial-documentary/
@@ -84,88 +122,65 @@ assets/<article-slug>-editorial-documentary/
 ├── prompts/
 ├── images/
 │   ├── raw/
-│   │   └── 01-*.png
 │   └── 01-*.png
 └── delivery.md
 ```
 
 ## Installation
 
-Copy the repository into your Codex Skills directory:
-
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R ./editorial-documentary-illustrations \
   "${CODEX_HOME:-$HOME/.codex}/skills/"
-```
-
-Install the annotation dependency:
-
-```bash
 python3 -m pip install -r requirements-annotation.txt
 ```
 
-No font files are bundled. The renderer selects a compatible local font based on `article.annotation_language`, or you can pass a local font path with `--font`. Arabic, Hebrew, and some South Asian scripts work best with Pillow built with RAQM support and an appropriate local font.
+No font files are bundled. The renderer selects a compatible local font based on `article.annotation_language`, or accepts a local path through `--font`.
 
 ## Usage
 
-### Plan illustrations without generating images
+### Plan without generating
 
 ```text
 Use $editorial-documentary-illustrations
-Analyze the article below and create a version 3 shot manifest for five documentary cutout illustrations. Do not generate images yet.
-Automatically resolve the primary reader language and draft one insight headline plus 3–6 short callouts for each image in that language.
+Analyze the article and its primary sources. Create a version 4 manifest for five images.
+Before choosing compositions, define the article type, visual thesis, topic signature, global must-avoid list, and a semantic contract for every shot.
+Do not generate images yet.
 
 <article>
 ```
 
-### Generate the complete annotated set
+### Generate a complete grounded set
 
 ```text
 Use $editorial-documentary-illustrations
-Create five 16:9 parchment cutout inline illustrations for the article below.
-Resolve the article’s primary reader language automatically unless I specify another target language.
-Generate text-free base images first, then inspect the actual composition and add one insight headline plus 3–6 short semantic labels.
-Every label must point to a visible object, preserve source terminology, and pass factual and language review.
+Create five 16:9 parchment-cutout article illustrations.
+Meaning must override style. The unannotated base image must express the article-specific mechanism and pass the Label-off, Blind-caption, and Neighbor-article tests.
+Generate text-free bases first, then add reviewed annotations in the resolved reader language.
 
 <article>
 ```
 
-### Override the annotation language
+### Technical research
 
 ```text
 Use $editorial-documentary-illustrations
-The source article is in English, but the illustrations are for readers in Taiwan. Use zh-TW for annotations, alt text, and captions. Keep model names, acronyms, benchmark names, and numbers in their original form.
+This is a technical-research article. Read the abstract, architecture or method figure, method, results, and limitations before planning the hero.
+Use a domain-faithful architecture artifact. Do not replace the mechanism with generic workers, factories, cities, robots, brains, gears, or server towers.
 ```
 
-### Create an exactly 10-second motion prompt
-
-```text
-Use $editorial-documentary-illustrations
-Convert shot 3 into an exactly 10-second, smooth 24fps documentary cutout animation prompt.
-No voiceover and no text overlays. Use only ambient sound and one continuous time-lapse scene.
-```
-
-## Validation, prompt rendering, and annotation
-
-Validate a manifest:
+## Validation, preflight, prompt rendering, and annotation
 
 ```bash
 python3 scripts/validate_manifest.py path/to/manifest.json
-```
 
-Render text-free still prompts and the annotation plan:
+python3 scripts/semantic_preflight.py path/to/manifest.json
 
-```bash
 python3 scripts/render_prompts.py \
   path/to/manifest.json \
   --mode still \
   --output path/to/prompts-still
-```
 
-After placing generated base images in `images/raw/`, finalize the annotation coordinates and render the final images:
-
-```bash
 python3 scripts/annotate_images.py \
   path/to/manifest.json \
   --input path/to/images/raw \
@@ -173,102 +188,78 @@ python3 scripts/annotate_images.py \
   --force
 ```
 
-Use a specific local font when required:
-
-```bash
-python3 scripts/annotate_images.py \
-  path/to/manifest.json \
-  --input path/to/images/raw \
-  --output path/to/images \
-  --font /path/to/local-font.ttf \
-  --force
-```
-
-## Version 3 manifest essentials
+## Version 4 manifest excerpt
 
 ```json
 {
-  "version": 3,
+  "version": 4,
   "article": {
-    "title": "Example article",
-    "slug": "example-article",
-    "language": "en",
-    "annotation_language": "en",
-    "summary": "A concise summary of the article and its central argument.",
-    "target_count": 5
+    "article_type": "technical-research",
+    "visual_thesis": "A 3:1 hybrid stack retains precise retrieval while replacing most growing KV cache with bounded recurrent state.",
+    "topic_signature": [
+      "bounded recurrent state",
+      "full-attention retrieval layer",
+      "3:1 layer ratio",
+      "growing KV cache"
+    ],
+    "global_must_avoid": [
+      "generic AI robot or glowing brain",
+      "unrelated office workers operating a machine"
+    ]
   },
   "shots": [
     {
-      "id": "01",
-      "filename": "01-specialist-model.png",
-      "alt_text": "A compact specialist model handles the main workflow while difficult cases branch to a larger model.",
-      "caption": "Routine work remains on the efficient path; only difficult cases are escalated.",
-      "annotation": {
-        "enabled": true,
-        "language": "en",
-        "layout_status": "draft",
-        "headline": {
-          "text": "Keep routine work on the efficient path",
-          "x": 0.38,
-          "y": 0.06,
-          "accent": "terracotta",
-          "font_size": 42,
-          "angle": 0
-        },
-        "labels": []
+      "image_role": "hero",
+      "visualization_mode": "literal-technical",
+      "role": "architecture-stack",
+      "semantic_contract": {
+        "source_basis": ["Grounded claim one", "Grounded claim two"],
+        "must_show": ["Required structure", "Required relationship", "Required resource contrast"],
+        "must_not_show": ["Generic machine with no architecture mapping"],
+        "visual_evidence": [
+          {
+            "concept": "3:1 layer ratio",
+            "visible_form": "one four-module stack with three terracotta and one indigo module",
+            "relationship": "the modules form one interleaved architecture"
+          }
+        ],
+        "specificity_terms": ["3:1 layer ratio", "bounded recurrent state"],
+        "expected_blind_caption": "A four-layer hybrid stack contrasts bounded state with a growing KV cache trail.",
+        "hero_artifact": "one interleaved four-layer attention stack"
       }
     }
   ]
 }
 ```
 
-See [`templates/manifest.template.json`](templates/manifest.template.json) and [`schemas/shot-manifest.schema.json`](schemas/shot-manifest.schema.json) for the complete structure.
+See [`templates/manifest.template.json`](templates/manifest.template.json), [`schemas/shot-manifest.schema.json`](schemas/shot-manifest.schema.json), and [`references/semantic-grounding.md`](references/semantic-grounding.md).
 
 ## Repository structure
 
 ```text
 .
 ├── SKILL.md
-├── README.md
-├── README.zh-TW.md
-├── README.zh-CN.md
-├── README.ja.md
-├── README.ko.md
-├── README.es.md
-├── LICENSE
-├── NOTICE.md
-├── requirements-annotation.txt
-├── agents/openai.yaml
+├── README*.md
 ├── references/
-│   ├── annotation-system.md
+│   ├── semantic-grounding.md
 │   ├── article-analysis.md
-│   ├── visual-bible.md
-│   ├── style-dna.md
+│   ├── composition-patterns.md
 │   ├── prompt-template.md
 │   ├── qa-checklist.md
-│   └── retry-ladder.md
+│   └── ...
 ├── schemas/shot-manifest.schema.json
 ├── templates/manifest.template.json
 ├── scripts/
-│   ├── annotate_images.py
+│   ├── semantic_preflight.py
+│   ├── validate_manifest.py
 │   ├── render_prompts.py
-│   └── validate_manifest.py
+│   └── annotate_images.py
 └── tests/test_tooling.py
 ```
-
-## Design principles
-
-- One image communicates one core idea.
-- The final image must explain the article, not merely decorate it.
-- The image model creates the visual world; deterministic post-production handles text.
-- Annotation language follows the article or an explicit audience override.
-- Labels must point to visible objects and add cognitive value.
-- A correct base image is not regenerated when only the annotation plan is wrong.
-- Brand references are treated as descriptive shorthand, never as permission to reproduce an existing frame or identity system.
 
 ## Attribution and license
 
 - Released under the [MIT License](LICENSE).
 - The multi-step workflow was inspired by and adapted from Ian’s [`ian-xiaohei-illustrations`](https://github.com/helloianneo/ian-xiaohei-illustrations); see [`NOTICE.md`](NOTICE.md).
-- This repository does not include the original Xiaohei character IP, example images, prompts verbatim, or font files.
+- This repository does not include the original Xiaohei character IP, example images, copied prompts, or font files.
 - This project is not affiliated with, endorsed by, or produced by Vox Media. Do not copy specific frames, logos, title cards, typefaces, or branded assets.

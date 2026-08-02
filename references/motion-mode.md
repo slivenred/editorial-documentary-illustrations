@@ -1,77 +1,61 @@
 # Motion Mode — Exactly 10 Seconds
 
-## 固定規格
+Motion mode inherits the same `semantic_contract` as the approved still image. It may animate the mechanism, but it may not replace or simplify it into generic activity.
 
-- Duration: exactly 10 seconds.
-- Frame rate: smooth 24fps.
-- One continuous scene.
-- No voiceover.
-- No text overlays or subtitles.
-- No logo or watermark.
-- Only subtle ambient background sound is implied.
-- Preserve the exact same visual bible as the still image.
-- Camera remains locked or uses one very slow, subtle drift.
+## Fixed specification
 
-## 四個節拍
+- exactly 10 seconds;
+- smooth 24fps;
+- one continuous scene;
+- no voiceover, dialogue, subtitles, text overlays, logo, or watermark;
+- only subtle ambient sound is implied;
+- preserve the same Visual Bible, hero artifact, must-show items, component identity, counts, order, comparisons, and resource behavior;
+- camera locked or one slow subtle drift;
+- final 0.5–0.8 seconds holds on a stable tableau.
 
-### 0.0–1.5 秒：Establish
+## Four beats
 
-羊皮紙世界先存在；主工作台、地點或核心物件出現；只建立一個視覺問題。
+### 0.0–1.5 seconds — Establish
 
-### 1.5–4.0 秒：Transform
+Reveal the article-specific artifact and the initial state. Do not open with generic parchment decoration.
 
-材料、證據、人物或物件開始匯入，核心動作發生。使用平滑 cutout movement、展開、組裝、混合、翻轉或搭建，不做硬切。
+### 1.5–4.0 seconds — Transform
 
-### 4.0–7.5 秒：Expand
+Animate the central mechanism, state transition, comparison, or causal action defined by `visual_evidence`.
 
-路徑延伸，人物從不同方向進入，隊伍、群眾、建築、紙片或結果逐步增加。用 cluster 表示規模。
+### 4.0–7.5 seconds — Expand
 
-### 7.5–10.0 秒：Resolve
+Make the scale, resource, route, ordering, or result change visible. Technical research should animate component behavior, not add decorative crowds.
 
-所有路徑與動作匯聚到清楚的最終 tableau。最後 0.5–0.8 秒穩定停留，不加入文字卡。
+### 7.5–10.0 seconds — Resolve
 
-## Motion Prompt 範本
+Resolve the visual thesis into one readable relationship. Hold the final frame long enough to inspect.
 
-```text
-Create an exactly 10-second, smooth 24fps editorial documentary paper-cutout animation. It must be an original composition and must not reproduce any existing frame, branded asset, logo, title card, typography, or identifiable layout.
+## Semantic tests
 
-{STYLE_LOCK_VERBATIM}
+- Pause the animation at 5–7 seconds and run the Label-off test.
+- The final frame must still approach `expected_blind_caption`.
+- Replacing labels must not make the animation suitable for a neighboring article.
+- Every must-show item must appear long enough to be understood.
 
-ARTICLE VISUAL BIBLE
-World summary: {world_summary}
-Background: {background}
-Palette and usage: {palette}
-Camera: {camera}
-Lighting and shadows: {lighting}
-Character system: {character_system}
-Recurring motif: {recurring_motif}
-Continuity rules: {continuity_rules}
+## Prompt order
 
-STORY BEATS
-0.0–1.5 seconds — Establish: {beat_1}
-1.5–4.0 seconds — Transform: {beat_2}
-4.0–7.5 seconds — Expand: {beat_3}
-7.5–10.0 seconds — Resolve: {beat_4}
+1. Non-negotiable Semantic Contract.
+2. Visual Evidence Mapping.
+3. Technical-research instruction when applicable.
+4. Style Lock.
+5. Visual Bible.
+6. Story beats.
+7. Motion and output constraints.
 
-MOTION LANGUAGE
-All elements appear, unfold, slide, rotate, assemble, or move along organic map-like paths with smooth easing. People are simplified paper cutouts and move along stylized routes. For crowds, use layered clusters rather than individually detailed figures. Keep the camera locked or use only a very slow subtle drift. Maintain elegant, premium documentary energy.
+The renderer in `scripts/render_prompts.py` follows this order automatically.
 
-No voiceover. No dialogue. No subtitles. No text overlays. No logo. No watermark. Only subtle lively ambient background sound is implied. End on a stable final tableau for the last 0.5–0.8 seconds.
-```
+## Common failures
 
-## 非流程型文章
-
-- Establish：顯示原本的問題或分散狀態。
-- Transform：核心機制開始作用。
-- Expand：影響擴大或不同角色加入。
-- Resolve：用一個物理隱喻完成文章主張。
-
-## 常見失敗
-
-- 10 秒內硬塞十個鏡頭。
-- 快速縮放與轉場像廣告。
-- 人物手部畸形。
-- 每秒新增太多獨立人物。
-- 最後沒有停留。
-- 靜態圖與動畫色盤／鏡頭不同。
-- 加入旁白或字幕。
+- style-consistent animation with an unrelated mechanism;
+- generic people moving around a machine instead of the actual architecture;
+- ten hard cuts inside ten seconds;
+- counts, order, ratios, state size, or comparison conditions changing between frames;
+- fast advertising-style zooms and transitions;
+- final tableau too brief to inspect;
+- text cards or voiceover used to explain a semantically weak scene.

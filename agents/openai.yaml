@@ -1,6 +1,6 @@
 interface:
   display_name: "紀錄片剪紙文章配圖"
-  short_description: "把文章轉成一致的羊皮紙剪紙底圖，並依文章語言後製可讀的認知標註"
-  default_prompt: "Use $editorial-documentary-illustrations 為這篇文章規劃並生成 5 張一致的 16:9 紀錄片剪紙正文配圖。先自動判斷文章的主要讀者語言；若使用者未指定其他語言，標註沿用文章主語言。先生成無字底圖，再根據實際畫面加入一個核心判斷與 3–6 個同語言短標註；文字必須指向可見物件並經過校對。"
+  short_description: "先鎖定文章專屬機制，再生成羊皮紙剪紙底圖與語意標註"
+  default_prompt: "Use $editorial-documentary-illustrations 為這篇文章規劃並生成 5 張 16:9 紀錄片剪紙正文配圖。先解析文章語言、visual thesis、topic signature 與每張圖的 semantic contract；無字底圖本身必須通過 label-off、blind-caption 與 neighbor-article 測試，不能靠後製文字把泛用圖片硬解釋成文章內容。通過 Base QA 後，再依文章或指定讀者語言加入一個核心判斷與 3–6 個短標註。"
 policy:
   allow_implicit_invocation: true

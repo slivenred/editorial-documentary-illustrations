@@ -1,128 +1,128 @@
 ---
 name: editorial-documentary-illustrations
-description: 為各語言文章規劃、生成與修訂 VOX-inspired／現代解說新聞式的羊皮紙剪紙正文配圖。當使用者提到 VOX 風格、紀錄片剪紙、歷史地圖動畫、aged parchment、paper cutout、文章配圖、文配圖、shot list、文章插圖、因果鏈、歷史過程、地圖路徑、認知標註、多語文字、10 秒動畫提示詞或統一畫風時使用。預設先自動判斷文章的主要讀者語言，再生成無字底圖，最後以可控後製加入一個核心判斷與 3–6 個同語言短標註；同篇文章共用 visual bible，並依 QA 門檻自動重試。不複製特定既有影片畫面或品牌資產。
+description: 為各語言文章規劃、生成與修訂 VOX-inspired／現代解說新聞式的羊皮紙剪紙正文配圖。當使用者要求文章配圖、精選圖片、文內圖、shot list、歷史地圖動畫、paper cutout、認知標註、多語文字、10 秒動畫提示詞、統一畫風或圖文語意對齊時使用。預設先建立文章語意合約與 Visual Bible，確保無字底圖本身能表達文章專屬機制，再依文章或目標讀者語言後製核心判斷與短標註；依 Semantic Preflight、Base QA、Annotation QA 自動重試。不複製特定既有影片畫面或品牌資產。
 ---
 
 # Editorial Documentary Illustrations
 
 ## 核心任務
 
-把文章裡真正需要被「看見」的判斷、機制、時間進程、因果關係、規模變化與社會互動，轉成原創的 16:9 羊皮紙剪紙紀錄片配圖。
+把文章中的判斷、機制、時間進程、因果關係、規模變化與結果，轉成原創的 16:9 羊皮紙剪紙文內圖。
 
-每張最終成品包含兩層：
+**風格一致不是成功條件，只是基本條件。** 無字底圖必須在沒有標註時，就能讓讀者看出文章專屬的實體、機制與關係。不能先畫一張泛用 VOX 風格圖片，再靠文字把它硬解釋成文章內容。
 
-1. **無字敘事底圖**：由圖像模型生成，負責場景、人物、物件、路徑、剪紙材質與動態暗示。
-2. **可控認知標註**：由 Agent 根據文章上下文與讀者語言撰寫，再用程式後製加入，負責核心判斷、階段名稱、數字與物件指向。
+每張最終成品包含：
 
-底圖不得要求圖像模型排任何語言文字；最終成品則預設要有有意義、可讀、經校對且語言正確的短標註。
+1. **語意正確的無字底圖**：圖像模型負責場景、物件、機制、關係、材質與動態暗示。
+2. **可控認知標註**：Agent 依文章與讀者語言撰寫，使用程式後製核心判斷、名稱、數字、階段與 callout。
+
+先讀 `references/semantic-grounding.md`，再進行視覺規劃。
 
 ## 標註語言解析
 
-生成 manifest 前先決定 `article.annotation_language`。依序使用：
+生成 manifest 前決定 `article.annotation_language`：
 
-1. **使用者明確指定**：最高優先級。
-2. **文章 metadata**：frontmatter、locale、`lang` 或既有內容設定。
-3. **文章主導語言**：標題、導言、段落標題與主要解說正文。
-4. **混合語言判定**：以標題、段落標題與多數解說正文為準；忽略程式碼、網址、引用區塊、參考資料標題、品牌名與專有名詞。
-5. **最後備援**：只有文章過短或無法判定時，才使用目前對話語言。
+1. 使用者明確指定。
+2. 文章 frontmatter、locale、`lang` 或 metadata。
+3. 標題、導言、段落標題與主要正文的主導語言。
+4. 混合語言文章以多數解說正文為準，忽略程式碼、網址、引用、參考資料與專有名詞。
+5. 只有文章太短或無法判斷時，才使用對話語言。
 
-規則：
-
-- 最終 manifest 必須寫入具體 BCP 47 tag，例如 `zh-TW`、`en`、`ja`、`ko`、`es`；不得保留 `auto` 或 `und`；`mul` 只用於文章層的明確多語輸出。
-- `article.language` 記錄文章主語言，`article.annotation_language` 記錄最終標註語言。
-- 除非使用者明確要求翻譯，兩者預設相同。
-- 同篇文章全部 still 圖預設使用同一標註語言；明確要求多語時才使用 `mul` 並逐張指定。
-- 品牌、產品、模型、benchmark、縮寫、版本號、單位與數字保留文章原寫法，不因標註語言而擅自翻譯。
-- `alt_text`、`caption` 與圖內標註預設使用 `article.annotation_language`。
+使用具體 BCP 47 tag，例如 `zh-TW`、`en`、`ja`、`ko`、`es`。不得保留 `auto` 或 `und`；`mul` 只用於文章層的明確多語輸出。除非使用者要求翻譯，`article.language`、`article.annotation_language`、`alt_text`、`caption` 與圖內標註使用同一語言。產品名、模型名、benchmark、縮寫、版本、單位與數字保留原文。
 
 ## 預設值
 
-除非使用者另有指定：
+- 模式：`still`
+- 數量：5 張
+- 比例：16:9
+- 最終文字：1 個核心判斷 + 3–6 個短標註
+- 底圖 prompt：英文
+- 標註語言：`article.annotation_language`
+- 標註方式：`scripts/annotate_images.py`
+- 視覺：暖色羊皮紙、淡網格、紙張摺痕、手繪剪紙物件、柔和短陰影、俯視或輕微等角鏡頭
+- 原創性：不重製任何特定影格、logo、標題卡、字體或品牌資產
 
-- 模式：`still`。
-- 數量：5 張。
-- 比例：16:9。
-- 最終圖中文字：1 個核心判斷 + 3–6 個短標註。
-- 標註方式：圖像模型不寫字，使用 `scripts/annotate_images.py` 後製。
-- 生圖 prompt：英文；標註文字：`article.annotation_language`。
-- 視覺：暖色舊羊皮紙、淡網格與摺痕、手繪剪紙人物、柔和短陰影、俯視地圖或輕微等角鏡頭、自然土色。
-- 人物：簡化剪紙人形，不畫細緻手指、不做臉部特寫。
-- 原創性：不重製任何特定既有畫面、logo、標題卡、字體或品牌資產。
+## 必讀參考
 
-## 需要時才讀取參考
+依任務讀取：
 
 - `references/article-analysis.md`
+- `references/semantic-grounding.md`
 - `references/visual-bible.md`
 - `references/style-dna.md`
-- `references/character-system.md`
 - `references/composition-patterns.md`
 - `references/prompt-template.md`
 - `references/annotation-system.md`
-- `references/motion-mode.md`
 - `references/qa-checklist.md`
 - `references/retry-ladder.md`
+- `references/motion-mode.md`
 - `references/originality-and-brand-safety.md`
 - `references/style-lock.txt`
 
-## 模式判定
+## 模式
 
 ### `plan`
 
-1. 讀文章並建立 article map。
-2. 解析 `article.language` 與 `article.annotation_language`。
-3. 選擇認知錨點並建立 visual bible。
-4. 為每張圖撰寫 `core_idea`、構圖、headline 與 3–6 個 labels。
-5. 座標可先使用 provisional 值，但文字必須具體、有來源、語言正確。
-6. 輸出 version 3 shot manifest，不呼叫圖像工具。
+1. 讀文章與主要來源。
+2. 解析文章與標註語言。
+3. 設定 `article_type`、`visual_thesis`、`topic_signature`、`global_must_avoid`。
+4. 建立 Visual Bible。
+5. 為每張圖建立 `semantic_contract`。
+6. 撰寫構圖、headline 與 labels 草案。
+7. 輸出 version 4 manifest；不生圖。
 
 ### `still`
 
-使用者要求生成配圖時，必須完成整個雙層流程：
-
-1. 完成 version 3 manifest，先解析並固定標註語言。
-2. 生成低至中密度的無字 calibration frame。
-3. 通過 Base QA 後，再逐張生成其餘無字底圖。
-4. 支援參考圖時，把第一張合格底圖作為後續 style reference。
-5. 逐張檢查底圖，找出可放字的安靜區與 labels 所指向的可見物件。
-6. 更新 `annotation.layout_status` 為 `final`，修正座標。
-7. 執行 `scripts/annotate_images.py`。
-8. 對最終標註圖做 Annotation QA。
-9. 底圖正確但文字失敗時，只調整 annotation plan，不重生成底圖。
-10. 若環境沒有圖像工具，只交付 prompt、manifest 與 annotation plan，並清楚標示未實際生圖。
-11. 若環境缺 Pillow 或對應語言字型，安裝依賴或指定本機字型；不得退回要求圖像模型直接排字。
+1. 完成並驗證 manifest。
+2. 執行 Semantic Preflight；未通過不得生圖。
+3. 先生成一張低至中密度的無字 calibration frame。
+4. 以 Label-off、Blind-caption、Neighbor-article 三項測試驗收底圖。
+5. 通過後才逐張生成其他底圖；參考圖只鎖材質與畫風，不覆寫每張語意合約。
+6. 逐張確認 `must_show`、`visual_evidence`、hero artifact 與可標註區。
+7. 更新 annotation 座標與 `layout_status: final`。
+8. 執行 `scripts/annotate_images.py`。
+9. 執行 Annotation QA。
+10. 底圖語意正確而標註失敗時，只改 annotation plan；語意不正確時必須重生底圖。
 
 ### `motion`
 
-1. 以 still shot 或 article anchor 為基礎。
-2. 拆成 exactly 10 seconds、24fps 的四個連續節拍。
-3. No voiceover、no text overlays。
-4. 靜態圖的標註不直接燒進動畫；需要文字時交給影片剪輯層。
+以已通過語意 QA 的 still shot 為基礎，建立 exactly 10 seconds、24fps、單一連續場景、無 voiceover、無 text overlay 的動畫 prompt。不得在動畫版本重新發明機制。
 
 ### `hybrid`
 
-先完成帶標註 still，再由同一 visual bible 產出 motion prompt；不得重新發明人物、色盤、鏡頭或核心意象。
+先完成帶標註 still，再從同一 semantic contract 與 Visual Bible 產出 motion prompt。
 
 ## 工作流
 
-### 1. 消化文章，不要平均配圖
+### 1. 建立 Article Map
 
-提煉一句話主張、時間或因果主線、關鍵角色與物件、最難想像的隱藏機制、規模轉折，以及最值得記住的結果、數字或矛盾。不要為純背景資訊或重複論點配圖。
+提煉：文章主張、起點、轉化、隱藏機制、規模／資源變化、結果與限制。
 
-### 2. 決定數量
+### 2. 建立文章級語意基礎
 
-- 800 字以下：1–3 張。
-- 800–2,500 字：3–5 張。
-- 2,500–5,000 字：5–7 張。
-- 5,000 字以上：6–9 張。
+Manifest 的 `article` 必須包含：
 
-### 3. 建立 Article Visual Bible
+- `article_type`
+- `visual_thesis`
+- `topic_signature`
+- `global_must_avoid`
 
-固定背景、色盤、鏡頭、光線、人物比例、recurring motif、路徑形式、密度節奏、標註紙片、連線、字級與色彩語意。同篇文章不得任意改動。
+`topic_signature` 至少包含三個文章專屬項目，不能只寫 AI、model、data、speed、system 等泛詞。
 
-### 4. 產出 Shot Manifest
+### 3. 技術研究先讀主要來源
+
+`technical-research` 需優先讀 abstract、architecture／method figure、method、result figure 與 limitations。預設使用 `literal-technical` 或 `hybrid-metaphor`。不得把模型架構隨意變成城市、工廠、辦公室人群、機器人、腦、齒輪或伺服器塔。
+
+### 4. 建立 Article Visual Bible
+
+固定背景、色盤、鏡頭、光線、剪紙材質、人物比例、recurring motif、密度與標註樣式。Visual Bible 只能統一畫風，不能取代文章專屬內容。
+
+### 5. 建立 Shot Manifest
 
 每張圖至少包含：
 
+- `image_role`: `hero` 或 `inline`
+- `visualization_mode`
 - `placement_after`
 - `anchor`
 - `role`
@@ -133,40 +133,65 @@ description: 為各語言文章規劃、生成與修訂 VOX-inspired／現代解
 - `motion_cues`
 - `density`
 - `people_count`
+- `semantic_contract`
 - `filename`
 - `alt_text`
 - `caption`
-- `annotation.language`
-- `annotation.headline`
-- `annotation.labels`
-- 可選 `motion_beats`
+- `annotation`
 
-`annotation.language` 必須等於 `article.annotation_language`；只有 `article.annotation_language` 為 `mul` 時才可逐張不同。
+### 6. Semantic Contract
 
-### 5. 組裝無字底圖 Prompt
+每張圖必須包含：
 
-每張 prompt 依序包含原創性聲明、style lock、visual bible、shot、動態暗示、密度、人物數與標註留白區。不要把實際標註文字放進生圖 prompt；底圖只負責預留空間。
+- `source_basis`
+- `must_show`
+- `must_not_show`
+- `visual_evidence`
+- `specificity_terms`
+- `expected_blind_caption`
+- `hero_artifact`；inline 可留空，hero 不可留空
 
-### 6. Calibration-first
+Hero 規則：
 
-第一張使用低至中密度、1–5 個人物、一個清楚主體，並能測試羊皮紙、剪紙邊緣、陰影、路徑、人物比例與標註留白。
+- 最多一張；若存在，必須是第一張。
+- 至少 3 個 `must_show`。
+- 至少兩個 `specificity_terms` 與 `article.topic_signature` 重疊。
+- 必須呈現一個關係、取捨或變化，不可只堆符號。
+- 精選圖片不是泛用 world-building 場景。
 
-### 7. 建立最終 Annotation Plan
+### 7. 組裝 Prompt
 
-1. 確認 headline 與段落一致。
-2. 確認每個 label 指向的物件存在。
-3. 以 0–1 正規化座標填入標籤位置與 target。
-4. 避開人物臉部、手部、主要路徑、主體中心與裁切邊緣。
-5. 同張圖的 callout 線不要大量交叉。
-6. 將 `layout_status` 改為 `final`。
-7. 使用 `scripts/annotate_images.py` 產生 PNG。
+順序固定為：
 
-### 8. QA 與自動重試
+1. Non-negotiable Semantic Contract
+2. Visual evidence mapping
+3. Style Lock
+4. Visual Bible
+5. Shot composition
+6. Annotation reservation
+7. Output constraints
 
-- **Base QA**：場景、敘事、風格、人物與跨圖連續性。
-- **Annotation QA**：語言符合目標、事實正確、語意有幫助、字可讀、指向正確、沒有遮擋或 PPT 化。
+Prompt 必須明寫：**Meaning overrides style**、底圖不得依賴後製文字才成立、不得用泛用 AI 符號替代文章機制。
 
-### 9. 保存與交付
+### 8. 三項語意測試
+
+#### Label-off Test
+
+隱藏所有標註後，底圖仍須表達機制與關係。
+
+#### Blind-caption Test
+
+不看 prompt，描述底圖一句話。描述必須包含至少兩個文章專屬錨點與正確關係，並接近 `expected_blind_caption`。
+
+#### Neighbor-article Test
+
+若只換標籤就能讓同一底圖套用到其他文章，視為失敗。
+
+### 9. Annotation
+
+標註只能命名或解釋已存在的 visual evidence。不得把泛用齒輪、道路或機器硬標成文章中的特定機制。
+
+### 10. 保存
 
 ```text
 assets/<article-slug>-editorial-documentary/
@@ -175,21 +200,18 @@ assets/<article-slug>-editorial-documentary/
 ├── prompts/
 ├── images/
 │   ├── raw/
-│   │   └── 01-*.png
 │   └── 01-*.png
 └── delivery.md
 ```
 
-最終回報包含生成張數、插入位置、用途、成品路徑、`alt_text`、calibration frame、重試原因、標註語言與是否完成後製。
-
 ## 永久禁忌
 
-- 不複製特定媒體既有畫面或品牌資產。
-- 不要求圖像模型直接排任何語言的長句、數字表格、logo、浮水印或字幕。
-- 不把標註語言硬編碼成繁中、英文或任何單一語言。
-- 不在未經要求時翻譯專有名詞、模型名、縮寫、版本號或數字。
-- 不使用泛用標籤，例如「流程圖」「重點」「系統架構」「結果」及其其他語言的同義泛詞。
-- 不讓文字遮住主體、人物臉部或主要路徑。
-- 不用十幾個標註把畫面塞滿。
-- 不畫精細手指、近距離手部操作或寫實臉部特寫。
-- 不讓每張圖換一套色盤、鏡頭、紙張或標註樣式。
+- 不以 VOX 風格正確取代內容正確。
+- 不生成可套用到大量其他文章的泛用 AI 圖。
+- 不讓標註拯救與文章無關的底圖。
+- 不忽略 `must_show`、`visual_evidence` 或 hero artifact。
+- 不把技術研究預設畫成人類操作泛用機器。
+- 不要求圖像模型直接排任何語言的文字、數字表格、logo 或字幕。
+- 不硬編碼標註語言。
+- 不翻譯未要求翻譯的專有名詞、模型名、benchmark、縮寫、版本與數字。
+- 不複製媒體或品牌既有畫面。

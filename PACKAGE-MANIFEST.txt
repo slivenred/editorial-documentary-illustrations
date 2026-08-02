@@ -20,6 +20,7 @@
 ./references/prompt-template.md
 ./references/qa-checklist.md
 ./references/retry-ladder.md
+./references/semantic-grounding.md
 ./references/style-dna.md
 ./references/style-lock.txt
 ./references/visual-bible.md
@@ -27,6 +28,7 @@
 ./schemas/shot-manifest.schema.json
 ./scripts/annotate_images.py
 ./scripts/render_prompts.py
+./scripts/semantic_preflight.py
 ./scripts/validate_manifest.py
 ./templates/manifest.template.json
 ./tests/test_tooling.py

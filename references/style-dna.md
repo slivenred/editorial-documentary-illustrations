@@ -1,65 +1,49 @@
 # Style DNA
 
-## 一句話
+## One sentence
 
-原創的現代解說新聞／歷史紀錄片剪紙視覺：暖色舊羊皮紙作為世界地圖，人物與物件像手繪紙貼紙，路徑與物件的出現暗示 time-lapse；模型底圖保持無字，最終成品再依 annotation plan 後製認知標註。
+Original modern explainer-journalism and historical-documentary cutout visuals: warm aged parchment, paper-cut objects, restrained earthy color, soft shadows, and time-lapse energy—while preserving the article's actual mechanism and evidence.
 
-## 不可變核心
+## Priority
 
-- 16:9 橫式。
-- 暖米褐色 aged parchment。
-- 細微紙纖維、淡網格、低對比地圖線與少量自然摺痕。
-- 手繪 cutout／paper sticker 人物與物件。
-- 每個主要剪紙物件有一致、短而柔的落影。
-- 俯視地圖感、輕微等角或平面桌面視角；不使用戲劇化透視。
-- 一張圖只講一個核心因果、過程、路徑、對比或規模變化。
-- 圖像模型生成的底圖完全無文字、數字、logo 或 UI。
-- 最終成品的文字只由可控後製加入，語言使用 `article.annotation_language`。
-- 原創構圖，不重製特定既有影格。
+1. semantic fidelity;
+2. readable relationship;
+3. composition;
+4. cross-image continuity;
+5. decorative style.
 
-## 基礎色盤
+A beautiful parchment scene that could fit another article is a failure.
 
-- Parchment cream：`#E7D5AE`
-- Dark ink brown：`#2C261F`
-- Terracotta：`#A9573E`
-- Mustard ochre：`#C49A45`
-- Muted sage：`#718066`
-- Dusty indigo：`#485F73`
-- Warm brick red：`#8E4436`
+## Immutable visual core
 
-背景永遠是 parchment cream 的變體；主線與輪廓用 dark ink brown；每張只允許一個主要 accent 與一至兩個次要 accent。不使用霓虹、糖果色或科技藍紫漸層。
+- 16:9 horizontal.
+- Warm aged parchment with visible but restrained fibers, faint grid, and 2–4 gentle creases.
+- Hand-drawn cutout or paper-sticker objects with short soft shadows.
+- Top-down map, flat orthographic, or restrained soft-isometric view.
+- One core claim per image.
+- Original composition with no copied frame or brand asset.
+- Text-free base image; deterministic annotations are added later.
 
-## 紙張、剪紙與光線
+## Domain fidelity
 
-- 紋理可見但不搶主體。
-- 摺痕最多 2–4 條，不切過主要人物臉部。
-- 外輪廓略有手繪不規則，不能像完美向量。
-- 紙片厚度只以細薄邊緣暗線表達。
-- 落影方向固定，距離短、模糊柔和。
-- 不使用厚 3D 擠出、塑膠或黏土質感。
-- 柔和、均勻、偏暖的上方或左上方漫射光。
+The paper world may contain technical modules, tokens, state cells, layer cards, memory trails, scientific apparatus, policy documents, geographic forms, or real social actors when the article requires them. Do not force every topic into the same market, road, factory, city, worker, gear, robot, brain, server, or shield vocabulary.
 
-## 鏡頭
+## Palette
 
-優先：12–20° 俯視地圖／桌面視角、平面正投影、輕微等角。避免低角度英雄鏡頭、超廣角變形、人臉特寫、景深模糊與跨圖鏡頭漂移。
+Use 4–6 colors from parchment cream, dark ink brown, terracotta, mustard ochre, muted sage, dusty indigo, and warm brick red. Color semantics must remain stable within one article.
 
-## 畫面密度
+## Density
 
-- `low`：1–3 人物，3–6 個主要物件，留白 40–55%。
-- `medium`：3–8 人物，6–12 個主要物件，留白 25–40%。
-- `high`：人物以 2–5 組群眾 cluster 表示，留白至少 18%。
+- low: 1–3 people, 3–6 major objects, 40–55% breathing room;
+- medium: 3–8 people or 6–12 major objects, 25–40% breathing room;
+- high: use clusters or repeated modules, at least 18% breathing room.
 
-同篇文章建議節奏：`low → medium → medium → high → resolved-medium`。
+For technical research, repeated modules and state changes are often more informative than people.
 
-## 動態暗示
+## Avoid
 
-可使用物件由小到大、半成品到完成品、彎曲路徑、腳印、虛線、淡化位置殘影、逐漸變長的隊伍、正在展開的建築或由多方向匯聚的物件。底圖不得畫正式流程圖箭頭、時間軸刻度或文字 placeholder。
-
-## 絕對不要
-
-- 寫實攝影、電影劇照、遊戲式 3D render、黏土或塑膠玩具。
-- 企業扁平插畫、PPT 資訊圖、動漫、可愛吉祥物、兒童繪本。
-- 科技 UI、App 畫面、資料儀表板。
-- 要求圖像模型直接排任何語言文字。
-- 最終後製放入長段文字、錯誤語言、logo、字幕或浮水印。
-- 精細手指與近距離手部特寫。
+- photorealism, cinematic stills, plastic 3D, clay, anime, children's illustration;
+- corporate vector art, dashboards, generic flowcharts;
+- generic AI symbolism used in place of the article mechanism;
+- style motifs that erase counts, order, comparisons, or causal relationships;
+- model-generated text or numbers in the base image.

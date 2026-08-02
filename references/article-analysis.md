@@ -1,91 +1,130 @@
 # Article Analysis
 
-## 目標
+## Goal
 
-不是找「每段可以畫什麼」，而是找「哪些認知動作若沒有圖，讀者最難在腦中形成模型」。
+Do not ask “what can be drawn for each paragraph?” Ask:
 
-## 先建立 Article Map
+1. What must a reader understand?
+2. Which article-specific mechanism, relationship, or change is difficult to imagine?
+3. What visible evidence would make that claim recognizable without relying on labels?
 
-用 6 句以內回答：
+Read `semantic-grounding.md` before planning shots.
 
-1. 文章主張是什麼？
-2. 事件或系統從哪裡開始？
-3. 中間發生什麼轉化？
-4. 哪個隱藏機制最難理解？
-5. 哪個地方出現規模、速度、權力或情緒的變化？
-6. 最後造成什麼結果？
+## 1. Build the Article Map
 
-## 候選認知錨點
+Answer in six lines or fewer:
 
-優先尋找：
+1. What is the article's thesis?
+2. What starts the event or system?
+3. What changes in the middle?
+4. Which hidden mechanism determines the outcome?
+5. Where do scale, speed, cost, power, memory, or emotion change?
+6. What result or limitation should the reader remember?
 
-- 起源：某件事如何從小規模出現。
-- 組裝：多個材料、角色或證據如何匯聚。
-- 轉化：輸入如何變成另一種結果。
-- 路徑：人、資訊、商品、資金或影響力如何移動。
-- 擴張：一個攤位變成市場、一個觀點變成共識。
-- 排隊／聚集：需求、注意力、風險或支持者變多。
-- 隱藏機制：表面看不見但決定結果的系統。
-- 對比：過去／現在、人工／自動、分散／集中。
-- 斷點：流程在哪裡漏掉、卡住或失真。
-- 結果：某個系統最後如何改變人的行為。
+## 2. Classify the article
 
-## 0–10 評分
+Set `article.article_type` before choosing a composition. Technical research, product news, history, policy, social analysis, and how-to content need different levels of literalness.
 
-每個候選段落依下列五項各給 0–2 分：
+For technical research, read the primary abstract, architecture figure, method, result figure, and limitations before inventing a metaphor.
 
-- `explanatory_value`：圖是否能顯著降低理解成本。
-- `visual_action`：是否可轉成明確物理動作。
-- `narrative_change`：是否有前後、因果、時間或規模變化。
-- `distinctiveness`：是否會和其他圖片重複。
-- `placement_value`：放在該段後是否能真正幫助閱讀。
+## 3. Write the Visual Thesis
 
-建議只選 7 分以上。若候選太多，優先保留能形成全篇敘事節奏的組合，而非最高分的相似圖片。
+`article.visual_thesis` is one visual proposition the entire image set should prove. It must include a relationship, trade-off, sequence, or change.
 
-## 配圖數量
+Weak: `This article is about linear attention.`
 
-- 800 字以下：1–3。
-- 800–2,500 字：3–5。
-- 2,500–5,000 字：5–7。
-- 5,000 字以上：6–9。
+Strong: `A 3:1 KDA–MLA hybrid preserves selective full-attention retrieval while replacing most growing KV cache with compact recurrent state.`
 
-不要用固定「每 500 字一張」平均切分。
+## 4. Extract the Topic Signature
 
-## 排列節奏
+Choose 3–10 specific anchors:
 
-一組 5 張的理想功能分配：
+- named entities;
+- architecture or mechanism;
+- relationship, ratio, or sequence;
+- result, benchmark, or constraint.
 
-1. **世界建立**：主題在哪個空間或歷史背景中發生。
-2. **核心轉化**：最重要的 process 或 mechanism。
-3. **隱藏路徑**：資訊、人或資源如何流動。
-4. **規模變化**：擴散、排隊、聚集或失控。
-5. **結果定格**：回到文章主張，形成可記憶的最終場景。
+Do not use only broad nouns such as AI, model, data, speed, system, people, or growth.
 
-不必每篇都照此順序，但避免連續三張都是相同的左到右流程。
+## 5. Select cognitive anchors
 
-## 不值得配圖的內容
+Prioritize:
 
-- 純定義，且一行文字已足夠。
-- 重複前面結論的段落。
-- 只有大量數字，但沒有可視化的關係。
-- 只為裝飾而存在的泛用人物。
-- 需要圖內長文字才能成立的說明。
-- 無法用一個場景表達、只能做密集 PPT 的段落。
+- origin;
+- assembly;
+- transformation;
+- path;
+- hidden mechanism;
+- contrast;
+- bottleneck;
+- scale change;
+- verified result;
+- limitation or boundary.
 
-## 從抽象概念到物理場景
+Score each candidate from 0–10 using 0–2 points for:
 
-使用四步：
+- `explanatory_value`
+- `visual_action`
+- `narrative_change`
+- `article_specificity`
+- `placement_value`
 
-1. 找動詞：匯聚、篩選、擴散、卡住、交換、競爭、堆疊、回流。
-2. 找空間：市場、道路、工作台、港口、井、攤位、車站、廚房、檔案室、地圖。
-3. 找主體：誰或什麼正在做關鍵動作。
-4. 找變化：開始與結束之間，數量、位置、形狀或秩序如何改變。
+Only keep candidates scoring 7 or above. `article_specificity` is mandatory: a visually attractive but generic scene should not pass.
 
-例：
+## 6. Decide literalness before metaphor
 
-- 「AI 搜尋會先檢索再回答」  
-  → 紙片證據從多個資料庫小屋沿路徑進入中央編輯台，再組裝成一張答案卡。
-- 「品牌權威由多個第三方證據形成」  
-  → 不同來源的紙章與報紙剪片沿地圖匯聚，逐層搭成一座可通行的橋。
-- 「街頭食物變熱門」  
-  → 小攤位從空白地圖展開，路徑從四面延伸，隊伍逐步加長，最後形成群眾生態。
+Use this priority:
+
+1. `literal-technical` for architecture, algorithms, hardware, scientific mechanisms, and benchmarks.
+2. `literal-scene` for people, places, events, and physical processes.
+3. `hybrid-metaphor` when a literal mechanism needs one controlled analogy.
+4. `abstract-metaphor` only for genuinely abstract arguments.
+
+Do not default to markets, roads, factories, cities, workers, gears, robots, brains, shields, or pipelines. These are reusable style objects, not evidence of relevance.
+
+## 7. Build a Semantic Contract for every shot
+
+Every shot must specify:
+
+- source basis;
+- image role;
+- visualization mode;
+- must-show items;
+- must-not-show substitutions;
+- visual evidence mappings;
+- specificity terms;
+- expected blind caption;
+- hero artifact when applicable.
+
+The first hero shot must cover the article thesis, not merely introduce the visual world.
+
+## 8. Number of images
+
+- under 800 words: 1–3;
+- 800–2,500 words: 3–5;
+- 2,500–5,000 words: 5–7;
+- over 5,000 words: 6–9.
+
+Do not distribute images at fixed word intervals.
+
+## 9. Narrative rhythm
+
+A five-image set may use:
+
+1. thesis-bearing hero or article-specific world;
+2. core mechanism;
+3. hidden relationship;
+4. scale, resource, or performance change;
+5. result, limitation, or decision consequence.
+
+Avoid three consecutive generic left-to-right flows.
+
+## Not worth illustrating
+
+- a definition already clear in one sentence;
+- repeated conclusions;
+- isolated numbers with no relationship;
+- generic people added only for decoration;
+- scenes that require long labels to become relevant;
+- a metaphor whose mapping cannot be stated explicitly;
+- a base image that could fit many neighboring articles after relabeling.
