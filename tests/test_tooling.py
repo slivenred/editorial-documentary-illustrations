@@ -31,152 +31,114 @@ def manifest() -> dict:
     return json.loads((ROOT / "templates/manifest.template.json").read_text(encoding="utf-8"))
 
 
-class PlanningTests(unittest.TestCase):
-    def test_kimi_four_minute_article_recommends_three_images(self):
-        result = recommender.recommend_count(4, 4, 5, True)
-        self.assertEqual(result["recommended_total"], 3)
+class Tests(unittest.TestCase):
+    def test_recommendation_for_four_minute_article_is_three(self):
+        self.assertEqual(recommender.recommend_count(4, 3, True), 3)
 
-    def test_short_article_is_not_forced_to_five_images(self):
-        result = recommender.recommend_count(2, 7, 6, True)
-        self.assertEqual(result["recommended_total"], 1)
+    def test_short_article_can_use_one_image(self):
+        self.assertEqual(recommender.recommend_count(1, 4, True), 1)
 
-    def test_long_article_caps_at_eight(self):
-        result = recommender.recommend_count(30, 20, 20, True)
-        self.assertEqual(result["recommended_total"], 8)
+    def test_estimate_cjk_reading_time(self):
+        minutes = recommender.estimate_reading_minutes("測" * 900, "zh-TW")
+        self.assertAlmostEqual(minutes, 2.0, places=1)
 
-    def test_valid_template(self):
+    def test_valid_v6_manifest(self):
         errors, warnings = validator.validate_manifest(manifest())
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
 
     def test_old_version_is_rejected(self):
         data = manifest()
-        data["version"] = 4
+        data["version"] = 5
         errors, _ = validator.validate_manifest(data)
         self.assertTrue(any("version" in error for error in errors))
 
-    def test_auto_count_rejects_overproduction(self):
+    def test_target_count_must_match_auto_recommendation(self):
         data = manifest()
-        extra = copy.deepcopy(data["shots"][-1])
-        extra["id"] = "04"
-        extra["filename"] = "04-extra-image.png"
-        extra["placement"]["section_index"] = 5
-        extra["placement"]["after_paragraph_index"] = 11
-        extra["placement"]["after_paragraph_excerpt"] = "Extra paragraph for an unnecessary image."
-        data["shots"].append(extra)
-        data["article"]["target_count"] = 4
-        errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("Auto image count recommends 3" in error for error in errors))
-
-    def test_fixed_mode_allows_explicit_override(self):
-        data = manifest()
-        data["article"]["image_count_mode"] = "fixed"
         data["article"]["target_count"] = 2
-        data["shots"] = data["shots"][:2]
-        errors, warnings = validator.validate_manifest(data)
-        self.assertEqual(errors, [])
-        self.assertEqual(warnings, [])
-
-    def test_inline_images_need_two_paragraph_gap(self):
-        data = manifest()
-        data["shots"][2]["placement"]["after_paragraph_index"] = 5
         errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("at least two paragraph" in error for error in errors))
+        self.assertTrue(any("automatic recommendation" in error for error in errors))
 
-    def test_hero_must_be_first_when_enabled(self):
+    def test_hero_must_be_first(self):
         data = manifest()
         data["shots"][0], data["shots"][1] = data["shots"][1], data["shots"][0]
         errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("exactly one hero must be the first" in error for error in errors))
+        self.assertTrue(any("hero" in error.lower() for error in errors))
 
-    def test_generic_headline_is_rejected(self):
+    def test_hero_must_cover_claim(self):
         data = manifest()
-        data["shots"][0]["headline"] = "重點整理"
+        data["shots"][0]["title_coverage"] = ["key_result", "mechanism"]
         errors, _ = validator.validate_manifest(data)
-        self.assertTrue(any("headline" in error and "generic" in error for error in errors))
+        self.assertTrue(any("claim" in error for error in errors))
 
-
-class PromptTests(unittest.TestCase):
-    def test_still_prompt_is_context_first_and_not_semantic_contract_heavy(self):
+    def test_low_value_anchor_is_rejected(self):
         data = manifest()
-        style_lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
-        prompt = renderer.render_still(style_lock, data["article"], data["visual_bible"], data["shots"][0])
-        self.assertIn("ARTICLE CONTEXT", prompt)
-        self.assertIn("EXPLAINER-TO-VISUAL MAPPING", prompt)
-        self.assertIn("hero-explainer", prompt)
-        self.assertNotIn("NON-NEGOTIABLE SEMANTIC CONTRACT", prompt)
-        self.assertNotIn("Blind-caption", prompt)
-        self.assertIn("Do not over-engineer", prompt)
+        score = data["shots"][1]["anchor_score"]
+        for key in score:
+            score[key] = 1
+        errors, _ = validator.validate_manifest(data)
+        self.assertTrue(any("anchor score" in error for error in errors))
 
-    def test_prompt_preserves_final_text_meaning_but_forbids_rendered_text(self):
+    def test_inline_positions_are_ordered(self):
         data = manifest()
-        style_lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
-        prompt = renderer.render_still(style_lock, data["article"], data["visual_bible"], data["shots"][0])
-        self.assertIn(data["shots"][0]["headline"], prompt)
-        self.assertIn("No text, letters, numbers", prompt)
+        data["shots"][1]["placement"]["after_paragraph_global_index"] = 7
+        data["shots"][2]["placement"]["after_paragraph_global_index"] = 6
+        errors, _ = validator.validate_manifest(data)
+        self.assertTrue(any("ordered" in error for error in errors))
 
-    def test_motion_prompt(self):
+    def test_labels_are_limited_to_four(self):
         data = manifest()
-        style_lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
-        prompt = renderer.render_motion(style_lock, data["article"], data["visual_bible"], data["shots"][0])
-        self.assertIn("exactly 10-second", prompt)
-        self.assertIn("No voiceover", prompt)
+        data["shots"][0]["labels"].append(copy.deepcopy(data["shots"][0]["labels"][0]))
+        data["shots"][0]["labels"].append(copy.deepcopy(data["shots"][0]["labels"][1]))
+        errors, _ = validator.validate_manifest(data)
+        self.assertTrue(any("labels" in error for error in errors))
 
-    def test_render_cli_smoke(self):
+    def test_prompt_contains_exact_text_and_safe_layout(self):
+        data = manifest()
+        lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
+        output = renderer.render_still(lock, data, data["shots"][1])
+        self.assertIn("RENDER VERBATIM", output)
+        self.assertIn(data["shots"][1]["headline"], output)
+        self.assertIn("Use the approved featured image only as a style reference", output)
+        self.assertIn("72px", output)
+
+    def test_hero_prompt_contains_title_contract(self):
+        data = manifest()
+        lock = (ROOT / "references/style-lock.txt").read_text(encoding="utf-8")
+        output = renderer.render_still(lock, data, data["shots"][0])
+        self.assertIn("TITLE CONTRACT", output)
+        self.assertIn(data["article"]["title_contract"]["claim"], output)
+
+    def test_placement_plan_contains_paragraph_indices(self):
+        output = renderer.placement_plan(manifest())
+        self.assertIn("After paragraph", output)
+        self.assertIn("| 3 |", output)
+
+    def test_annotator_requires_v6(self):
         with tempfile.TemporaryDirectory() as directory:
-            temp = Path(directory)
-            manifest_path = temp / "manifest.json"
-            output = temp / "out"
+            path = Path(directory) / "manifest.json"
+            path.write_text(json.dumps(manifest(), ensure_ascii=False), encoding="utf-8")
+            loaded = annotator.load_manifest(path)
+            self.assertEqual(loaded["version"], 6)
+
+    def test_cli_smoke(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory_path = Path(directory)
+            manifest_path = directory_path / "manifest.json"
+            output_path = directory_path / "out"
             manifest_path.write_text(json.dumps(manifest(), ensure_ascii=False), encoding="utf-8")
             result = subprocess.run(
                 [
                     "python3", str(ROOT / "scripts/render_prompts.py"), str(manifest_path),
-                    "--mode", "still", "--output", str(output),
+                    "--mode", "still", "--output", str(output_path),
                 ],
                 capture_output=True,
                 text=True,
                 check=False,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertTrue((output / "01-kimi-linear-overview-still.txt").is_file())
-            self.assertTrue((output / "delivery.md").is_file())
-
-
-class AnnotationTests(unittest.TestCase):
-    def test_font_groups(self):
-        self.assertEqual(annotator.font_group("zh-TW"), "zh")
-        self.assertEqual(annotator.font_group("ja"), "ja")
-        self.assertEqual(annotator.font_group("ar"), "arabic")
-        self.assertEqual(annotator.font_group("en"), "latin")
-
-    def test_layout_boxes(self):
-        hero = annotator.card_boxes(1600, 900, "hero-explainer", 3)
-        mechanism = annotator.card_boxes(1600, 900, "mechanism-focus", 3)
-        self.assertEqual(len(hero), 3)
-        self.assertEqual(len(mechanism), 3)
-        self.assertGreater(hero[1][0], hero[0][0])
-        self.assertGreater(mechanism[1][1], mechanism[0][1])
-
-    def test_annotator_requires_version_five(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "manifest.json"
-            data = manifest()
-            path.write_text(json.dumps(data), encoding="utf-8")
-            self.assertEqual(annotator.load_manifest(path)["version"], 5)
-
-    def test_annotation_render_smoke(self):
-        mods = annotator.pillow()
-        Image = mods[0]
-        with tempfile.TemporaryDirectory() as directory:
-            temp = Path(directory)
-            source = temp / "source.png"
-            target = temp / "target.png"
-            Image.new("RGB", (1600, 900), "#DFC99B").save(source)
-            font = annotator.find_font(None, "zh-TW", "測試文字")
-            annotator.annotate_image(mods, source, target, manifest()["shots"][0], font, "zh-TW")
-            self.assertTrue(target.is_file())
-            with Image.open(target) as image:
-                self.assertEqual(image.size, (1600, 900))
+            self.assertTrue((output_path / "00-kimi-linear-featured-still.txt").is_file())
+            self.assertTrue((output_path / "placement-plan.md").is_file())
 
 
 if __name__ == "__main__":

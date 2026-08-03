@@ -9,70 +9,35 @@
   <a href="README.es.md">Español</a>
 </p>
 
-> 記事の長さと内容から最適な画像数と挿入位置を自動で選び、文脈に合った VOX-inspired の羊皮紙カットアウト図解と説明文を生成します。
+> 記事タイトルに直結するアイキャッチ画像と、文章の長さ・文脈・理解効果から自動選択した本文画像を、統一された羊皮紙カットアウト解説スタイルで生成します。
 
-完成画像の情報階層は固定です。
+## 主な機能
 
-```text
-eyebrow → 結論見出し → 補足文 → カットアウト主視覚 → 2〜4 枚の説明カード
-```
+- タイトルの主張を直接表すアイキャッチ画像 1 枚。
+- 文章に本当に必要な本文画像 0〜6 枚。
+- 各画像の正確な挿入位置。
+- 説明テキストを統合した 16:9 の完成画像。
+- アイキャッチから本文画像まで共通の Visual Bible。
 
-Version 5 は、文字なし画像だけにすべての技術情報を詰め込まず、汎用 AI 画像を大量のラベルで後付け説明する方法も避けます。
+## ビジュアル
 
-## 画像数の自動決定
+暖色の古い羊皮紙、薄いグリッド、二重罫線、中央揃えの見出し、立体的な紙工作シーン、2〜4 個の短いラベル、必要に応じた下部の要点リボン。人物は必須ではありません。
 
-| 読了時間 | 最大画像数 |
-|---|---:|
-| 1〜2 分 | 1 |
-| 3〜4 分 | 3 |
-| 5〜6 分 | 4 |
-| 7〜9 分 | 5 |
-| 10〜12 分 | 6 |
-| 13〜16 分 | 7 |
-| 17 分以上 | 8 |
+本文画像は、アイキャッチ画像の紙色、枠、タイポグラフィ、紙工作の厚み、影、配色、ラベル、リボンを継承します。白背景のスケッチ、左右分割パネル、PPT、一般的なベクター図にはしません。
 
-最終枚数は、読了時間の容量と、重複しない高価値な視覚アンカー数の小さい方です。Hero も総数に含まれます。
+## 自動枚数と配置
 
-## 挿入位置
-
-- Hero は記事タイトルの直後。
-- 本文画像は、概念が最初に十分説明された段落の後。
-- 本文画像の間には少なくとも 2 段落を空ける。
-- FAQ、参考文献、記事末尾に装飾目的で追加しない。
-
-## 6 つのレイアウト
-
-`hero-explainer`、`mechanism-focus`、`process-strip`、`comparison-split`、`timeline-route`、`result-board`。
-
-## インストール
-
-```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./editorial-documentary-illustrations \
-  "${CODEX_HOME:-$HOME/.codex}/skills/"
-python3 -m pip install -r requirements-annotation.txt
-```
+総枚数にはアイキャッチを含みます。読了時間の容量と、高価値で重複しない視覚アンカー数の小さい方を採用します。本文画像は、該当概念が初めて十分に説明された段落の直後へ配置します。
 
 ## 使用例
 
 ```text
 Use $editorial-documentary-illustrations
-記事を分析し、最適な画像数と挿入位置を自動で決めてください。
-各画像は該当段落に直接対応し、VOX-inspired の羊皮紙カットアウト場面、見出し、補足文、2〜4 枚の説明カードを含めてください。
-5 枚固定にはしないでください。
+以下の記事に対して、アイキャッチ画像と最適な数の本文画像を生成してください。
+アイキャッチは記事タイトルに答え、本文画像はアイキャッチのスタイルを継承し、各画像で一つの文脈上の要点だけを説明してください。
+枚数と挿入位置は自動決定し、文字、切れ、重なり、画像間の一貫性を検査してください。
 
-<記事本文>
+<記事>
 ```
 
-## コマンド
-
-```bash
-python3 scripts/recommend_image_count.py --reading-minutes 4 --anchors 4 --sections 5 --include-hero
-python3 scripts/validate_manifest.py path/to/manifest.json
-python3 scripts/render_prompts.py path/to/manifest.json --mode still --output path/to/prompts
-python3 scripts/annotate_images.py path/to/manifest.json --input path/to/images/raw --output path/to/images --force
-```
-
-完全な形式は [`templates/manifest.template.json`](templates/manifest.template.json) を参照してください。
-
-MIT License で公開されており、Vox Media とは無関係です。第三者フォントや元キャラクター素材は含みません。
+詳細は [`SKILL.md`](SKILL.md) と [`templates/manifest.template.json`](templates/manifest.template.json) を参照してください。MIT License。Vox Media とは無関係で、Ian の Xiaohei キャラクター素材も含みません。

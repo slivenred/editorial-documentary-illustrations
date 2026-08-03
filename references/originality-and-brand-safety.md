@@ -1,10 +1,12 @@
 # Originality and Brand Safety
 
-- Public name: Editorial Documentary Illustrations / 紀錄片剪紙文章配圖。
-- `VOX-inspired` is a descriptive trigger, not an affiliation claim.
-- Use general visual grammar: parchment, cutouts, editorial explanation, map routes, restrained color, integrated text hierarchy.
-- Do not copy a specific frame, camera arrangement, title card, logo, typeface, annotation layout, or branded asset.
-- Do not claim endorsement by Vox Media or another publisher.
-- Do not include third-party font files in the repository.
-- Workflow ideas adapted from Ian's `ian-xiaohei-illustrations` remain credited in `NOTICE.md`; no Xiaohei character or source artwork is included.
-- The dbskill repository was reviewed only for high-level information-hierarchy lessons: one conclusion-first title, one supporting sentence, a small number of clearly ordered blocks, restrained color, and a stable reading path. Do not copy dbskill SVG source, CSS, coordinates, wording, icons, screenshots, or other assets.
+允許使用：羊皮紙、剪紙、紙雕、地圖路徑、編輯式標題、短標註卡、土色系、柔和陰影與現代解說新聞的抽象視覺語法。
+
+不允許：
+
+- 複製任何特定 Vox 影片影格、人物排列、標題卡、logo、字體或完整版型。
+- 宣稱與 Vox Media 有官方關係。
+- 複製 Ian 的小黑角色、範例構圖、提示詞全文或視覺資產。
+- 在 repo 中附帶第三方字型檔。
+
+本 Skill 只採用一般工作流原則：認知錨點、一圖一意、物理隱喻、短文字、逐張生成與 QA 迭代。

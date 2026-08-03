@@ -1,21 +1,71 @@
 ---
 name: editorial-documentary-illustrations
-description: 為各語言文章自動規劃並生成 VOX-inspired／現代解說新聞式的羊皮紙剪紙精選圖片與文內圖。會依文章長度、段落結構與內容價值，自動決定最佳圖片數量、用途與插入位置；每張圖以符合上下文的剪紙場景搭配整合式解釋文字，不以泛用 AI 圖或散亂 callout 取代文章內容。支援多語標註、16:9 靜態圖與 exactly 10 seconds 動畫提示詞。
+description: 為各語言文章自動規劃並生成一張標題導向的精選圖片與最合適數量的文內圖。使用 VOX-inspired／現代解說新聞式的羊皮紙剪紙視覺，把文章的主張、機制、對比、流程與結果轉成帶有可讀解釋文字的 16:9 最終圖片。圖片數量與插入位置會依文章長度、段落節奏、上下文與理解增益自動決定；精選圖回應標題，文內圖延續精選圖的完整視覺系統，不固定人物、不平均配圖、不用散亂標籤補救無關畫面。
 ---
 
 # Editorial Documentary Illustrations
 
 ## 核心任務
 
-把文章中真正需要視覺化的機制、對比、流程、時間變化、數字結果與決策意義，轉成一組風格一致、內容直接對應上下文的 16:9 羊皮紙剪紙解說圖。
+為文章建立一套完整的「精選圖片 + 文內圖」視覺敘事：
 
-最終圖不是「一張無字插畫＋散落標籤」，而是一張完整的 editorial explainer board：
+1. **精選圖片**先回應文章標題、最重要結果與造成結果的核心原因。
+2. **文內圖**只在能顯著降低理解成本的地方出現。
+3. 每張圖都延續同一套羊皮紙、紙雕場景、字體氣質、邊框、色盤、標註卡與陰影。
+4. 圖像與文字從一開始就共同設計；最終成品預設直接含有可讀文字。
+5. 圖片數量、內容與位置，以最佳觀看體驗、理解速度與閱讀節奏為準。
 
-1. 上方：一句核心判斷與一行補充說明。
-2. 中間：符合該段上下文的 VOX-inspired 羊皮紙剪紙場景。
-3. 下方或側邊：2–4 個短解釋卡，依固定閱讀順序補足名稱、因果、比例或結果。
+這不是固定五張圖的模板，也不是論文架構圖、PPT 資訊圖或純裝飾插畫。
 
-圖像與文字共同完成解釋。不要要求無字底圖單獨承擔所有技術細節，也不要讓文字替一張不相關的泛用圖片硬找意義。
+## 通過案例所確立的視覺方向
+
+### 精選圖片
+
+- 1600 × 900 或等比例 16:9。
+- 暖色 aged parchment、低對比網格、細緻雙線邊框與簡潔角飾。
+- 上方置中：短 eyebrow、文章核心 headline、結果型 subheadline。
+- 中下方：一個可讀的紙雕敘事場景，例如競賽、路徑、機械、負擔、門、閘門、堆疊或轉化。
+- 右側或靠近目標物：2–4 個短標註卡，使用短線與圓點，不讓線條穿過主體。
+- 底部可加入一句結論旗帶或紙條。
+- 人物不是必要條件；若物件已能說清楚，就不硬加人物。
+
+### 文內圖
+
+文內圖必須使用與精選圖相同的：
+
+- 羊皮紙色與網格強度。
+- 邊框與角飾。
+- 標題位置、字級比例與色彩語意。
+- 紙雕深度、陰影方向與物件材質。
+- 標註卡、短引線、結論旗帶。
+
+文內圖不可降級成白底簡圖、左右資訊面板、散落貼紙、傳統流程圖或普通向量圖。
+
+## 精選圖片的 Title Contract
+
+在規劃精選圖片前，先解析：
+
+- `claim`：標題最主要的宣稱。
+- `key_result`：最值得被記住的結果、數字或改變。
+- `mechanism`：造成結果的核心原因。
+
+精選圖必須在 headline、subheadline、主場景與標註中覆蓋至少兩項，且 `claim` 必須被直接呈現。
+
+錯誤：只畫文章中的一個技術小節，卻沒有呈現標題主張。
+
+正確：先以標題主張建立主場景，再用最重要結果與核心機制支撐它。
+
+## 標註語言
+
+依序決定 `article.annotation_language`：
+
+1. 使用者明確指定。
+2. 文章 frontmatter、locale、`lang` 或 metadata。
+3. 標題、導言、段落標題與主要正文的主導語言。
+4. 混合語言文章以多數解說正文為準；忽略程式碼、網址、引文、參考資料與專有名詞。
+5. 文章過短或無法判斷時，才使用目前對話語言。
+
+最終使用具體 BCP 47 tag，例如 `zh-TW`、`en`、`ja`、`ko`、`es`。產品名、模型名、benchmark、縮寫、版本、數字、百分比與單位保留原文，除非使用者要求翻譯。
 
 ## 預設行為
 
@@ -23,194 +73,194 @@ description: 為各語言文章自動規劃並生成 VOX-inspired／現代解說
 
 - 模式：`still`。
 - 比例：16:9。
-- 圖片數量：`auto`，不固定 5 張。
-- 圖片類型：需要時產生 1 張 hero，其餘為 inline。
-- 標註語言：自動跟隨文章或使用者指定的目標讀者語言。
-- 圖中文字：1 個短 headline、1 個 subheadline、2–4 個解釋卡。
-- 生圖 prompt：英文；最終文字：`article.annotation_language`。
-- 視覺：暖色羊皮紙、低對比網格、手工剪紙、柔和短陰影、俯視或輕微等角鏡頭、自然土色。
-- 文字後製：`scripts/annotate_images.py`。
-- 不複製特定既有影片影格、logo、標題卡、字體或品牌資產。
-
-## 標註語言
-
-依序判斷：
-
-1. 使用者明確指定。
-2. 文章 frontmatter、locale、`lang` 或 metadata。
-3. 標題、導言、段落標題與主要正文的主導語言。
-4. 混合語言文章以多數解說正文為準，忽略程式碼、網址、引文、參考資料與專有名詞。
-5. 文章太短或無法判斷時，才使用目前對話語言。
-
-最終寫入具體 BCP 47 tag，例如 `zh-TW`、`en`、`ja`、`ko`、`es`。產品名、模型名、benchmark、縮寫、版本號、數字、百分比與單位保留原文，除非使用者要求翻譯。
+- 精選圖：1 張。
+- 文內圖數量：`auto`。
+- 圖內文字：有，且是最終成品的一部分。
+- 生圖 prompt：英文；要渲染的文字使用 `article.annotation_language`。
+- 第一張合格精選圖作為後續文內圖的 style reference。
+- 在 Codex 中優先使用內建 `$imagegen`／支援高品質多語文字的圖片模型。
+- 若模型文字有錯，只修文字或局部編輯；若場景與上下文不符，重新生成場景。
+- 不新增 GitHub Actions 或任何自動部署流程。
 
 ## 需要時讀取
 
-- `references/article-analysis.md`：自動選圖數量與位置。
-- `references/composition-patterns.md`：六種圖解版型。
-- `references/visual-bible.md`：同篇文章畫風一致。
-- `references/style-dna.md`：VOX-inspired 剪紙視覺規則。
-- `references/prompt-template.md`：無字底圖 prompt。
-- `references/annotation-system.md`：整合式文字版面。
-- `references/qa-checklist.md`：內容、視覺與文字驗收。
+- `references/article-analysis.md`：文章拆解、自動圖片數量與插入位置。
+- `references/visual-bible.md`：精選圖到文內圖的連續性。
+- `references/style-dna.md`：通過案例所確立的視覺 DNA。
+- `references/composition-patterns.md`：精選圖與文內圖構圖。
+- `references/prompt-template.md`：整合式生圖提示詞。
+- `references/annotation-system.md`：文字階層與直接生圖／修字策略。
+- `references/qa-checklist.md`：標題對應、裁切、遮擋、文字與閱讀體驗。
 - `references/retry-ladder.md`：最小修正策略。
 - `references/motion-mode.md`：10 秒動畫。
-- `references/originality-and-brand-safety.md`：品牌與原創界線。
-- `references/style-lock.txt`：底圖固定風格鎖。
+- `references/originality-and-brand-safety.md`：原創與品牌界線。
+- `references/style-lock.txt`：所有圖片必須遵守的風格鎖。
 
 ## 模式
 
 ### `plan`
 
-1. 解析文章語言、閱讀時間、段落與章節。
-2. 找出候選視覺錨點並評分。
-3. 自動計算最佳圖片數量。
-4. 選擇每張圖的用途、版型與插入位置。
-5. 建立 Visual Bible 與 version 5 manifest。
-6. 不呼叫圖像工具。
+1. 解析文章標題、摘要、正文、章節與閱讀時間。
+2. 建立 `title_contract`。
+3. 找出高價值且不重複的視覺錨點。
+4. 自動決定總圖片數量。
+5. 決定每張文內圖的精確插入位置。
+6. 建立 Article Visual Bible。
+7. 輸出 version 6 manifest，不生圖。
 
 ### `still`
 
-1. 完成 version 5 manifest。
-2. 驗證自動圖片數量與位置。
-3. 逐張生成無字底圖；第一張合格圖可作為後續 style reference。
-4. 檢查底圖是否直接對應該段上下文，且保留指定文字安全區。
-5. 使用 `scripts/annotate_images.py` 加入 headline、subheadline 與解釋卡。
-6. 對最終成品做 QA；文字錯誤只改文字層，畫面不相關才重生底圖。
+1. 完成 version 6 manifest 並驗證。
+2. 先生成精選圖。
+3. 驗收精選圖是否對應標題、結果與機制。
+4. 把合格精選圖作為文內圖 style reference。
+5. 逐張生成文內圖；每張只解釋一個段落核心。
+6. 驗收所有文字、邊界、遮擋、圖文關聯與跨圖一致性。
+7. 若文字有錯，優先使用圖片編輯修正指定文字；不得因一個錯字重發明整張構圖。
+8. 若場景不符合段落，重做該張圖。
+
+### `hybrid`
+
+先完成圖片，再依 manifest 中的 `placement` 產出 HTML demo 或整合到文章。Demo 必須呈現建議插入位置，不可只是圖片總覽。
 
 ### `motion`
 
-以已通過 still QA 的 shot 為基礎，轉成 exactly 10 seconds、24fps、單一連續場景、無 voiceover、無 text overlay 的動畫 prompt。靜態解釋文字不燒進動畫。
+由一張已通過 QA 的 still shot 產生 exactly 10 seconds、24fps、單一連續場景的動畫 prompt。靜態圖中文字不直接燒進動畫；需要文字時交給影片後製層。
 
 ## 自動決定圖片數量
 
-先計算或讀取 `reading_minutes`。沒有 metadata 時：
+先取得或估算 `reading_minutes`，再找出 7 分以上且互不重複的候選視覺錨點。
 
-- 中文、日文、韓文：以可見文字長度估算閱讀時間。
-- 其他語言：以正文單字數估算。
+### 閱讀時間容量
 
-再依文章找出 7 分以上且不重複的視覺錨點。圖片總數為：
-
-```text
-min(依閱讀時間的容量, 高價值錨點數量)
-```
-
-閱讀時間容量：
-
-- 1–2 分鐘：最多 1 張。
+- 1 分鐘：最多 1 張。
+- 2 分鐘：最多 2 張。
 - 3–4 分鐘：最多 3 張。
 - 5–6 分鐘：最多 4 張。
 - 7–9 分鐘：最多 5 張。
 - 10–12 分鐘：最多 6 張。
-- 13–16 分鐘：最多 7 張。
-- 17 分鐘以上：最多 8 張。
+- 13 分鐘以上：最多 7 張。
+
+最終數量：
+
+```text
+min(閱讀時間容量, 高價值且不重複的視覺錨點數)
+```
+
+精選圖計入總數。若只有兩個真正有用的錨點，就只做兩張。
 
 可執行：
 
 ```bash
 python3 scripts/recommend_image_count.py \
   --reading-minutes 4 \
-  --anchors 4 \
-  --sections 5 \
+  --anchors 3 \
   --include-hero
 ```
 
-不要為了達到數量而硬配圖。若只有兩個真正有價值的錨點，就只做兩張。
+## 候選視覺錨點評分
 
-## 候選錨點評分
-
-每項 0–2 分，總分至少 7：
+每項 0–2 分：
 
 - `comprehension_gain`：圖片是否明顯降低理解成本。
-- `visual_structure`：是否有可見的流程、對比、變化或關係。
-- `context_specificity`：是否直接對應本段，而非泛用概念。
-- `non_redundancy`：是否和其他圖功能不同。
-- `placement_value`：放在這裡是否能改善閱讀節奏。
+- `visual_structure`：是否有可見的機制、對比、流程或變化。
+- `context_specificity`：是否直接對應該段上下文。
+- `non_redundancy`：是否避免重複其他圖片。
+- `placement_value`：插在該處是否改善閱讀。
 
-## 自動決定插入位置
+總分至少 7 才保留。
 
-- Hero 放在文章標題後。
-- Inline 圖放在「概念已被完整介紹」的段落後，不放在標題和第一句之間。
-- 通常放在該章節第 1–2 個解釋段落後。
-- 兩張 inline 圖至少間隔 2 個正文段落。
-- 不連續放圖，不在 FAQ、參考資料或純結論後硬塞圖。
-- 同一短章節最多 1 張；只有長章節且有兩個不同機制時才例外。
-- `placement.after_paragraph_excerpt` 必須引用真實段落片段，避免位置漂移。
+## 自動插入位置
 
-## 每張圖的資訊結構
+- 精選圖：文章標題後。
+- 文內圖：概念第一次被完整解釋的段落後。
+- 不直接放在章節標題後。
+- 兩張文內圖通常至少間隔兩個正文段落。
+- 不在 FAQ、參考資料、作者資訊或純結尾後加裝飾圖。
+- 第一張文內圖通常位於正文約 20–40% 處。
+- 最後一張圖通常在結論或限制段落之前，而不是之後。
 
-Manifest 每張 shot 包含：
+Manifest 必須保存：
 
-- `kind`：`hero` 或 `inline`
-- `placement`
-- `purpose`
-- `layout`
-- `eyebrow`
-- `headline`
-- `subheadline`
-- `visual_story`
-- `key_elements`
-- `explainers`
-- `motion_cues`
-- `filename`
-- `alt_text`
-- `caption`
+- 章節標題。
+- 全文段落索引。
+- 對應段落片段。
+- 為何放在此處。
 
-每個 explainer 包含：
+## 圖片文字階層
 
-- `title`：2–12 個中文字或同等長度。
-- `body`：一句補充說明。
-- `accent`：色彩語意。
-- `visual_anchor`：底圖中對應的可見物件或區域。
+每張圖預設：
 
-## 六種版型
+- Eyebrow：0–1 個。
+- Headline：1 個，2–3 行內。
+- Subheadline：1 個，1–2 行內。
+- Labels：2–4 個。
+- Bottom takeaway：0–1 個。
+- Caveat：0–1 個，只有必要時使用。
 
-- `hero-explainer`：上方結論，中間主視覺，下方 3 張解釋卡。
-- `mechanism-focus`：上方結論，左側機制主體，右側 2–4 張解釋卡。
-- `process-strip`：上方結論，中間流程場景，下方依序排列階段卡。
-- `comparison-split`：上方結論，中間左右對比，下方兩側說明與一個總結。
-- `timeline-route`：上方結論，中間彎曲時間路徑，下方階段卡。
-- `result-board`：上方結論，中間結果場景，下方 2–4 張數字或決策卡。
+Headline 必須是判斷，不是「系統架構圖」「流程」「重點」等圖表類型名稱。
 
-## 圖像生成原則
+## 安全版面
 
-- 每張圖只解釋一個核心問題。
-- 先決定要說什麼，再決定剪紙場景。
-- 技術內容可使用簡化模組、層、Token、記憶卡、比較軌跡，但不要追求論文架構圖的精密複製。
-- 不預設加入人物、機器人、城市、工廠、齒輪、發光大腦或伺服器塔。
-- 只保留 2–6 個關鍵物件。
-- 文字和圖共同解釋，不要求圖像模型直接生成任何文字。
+- 建議畫布：1600 × 900。
+- 外安全邊界：至少 72 px。
+- 重要文字與物件不得貼邊或被裁切。
+- 標題區與主場景不可互相遮擋。
+- 標註引線短而清楚，不穿過主體。
+- 任何文字卡不得遮住核心物件、路徑、比較結果或人物臉部。
+- 縮至 600 px 寬時，headline、主要數字與標籤仍要可讀。
 
-## QA
+## 人物規則
 
-最終成品必須同時通過：
+人物是可選元素，不是固定 IP：
 
-1. 上下文正確：讀者能看出它在解釋哪一段。
-2. 視覺簡單：一個主焦點，沒有過度技術化或過度裝飾。
-3. 文字有效：headline 是結論，卡片是原因、階段、對比或結果。
-4. 版面清楚：上→中→下或左→右有固定閱讀順序。
-5. 圖片數量與位置合理：沒有每節硬塞圖，也沒有兩張相鄰。
-6. 同篇一致：羊皮紙、色盤、鏡頭、字體與卡片樣式一致。
+- 有助於呈現負擔、競賽、操作或決策時才加入。
+- 純機制、門、閘門、記憶盒、路徑、堆疊或資源比較，不需要人物也可以成立。
+- 不為了「有故事感」硬塞人物。
 
-## 保存
+## 精選圖到文內圖的連續性
+
+後續每張文內圖都必須明確要求：
+
+```text
+Use the approved featured image only as a style reference.
+Match its parchment tone, fine border, corner ornaments, centered title hierarchy,
+paper-crafted depth, shadow direction, label-card treatment, accent colors,
+and bottom takeaway ribbon. Do not copy its composition.
+```
+
+若文內圖不像精選圖所屬的同一套專題，視為失敗。
+
+## 保存與交付
 
 ```text
 assets/<article-slug>-editorial-documentary/
 ├── manifest.json
 ├── prompts/
 ├── images/
-│   ├── raw/
-│   └── 01-*.png
+│   ├── 00-featured.png
+│   ├── 01-inline-*.png
+│   └── ...
 └── delivery.md
 ```
 
+交付需包含：
+
+- 自動決定的總圖片數量。
+- 精選圖對應的 Title Contract。
+- 每張文內圖的段落、用途與插入位置。
+- 圖片路徑、alt text 與 caption。
+- 任何重試、修字或裁切修正紀錄。
+
 ## 永久禁忌
 
-- 不把 VOX 風格當成內容相關性的替代品。
-- 不為每篇文章固定生成 5 張。
-- 不使用散亂、交叉的 callout 線與大量貼紙標籤。
-- 不要求無字底圖單獨解釋所有細節。
-- 不把技術文章變成難懂的論文架構圖。
-- 不讓文字遮住主視覺或塞滿超過約 35% 畫面。
-- 不要求圖像模型排文字、數字、logo 或字幕。
-- 不複製特定媒體既有畫面或品牌資產。
+- 不固定輸出五張。
+- 不平均為每個小節配圖。
+- 不讓文內圖降級成和精選圖不同的視覺系統。
+- 不使用散落的大量 callout 補救無關畫面。
+- 不強迫無字底圖獨自承擔所有技術細節。
+- 不讓文字遮住主體或讓物件超出範圍。
+- 不把人物當成必填元素。
+- 不用泛用 AI 機器、城市、齒輪或伺服器塔硬套任何技術文章。
+- 不生成傳統 PPT、企業向量圖、密集論文圖、兒童卡通或遊戲式 3D 畫面。
+- 不複製特定 Vox 或其他媒體現成畫面、logo、字體與標題卡。

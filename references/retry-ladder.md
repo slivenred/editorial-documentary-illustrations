@@ -1,43 +1,37 @@
 # Retry Ladder
 
-## 1. Context Reset
+## 1. Title Realignment
 
-症狀：圖片漂亮但像任何 AI 文章都能用。
+精選圖偏離標題時，重新從 `title_contract` 建立主場景，不只改 headline。
 
-修正：重寫 `visual_story`，只保留該段落中的人物、物件、機制與結果；刪除泛用科技裝飾。
+## 2. Context Realignment
 
-## 2. Simplify Scene
+文內圖與段落不符時，回到 `after_paragraph_excerpt`，只保留該段的一個核心動作或對比。
 
-症狀：畫面太技術、太滿或像論文架構圖。
+## 3. Hero Style Restore
 
-修正：把關鍵物件降到 2–4 類，只呈現一個關係；把精確名稱、比例與數字移到解釋卡。
+文內圖風格漂移時，把合格精選圖重新設為 style reference，鎖定羊皮紙、邊框、標題階層、紙雕厚度、色盤、標註卡與底部旗帶。
 
-## 3. Layout Reset
+## 4. Safe-area Expansion
 
-症狀：文字遮住畫面或卡片太亂。
+裁切或貼邊時：縮小場景 8–12%，增加外邊界，不裁掉任何內容。
 
-修正：換固定 layout，不手動散放標籤；優先使用 header + bottom cards 或 header + right cards。
+## 5. Text Reduction
 
-## 4. Text Rewrite
+文字擁擠時：先縮短 subheadline、合併 labels、刪除非必要 caveat；不要先縮小字體。
 
-症狀：文字像段落摘要、太長或沒有判斷。
+## 6. Label Reposition
 
-修正：headline 改成一句結論；每張卡只保留名稱／數字和一句解釋。
+標註遮住主體時：移到右側、上側或空白區，縮短引線，不改場景含義。
 
-## 5. Card Reduction
+## 7. Text-only Repair
 
-症狀：手機縮小後不可讀。
+只有錯字時，使用圖片編輯替換指定文字，保留其他內容不變。
 
-修正：由 4 張卡降為 3 張，再降為 2 張；不要縮小到難讀。
+## 8. Scene Simplification
 
-## 6. Style Restore
+畫面太複雜時，刪除次要物件，只留一個主場景與 2–4 個標註。
 
-症狀：羊皮紙、剪紙、色盤、鏡頭或陰影漂移。
+## 9. Count Reduction
 
-修正：使用 calibration frame 鎖材質，不複製構圖。
-
-## 7. Image Merge
-
-症狀：兩張圖內容相似。
-
-修正：合併成一張更清楚的圖，降低整篇圖片總數。
+兩張圖重複時，刪除或合併較低分者，不為維持預設張數而保留。

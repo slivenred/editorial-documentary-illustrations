@@ -9,70 +9,35 @@
   <a href="README.es.md">Español</a>
 </p>
 
-> 글의 길이와 내용을 바탕으로 최적의 이미지 수와 삽입 위치를 자동으로 정하고, 문맥에 맞는 VOX-inspired 양피지 컷아웃 장면과 설명 텍스트를 생성합니다.
+> 글 제목을 직접 설명하는 대표 이미지와, 글 길이·문맥·이해 효과를 기준으로 자동 선택한 본문 이미지를 하나의 양피지 페이퍼컷 해설 스타일로 생성합니다.
 
-완성 이미지의 정보 순서는 다음과 같습니다.
+## 핵심 기능
 
-```text
-eyebrow → 핵심 판단 → 한 줄 설명 → 컷아웃 주 시각 → 2~4개 설명 카드
-```
+- 제목의 핵심 주장을 표현하는 대표 이미지 1장.
+- 실제로 필요한 본문 이미지 0~6장.
+- 각 본문 이미지의 정확한 삽입 위치.
+- 설명 문구가 통합된 16:9 최종 이미지.
+- 대표 이미지와 모든 본문 이미지가 공유하는 Visual Bible.
 
-Version 5는 텍스트 없는 이미지에 모든 기술 세부 정보를 억지로 넣지 않으며, 범용 AI 이미지를 많은 라벨로 사후 설명하는 방식도 피합니다.
+## 시각 시스템
 
-## 이미지 수 자동 결정
+따뜻한 낡은 양피지, 옅은 그리드, 이중 테두리, 중앙 정렬 제목, 입체 종이 공예 장면, 2~4개의 짧은 라벨, 필요할 때만 사용하는 하단 결론 리본. 인물은 필수가 아닙니다.
 
-| 읽기 시간 | 최대 이미지 수 |
-|---|---:|
-| 1~2분 | 1 |
-| 3~4분 | 3 |
-| 5~6분 | 4 |
-| 7~9분 | 5 |
-| 10~12분 | 6 |
-| 13~16분 | 7 |
-| 17분 이상 | 8 |
+본문 이미지는 대표 이미지의 종이 색, 테두리, 타이포그래피, 종이 깊이, 그림자, 색상, 라벨 카드와 리본을 그대로 이어가야 합니다. 흰 배경 스케치, 좌우 텍스트 패널, PPT, 일반 벡터 다이어그램으로 바꾸지 않습니다.
 
-최종 수량은 읽기 시간 용량과 중복되지 않는 고가치 시각 앵커 수 중 작은 값입니다. Hero도 총수에 포함됩니다.
+## 자동 수량과 위치
 
-## 자동 배치
+총 수량에는 대표 이미지가 포함됩니다. 읽기 시간에 따른 최대 용량과, 가치가 높고 중복되지 않는 시각 앵커 수 중 더 작은 값을 사용합니다. 본문 이미지는 해당 개념이 처음 충분히 설명된 문단 뒤에 배치합니다.
 
-- Hero는 글 제목 뒤에 배치합니다.
-- 본문 이미지는 개념이 처음 충분히 설명된 문단 뒤에 배치합니다.
-- 본문 이미지 사이에는 최소 두 문단을 둡니다.
-- FAQ, 참고문헌, 글 끝에 장식용으로 억지 삽입하지 않습니다.
-
-## 6가지 레이아웃
-
-`hero-explainer`, `mechanism-focus`, `process-strip`, `comparison-split`, `timeline-route`, `result-board`.
-
-## 설치
-
-```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./editorial-documentary-illustrations \
-  "${CODEX_HOME:-$HOME/.codex}/skills/"
-python3 -m pip install -r requirements-annotation.txt
-```
-
-## 사용
+## 사용 예시
 
 ```text
 Use $editorial-documentary-illustrations
-글을 분석하고 최적의 이미지 수와 삽입 위치를 자동으로 결정해 주세요.
-각 이미지는 해당 문단과 직접 연결된 VOX-inspired 양피지 컷아웃 장면, headline, subheadline, 2~4개의 설명 카드를 포함해야 합니다.
-5장으로 고정하지 마세요.
+아래 글의 대표 이미지와 가장 적절한 수의 본문 이미지를 생성해 주세요.
+대표 이미지는 제목에 답해야 하고, 각 본문 이미지는 대표 이미지의 스타일을 유지하며 하나의 문맥 핵심만 설명해야 합니다.
+수량과 삽입 위치를 자동 결정하고, 텍스트 오류, 잘림, 겹침, 이미지 간 일관성을 검사해 주세요.
 
-<글 본문>
+<글>
 ```
 
-## 명령
-
-```bash
-python3 scripts/recommend_image_count.py --reading-minutes 4 --anchors 4 --sections 5 --include-hero
-python3 scripts/validate_manifest.py path/to/manifest.json
-python3 scripts/render_prompts.py path/to/manifest.json --mode still --output path/to/prompts
-python3 scripts/annotate_images.py path/to/manifest.json --input path/to/images/raw --output path/to/images --force
-```
-
-전체 형식은 [`templates/manifest.template.json`](templates/manifest.template.json)을 참고하세요.
-
-MIT License로 배포되며 Vox Media와 관련이 없습니다. 타사 폰트나 원본 캐릭터 소재는 포함하지 않습니다.
+자세한 내용은 [`SKILL.md`](SKILL.md)와 [`templates/manifest.template.json`](templates/manifest.template.json)을 참고하세요. MIT License이며 Vox Media와 관련이 없고 Ian의 Xiaohei 캐릭터 자료를 포함하지 않습니다.

@@ -9,73 +9,49 @@
   <a href="README.es.md">Español</a>
 </p>
 
-> 根据文章长度与内容，自动选择最佳图片数量和插入位置，再生成符合上下文、带有整合式解释文字的 VOX-inspired 羊皮纸剪纸文内图。
+> 自动生成标题导向的文章精选图，以及数量和位置最合适的文内图；全部使用同一套 VOX-inspired 羊皮纸剪纸解说视觉。
 
-每张最终图片采用固定信息层级：
+## 核心能力
 
-```text
-小标题 → 核心判断 → 一行补充 → 剪纸主视觉 → 2–4 张解释卡
-```
+- 1 张直接回应文章标题的精选图。
+- 0–6 张根据文章长度、上下文和理解增益自动选择的文内图。
+- 每张文内图的准确插入位置。
+- 带有可读解释文字的 16:9 最终图片。
+- 精选图与文内图共享同一份 Visual Bible。
 
-Version 5 不再强迫无文字底图独自承载全部技术细节，也不再用大量散落标签拯救泛用 AI 图片。
+## 视觉系统
 
-## 自动图片数量
+暖色旧羊皮纸、淡网格、双线边框、居中标题层级、立体纸雕场景、2–4 个短标注卡，以及可选的底部结论条。人物不是必需元素。
 
-| 阅读时间 | 图片总数上限 |
-|---|---:|
-| 1–2 分钟 | 1 |
-| 3–4 分钟 | 3 |
-| 5–6 分钟 | 4 |
-| 7–9 分钟 | 5 |
-| 10–12 分钟 | 6 |
-| 13–16 分钟 | 7 |
-| 17 分钟以上 | 8 |
+文内图必须延续精选图的羊皮纸、边框、标题、纸雕厚度、阴影、配色、标注卡和结论条，不得降级为白底草图、左右文字面板、PPT 或普通矢量图。
 
-最终数量为阅读时间容量与高价值、非重复视觉锚点数量中的较小值。Hero 计入总数。
+## 自动数量
 
-## 自动插入位置
+总数包含精选图：1 分钟最多 1 张；2 分钟 2 张；3–4 分钟 3 张；5–6 分钟 4 张；7–9 分钟 5 张；10–12 分钟 6 张；13 分钟以上 7 张。
 
-- Hero 放在文章标题后。
-- 文内图放在概念第一次完整解释的段落后。
-- 两张文内图至少间隔两个正文段落。
-- 不在 FAQ、参考资料或文章结尾硬塞图片。
-- Manifest 保存章节、段落索引、真实段落片段与放置理由。
+最终数量取阅读容量与高价值非重复视觉锚点数的较小值。
 
-## 六种版式
+## 自动位置
 
-`hero-explainer`、`mechanism-focus`、`process-strip`、`comparison-split`、`timeline-route`、`result-board`。
-
-它们都遵循“上方结论、中间 VOX-inspired 剪纸场景、下方或侧边解释卡”的阅读顺序。
-
-## 安装
-
-```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./editorial-documentary-illustrations \
-  "${CODEX_HOME:-$HOME/.codex}/skills/"
-python3 -m pip install -r requirements-annotation.txt
-```
+精选图放在标题后；文内图放在对应概念第一次完整说明的段落后。两张文内图通常至少相隔两个正文段落，不在 FAQ、参考资料、作者信息或纯结论后添加装饰图。
 
 ## 使用
 
 ```text
 Use $editorial-documentary-illustrations
-分析文章，自动决定最佳图片数量与插入位置。
-每张图直接对应所在段落，使用 VOX-inspired 羊皮纸剪纸场景，并加入一个 headline、一行 subheadline 与 2–4 张短解释卡。
-不要固定生成 5 张。
+为下面文章生成精选图和最合适数量的文内图。
+精选图必须回应文章标题；每张文内图都沿用精选图的视觉系统，并只解释一个上下文核心。
+自动决定数量和插入位置，检查文字、裁切、遮挡和跨图一致性。
 
-<文章内容>
+<文章>
 ```
 
 ## 工具
 
 ```bash
-python3 scripts/recommend_image_count.py --reading-minutes 4 --anchors 4 --sections 5 --include-hero
+python3 scripts/recommend_image_count.py --reading-minutes 4 --anchors 3 --include-hero
 python3 scripts/validate_manifest.py path/to/manifest.json
 python3 scripts/render_prompts.py path/to/manifest.json --mode still --output path/to/prompts
-python3 scripts/annotate_images.py path/to/manifest.json --input path/to/images/raw --output path/to/images --force
 ```
 
-完整格式请查看 [`templates/manifest.template.json`](templates/manifest.template.json)。
-
-本项目采用 [MIT License](LICENSE)，与 Vox Media 无关，也不包含第三方字体或原始角色素材。
+完整格式见 [`templates/manifest.template.json`](templates/manifest.template.json)。项目采用 [MIT License](LICENSE)，与 Vox Media 无关，也不包含 Ian 小黑角色或示例素材。

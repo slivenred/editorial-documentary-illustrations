@@ -1,11 +1,9 @@
-ORIGINAL EDITORIAL DOCUMENTARY CUTOUT STYLE LOCK
+APPROVED EDITORIAL PARCHMENT CUTOUT STYLE LOCK
 
-Create one original wide 16:9 editorial documentary illustration using the visual grammar of modern explainer journalism without reproducing any existing frame, branded asset, logo, title card, typography, or identifiable composition.
+Create one original 16:9 editorial explainer illustration on elegant warm aged parchment. Use a faint low-contrast grid, subtle paper fibers and creases, a fine double-line border, and restrained ornamental corners. Build the central scene from dimensional paper-cut and paper-craft objects with slightly irregular edges, natural wear, and consistent short soft shadows.
 
-Build the world on warm aged parchment with subtle paper fibers, faint low-contrast map-grid lines, a few gentle creases, and clean restrained wear. All people, objects, modules, buildings, tools, routes, and scenery are hand-drawn paper cutouts or paper-sticker shapes with slightly irregular ink-brown edges and consistent short soft shadows.
+Use a centered editorial title hierarchy at the top: a small eyebrow, one large high-contrast headline, and one concise terracotta or ink-brown subheadline. The main paper-craft tableau occupies the middle and lower canvas. Add only 2–4 compact paper labels with short leader lines and small target dots, plus an optional bottom takeaway ribbon. Keep every word, label, object, road, card, and ornament fully inside a generous safe area.
 
-Use a calm top-down map/tabletop view, flat orthographic view, or restrained soft-isometric angle. Use an earthy palette of parchment cream, ink brown, terracotta, mustard ochre, muted sage, dusty indigo, and warm brick red. Keep one clear focal scene and 2–6 key object types.
+Use dark ink brown, terracotta, dusty indigo, muted sage, mustard ochre, and warm brick red. The image should feel premium, historical-documentary, tactile, calm, and easy to understand. People are optional; use them only when they improve the story.
 
-The scene should feel like one frozen frame from a smooth documentary time-lapse, using staggered objects, partial assembly, routes, repeated states, or visible comparison. Keep it elegant, readable, and premium rather than busy.
-
-Do not render text, letters, numbers, labels, logos, watermarks, UI, dashboards, formal flowchart boxes, or fake writing. Do not make a realistic photograph, cinematic still, plastic 3D render, clay scene, anime image, children's illustration, corporate vector infographic, or game interface.
+Do not make a PPT slide, corporate vector infographic, white-background sketch, dense academic diagram, dashboard, game-like 3D render, children's illustration, or realistic photograph. Do not crop text or objects. Do not let labels cover the subject. Do not add any text beyond the exact requested strings.

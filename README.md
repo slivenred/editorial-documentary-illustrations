@@ -9,79 +9,70 @@
   <a href="README.es.md">Español</a>
 </p>
 
-> Automatically choose the best number and placement of article illustrations, then create context-specific VOX-inspired parchment cutouts with integrated explanatory text.
+> Automatically create a title-led featured image and the optimal number of context-aware inline illustrations in one coherent VOX-inspired parchment paper-cut editorial system.
 
-This Skill is designed for Codex and other agents that can follow `SKILL.md`. It combines an editorial cutout scene with a clear information hierarchy:
+This Skill is designed for Codex and other agents that follow `SKILL.md`. It plans the complete visual reading experience instead of generating a fixed number of decorative images.
 
-```text
-eyebrow → headline → subheadline → cutout visual → 2–4 explainer cards
-```
+## What it produces
 
-The goal is not a text-free illustration that must encode an entire paper by itself, and not a generic AI image rescued by scattered labels. Image and text are planned together.
+- One featured image that directly answers the article title.
+- Zero to six inline images, chosen automatically from article length, reading rhythm, context, and comprehension gain.
+- Exact insertion positions for every inline image.
+- Final 16:9 images with integrated, reviewed explanatory text.
+- One shared Visual Bible across the featured and inline images.
 
-## What changed in version 5
+## Approved visual system
 
-The previous workflow became too technical: semantic contracts, blind-caption tests, grouping brackets, comparison bars, and many callouts could produce an accurate-looking diagram that felt less like an editorial illustration.
+- Warm aged parchment with a faint grid and subtle creases.
+- Fine double-line border and restrained corner ornaments.
+- Centered eyebrow, large headline, and concise subheadline at the top.
+- A dimensional paper-craft tableau in the middle and lower canvas.
+- Two to four compact labels with short leader lines.
+- Optional bottom takeaway ribbon and one short caveat.
+- People are optional; objects should carry the explanation when possible.
 
-Version 5 simplifies the workflow:
+Inline images must match the approved featured image's parchment, border, typography hierarchy, paper depth, shadows, label cards, accents, and takeaway ribbon. They may not fall back to white sketches, split text panels, PPT cards, or generic vector diagrams.
 
-- image count is automatic rather than fixed at five;
-- image placement is tied to real paragraph excerpts;
-- one image answers one question;
-- the scene uses only 2–6 key object types;
-- text is integrated through a stable header and card system;
-- technical precision lives in concise explainer cards instead of a dense paper diagram;
-- scattered callout stickers and crossing leader lines are avoided.
+## Featured-image Title Contract
+
+Before creating the featured image, the Skill resolves:
+
+- `claim`: the article title's main assertion.
+- `key_result`: the result, number, or change readers should remember.
+- `mechanism`: the main reason the result happens.
+
+The featured image must visibly communicate the claim and at least one of the other two.
 
 ## Automatic image count
 
-The agent scores non-redundant visual anchors and limits the total by reading time:
+The total count includes the featured image:
 
 | Reading time | Maximum total images |
 |---|---:|
-| 1–2 min | 1 |
-| 3–4 min | 3 |
-| 5–6 min | 4 |
-| 7–9 min | 5 |
-| 10–12 min | 6 |
-| 13–16 min | 7 |
-| 17+ min | 8 |
+| 1 minute | 1 |
+| 2 minutes | 2 |
+| 3–4 minutes | 3 |
+| 5–6 minutes | 4 |
+| 7–9 minutes | 5 |
+| 10–12 minutes | 6 |
+| 13+ minutes | 7 |
 
 The final count is:
 
 ```text
-min(reading-time capacity, high-value non-redundant anchors)
+min(reading-time capacity, high-value non-redundant visual anchors)
 ```
 
-A hero image counts toward the total. The agent never adds an image only to fill a quota.
-
-```bash
-python3 scripts/recommend_image_count.py \
-  --reading-minutes 4 \
-  --anchors 4 \
-  --sections 5 \
-  --include-hero
-```
-
-For a four-minute Kimi Linear article, this recommends three total images rather than four or five.
+The Skill never fills a quota. If two images explain the article best, it generates two.
 
 ## Automatic placement
 
-- Hero: after the article title.
-- Inline image: after the paragraph that completes the first useful explanation of the concept.
-- Never place an image directly after a heading before the concept is introduced.
-- Keep at least two body paragraphs between inline images.
-- Avoid FAQ, references, author bio, and decorative end-of-article placements.
-- Store the section, paragraph index, exact excerpt, and reason in the manifest.
+- Featured image: immediately after the article title.
+- Inline image: after the paragraph that first completes the relevant explanation.
+- Inline images are normally separated by at least two body paragraphs.
+- No decorative image after FAQs, references, author information, or a purely concluding paragraph.
 
-## Six layouts
-
-- `hero-explainer` — headline, central visual, three bottom cards.
-- `mechanism-focus` — mechanism on the left, cards on the right.
-- `process-strip` — one visual process with ordered stage cards.
-- `comparison-split` — two comparable sides plus a takeaway.
-- `timeline-route` — one route through three or four stages.
-- `result-board` — one result scene plus metric or decision cards.
+Each manifest placement stores the section heading, global paragraph index, paragraph excerpt, and reason.
 
 ## Installation
 
@@ -92,7 +83,7 @@ cp -R ./editorial-documentary-illustrations \
 python3 -m pip install -r requirements-annotation.txt
 ```
 
-No font files are bundled. The renderer finds a compatible local font from `article.annotation_language`, or accepts `--font /path/to/font.ttf`.
+No font files are bundled.
 
 ## Usage
 
@@ -100,97 +91,78 @@ No font files are bundled. The renderer finds a compatible local font from `arti
 
 ```text
 Use $editorial-documentary-illustrations
-Analyze this article. Automatically choose the best image count and insertion positions.
-For every selected anchor, create a version 5 shot using one integrated explainer layout.
-Do not generate images yet.
+Analyze the article, resolve its Title Contract, and automatically decide the best total image count and insertion positions.
+Create a version 6 manifest, but do not generate images yet.
 
 <article>
 ```
 
-### Generate the complete set
+### Generate the complete image set
 
 ```text
 Use $editorial-documentary-illustrations
-Generate the best number of 16:9 VOX-inspired parchment-cutout article images.
-Do not force five images. Each image must directly match its section and include one headline, one subheadline, and 2–4 concise explainer cards in the article language.
-Generate text-free bases first, then render the integrated text layout.
+Generate the article's featured image and the optimal number of inline images.
+The featured image must answer the article title. Every inline image must use the approved featured image as a style reference and explain one specific context anchor.
+Use integrated text in the article's reader language and verify spelling, cropping, overlap, and cross-image consistency.
 
 <article>
 ```
 
-## Commands
+### Generate images and an HTML demo
+
+```text
+Use $editorial-documentary-illustrations
+Generate the complete article image set and an HTML demo showing each image at its recommended insertion position.
+Choose image count and placement automatically for the best reading and comprehension experience.
+
+<article>
+```
+
+## Tooling
 
 ```bash
+python3 scripts/recommend_image_count.py \
+  --reading-minutes 4 \
+  --anchors 3 \
+  --include-hero
+
 python3 scripts/validate_manifest.py path/to/manifest.json
 
 python3 scripts/render_prompts.py \
   path/to/manifest.json \
   --mode still \
   --output path/to/prompts
-
-python3 scripts/annotate_images.py \
-  path/to/manifest.json \
-  --input path/to/images/raw \
-  --output path/to/images \
-  --force
 ```
 
-## Version 5 manifest
+`annotate_images.py` is a fallback renderer for repairing or deterministically placing text when direct image-model typography needs correction. The primary workflow generates the integrated final image first.
 
-```json
-{
-  "version": 5,
-  "article": {
-    "reading_minutes": 4,
-    "section_count": 5,
-    "image_count_mode": "auto",
-    "include_hero": true,
-    "high_value_anchor_count": 4,
-    "target_count": 3,
-    "count_reason": "Three non-redundant visual anchors fit a four-minute article."
-  },
-  "shots": [
-    {
-      "kind": "hero",
-      "layout": "hero-explainer",
-      "headline": "Most layers stay linear; a few preserve exact retrieval",
-      "subheadline": "A 3:1 hybrid balances bounded memory with precise matching.",
-      "visual_story": "A simple four-layer paper stack with three KDA modules and one MLA module...",
-      "explainers": [
-        {
-          "title": "3:1 hybrid",
-          "body": "Three KDA layers for every MLA layer.",
-          "accent": "terracotta",
-          "visual_anchor": "the central four-layer paper stack"
-        }
-      ]
-    }
-  ]
-}
-```
+## Manifest version 6
+
+Version 6 adds:
+
+- `title_contract`
+- automatic count inputs
+- precise paragraph placement
+- visual-anchor scoring
+- integrated text fields
+- hero-to-inline style continuity
+- a fixed 1600×900 safe-layout contract
 
 See [`templates/manifest.template.json`](templates/manifest.template.json) and [`schemas/shot-manifest.schema.json`](schemas/shot-manifest.schema.json).
 
-## Repository structure
+## Design principles
 
-```text
-.
-├── SKILL.md
-├── README*.md
-├── references/
-├── schemas/shot-manifest.schema.json
-├── templates/manifest.template.json
-├── scripts/
-│   ├── recommend_image_count.py
-│   ├── validate_manifest.py
-│   ├── render_prompts.py
-│   └── annotate_images.py
-└── tests/test_tooling.py
-```
+- The featured image answers the title, not a secondary subsection.
+- Every inline image explains exactly one context-specific idea.
+- Images appear only where they improve understanding.
+- Text and imagery are designed together.
+- Inline images must look like the same editorial series as the featured image.
+- No important object or text may be covered, cropped, or pushed outside the frame.
+- People are optional, never mandatory.
 
-## License and attribution
+## Attribution and license
 
 - Released under the [MIT License](LICENSE).
-- The multi-step workflow was inspired by Ian's [`ian-xiaohei-illustrations`](https://github.com/helloianneo/ian-xiaohei-illustrations); see [`NOTICE.md`](NOTICE.md).
-- No source artwork, Xiaohei character IP, copied prompt, or font file is included.
-- This project is not affiliated with Vox Media. “VOX-inspired” describes a general editorial cutout grammar, not permission to copy branded assets.
+- The cognitive-anchor, one-image-one-idea, physical-metaphor, short-text, and QA workflow principles were inspired by and adapted from Ian's [`ian-xiaohei-illustrations`](https://github.com/helloianneo/ian-xiaohei-illustrations); see [`NOTICE.md`](NOTICE.md).
+- This repository does not include the Xiaohei character IP, example images, copied prompts, or font files.
+- This project is not affiliated with, endorsed by, or produced by Vox Media. Do not copy specific frames, logos, title cards, typefaces, or branded assets.

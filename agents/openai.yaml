@@ -1,6 +1,6 @@
 interface:
-  display_name: "VOX 剪紙文章圖解"
-  short_description: "依文章長度與內容，自動產生最佳數量、位置與解釋文字的剪紙文內圖"
-  default_prompt: "Use $editorial-documentary-illustrations 分析文章長度、章節與視覺錨點，自動決定最佳圖片數量與插入位置。每張成品使用 VOX-inspired 羊皮紙剪紙場景，並整合一個核心結論、一行補充說明與 2–4 個短解釋卡；圖片與文字共同解釋上下文，不生成泛用 AI 圖，也不使用散亂 callout。"
+  display_name: "羊皮紙剪紙文章解說圖"
+  short_description: "自動規劃標題導向精選圖與同風格文內圖，依文章長度和上下文決定數量與位置"
+  default_prompt: "Use $editorial-documentary-illustrations 分析這篇文章，自動決定最合適的精選圖與文內圖數量及插入位置。精選圖必須回應文章標題、最重要結果與核心原因；文內圖必須沿用精選圖的羊皮紙、邊框、置中標題、紙雕場景、短標註卡與底部結論旗帶，每張只解釋一個上下文核心。圖內文字使用文章或指定讀者語言，並完整檢查錯字、遮擋、裁切與跨圖一致性。"
 policy:
   allow_implicit_invocation: true

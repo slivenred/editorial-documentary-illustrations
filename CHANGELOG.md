@@ -1,44 +1,42 @@
 # Changelog
 
+## 4.0.0 — 2026-08-03
+
+- Rebuilt the Skill around the approved title-centered parchment-tableau visual system.
+- Made the featured image explicitly title-led through a required `title_contract` containing claim, key result, and mechanism.
+- Required inline images to inherit the featured image's parchment, border, typography hierarchy, paper-craft depth, shadows, color semantics, compact labels, and takeaway ribbon.
+- Replaced the split text-panel and scattered-callout approach with integrated final images: centered headline, concise subheadline, one physical tableau, 2–4 labels, optional takeaway, and optional caveat.
+- Made people optional rather than a recurring visual requirement.
+- Added automatic total image count based on reading time and high-value non-redundant anchors.
+- Added exact paragraph-level placement using section heading, global paragraph index, paragraph excerpt, and placement reason.
+- Upgraded the manifest to version 6 with Title Contract, anchor scoring, integrated text fields, style continuity, and a 1600×900 safe-layout contract.
+- Updated the prompt renderer to send exact final text to the image model and to use the approved featured image as the inline-image style reference.
+- Added hard QA gates for title alignment, context relevance, cropping, overlap, spelling, mobile readability, and cross-image continuity.
+- Updated fallback text rendering for manifest version 6.
+- Updated all localized README files, schema, template, scripts, tests, Agent prompt, references, and package manifest.
+- No demo assets, third-party fonts, or GitHub Actions workflows were added.
+
 ## 3.0.0 — 2026-08-02
 
-- Simplified the illustration workflow after the version 4 Kimi Linear regression produced technically dense but less readable images.
-- Replaced the fixed semantic-contract and blind-caption pipeline with an integrated editorial explainer board: eyebrow, headline, subheadline, context-specific VOX-inspired cutout visual, and 2–4 explanation cards.
-- Added automatic image-count planning based on reading time, high-value non-redundant anchors, section count, and whether a hero image is requested.
-- Added automatic placement rules using the exact section, paragraph index, paragraph excerpt, and placement reason.
-- Added six layouts: hero explainer, mechanism focus, process strip, comparison split, timeline route, and result board.
-- Added `scripts/recommend_image_count.py` and upgraded the manifest to version 5.
-- Reworked prompt rendering so image and text explain the idea together instead of forcing the text-free base to carry every technical detail.
-- Reworked deterministic annotation rendering into one stable reading hierarchy without scattered sticker callouts or crossing leader lines.
-- Updated validation, QA, retry rules, motion mode, Visual Bible, style rules, templates, tests, README documentation, and the default Agent prompt.
-- Added a Kimi Linear planning example that recommends three total images for a four-minute article: one overview hero, one KDA mechanism image, and one long-context result image.
-- Abstracted only the general information-hierarchy lessons visible in dbskill diagrams; no dbskill SVG, CSS, layout coordinates, source assets, or code were copied.
-- Removed the obsolete `references/semantic-grounding.md` and `scripts/semantic_preflight.py` from the published package.
-- No demo assets, font files, or GitHub Actions workflows were added.
+- Added automatic image-count and placement planning.
+- Added integrated explanatory board layouts and manifest version 5.
 
 ## 2.0.0 — 2026-08-02
 
-- Added a mandatory source-grounded semantic contract for every hero and inline illustration.
-- Upgraded the shot manifest to version 4.
-- Added Label-off, Blind-caption, and Neighbor-article tests.
-- Added `scripts/semantic_preflight.py`.
+- Added source-grounding rules and semantic preflight.
 
 ## 1.3.0 — 2026-07-29
 
-- Added English, Traditional Chinese, Simplified Chinese, Japanese, Korean, and Spanish README documentation.
+- Added multilingual README documentation.
 
 ## 1.2.0 — 2026-07-29
 
-- Replaced the hard-coded Traditional Chinese annotation default with automatic article-language resolution.
-- Upgraded the manifest to version 3 with language-neutral `alt_text` and `caption` fields.
-- Added language-aware local-font selection and RTL-aware rendering.
+- Added article-aware annotation languages and manifest version 3.
 
 ## 1.1.0 — 2026-07-29
 
-- Added deterministic semantic annotations to text-free base images.
-- Added annotation planning, QA, and local-font rendering.
+- Added deterministic semantic annotations.
 
 ## 1.0.0 — 2026-07-29
 
 - Initial release.
-- Added article analysis, Visual Bible, Style Lock, static still prompts, 10-second motion prompts, validation, QA, and retry rules.

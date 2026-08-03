@@ -1,191 +1,185 @@
 {
-  "version": 5,
+  "version": 6,
   "article": {
-    "title": "Kimi Linear 混合線性注意力",
-    "slug": "kimi-linear-hybrid-attention",
+    "title": "月之暗面 Kimi Linear：線性注意力首度全面超越全注意力，KV 最多省 75%",
+    "slug": "kimi-linear-hybrid-linear-attention-beats-full-attention",
     "language": "zh-TW",
     "annotation_language": "zh-TW",
-    "summary": "Kimi Linear 以三層 KDA 搭配一層 MLA，在維持精確檢索能力的同時降低長上下文 KV cache 與解碼成本。",
+    "summary": "Kimi Linear 以 KDA 與 MLA 採 3:1 混合，在長上下文維持精確檢索並降低 KV cache 與解碼成本。",
     "reading_minutes": 4,
-    "section_count": 5,
-    "image_count_mode": "auto",
     "include_hero": true,
-    "high_value_anchor_count": 4,
+    "high_value_anchor_count": 3,
     "target_count": 3,
-    "count_reason": "四分鐘文章容量最多三張；合併重複架構段落後，保留總覽、KDA 機制與長上下文結果三個互不重複的視覺錨點。"
+    "title_contract": {
+      "claim": "線性注意力首度全面超越全注意力",
+      "key_result": "KV cache 最多降低 75%，1M 解碼最高提升 6 倍",
+      "mechanism": "三層 KDA 搭配一層 MLA 的 3:1 混合架構"
+    }
   },
   "visual_bible": {
-    "background": "Warm aged parchment with restrained fibers, a faint grid, and two gentle diagonal creases.",
+    "background": "Warm aged parchment with faint grid lines, subtle fibers, gentle creases, restrained edge wear, and a clean premium documentary feel.",
+    "border": "Fine double-line ink border with small restrained ornamental corner flourishes.",
     "palette": [
-      "dark ink brown for structure and text",
-      "terracotta for KDA and the primary mechanism",
-      "dusty indigo for MLA and the comparison path",
-      "mustard ochre for token flow",
-      "muted sage for efficiency gains",
-      "warm brick red for growing cache cost"
+      "dark ink brown for main type and structure",
+      "terracotta for KDA and primary mechanism",
+      "dusty indigo for MLA and comparison",
+      "muted sage for savings and retained value",
+      "mustard ochre for result flags",
+      "warm brick red for growing burden"
     ],
-    "camera": "top-down-map-15deg",
-    "lighting": "Soft warm light from upper left with short lower-right shadows.",
-    "cutout_style": "Hand-drawn paper modules, token cards, memory trails, and simple physical metaphors with slightly irregular ink-brown edges.",
-    "typography": "One compact eyebrow, one strong headline, one short subheadline, and two to four restrained parchment explainer cards.",
+    "typography": "Centered editorial hierarchy with a small serif eyebrow, large high-contrast headline, and concise terracotta subheadline.",
+    "scene_style": "Dimensional handcrafted paper-cut tableau with tactile card, wood, road, machinery, doors, boxes, or landscape elements; not a flat diagram.",
+    "camera": "front-tableau",
+    "lighting": "Soft warm upper-left light with short consistent lower-right shadows.",
+    "label_style": "Compact parchment labels with dark type, restrained accent outlines, short leader lines, and small target dots.",
+    "takeaway_style": "A wide parchment ribbon or paper strip centered inside the bottom safe zone.",
     "continuity_rules": [
-      "Keep the same parchment and grid strength.",
-      "Keep the same camera and shadow direction.",
-      "Use terracotta for KDA and indigo for MLA across all images.",
-      "Keep the same header and explainer-card treatment.",
-      "Do not render text in the base image."
-    ]
+      "Use the approved hero as the style reference for all inline images.",
+      "Keep the same parchment tone, grid strength, border and corner ornaments.",
+      "Keep the same title hierarchy and color semantics.",
+      "Keep the same paper-craft depth and shadow direction.",
+      "Keep labels compact and leader lines short.",
+      "Keep all text and objects inside the safe border.",
+      "Do not copy the hero composition into inline images."
+    ],
+    "layout_contract": {
+      "canvas_width": 1600,
+      "canvas_height": 900,
+      "outer_margin_px": 72,
+      "header_max_height_px": 260,
+      "footer_max_height_px": 110,
+      "max_labels": 4,
+      "allow_text_over_subject": false,
+      "allow_overflow": false
+    }
   },
   "shots": [
     {
-      "id": "01",
-      "kind": "hero",
+      "id": "00",
+      "image_role": "hero",
+      "layout": "hero-comparison",
       "placement": {
-        "section_heading": "Article header",
-        "section_index": 0,
-        "after_paragraph_index": 0,
-        "after_paragraph_excerpt": "Article header",
-        "reason": "精選圖片需要在讀者進入正文前先建立 3:1 混合架構與效率／品質取捨。"
+        "section_heading": "Article title",
+        "after_paragraph_global_index": 0,
+        "after_paragraph_excerpt": "文章標題與摘要之後",
+        "reason": "以標題主張、3:1 架構與最重要效率結果建立整篇文章的精選圖。"
       },
-      "purpose": "overview",
-      "layout": "hero-explainer",
-      "eyebrow": "KIMI LINEAR",
-      "headline": "多數層走線性，少數層保留精確檢索",
-      "subheadline": "3:1 的 KDA／MLA 混合，把長上下文的記憶體優勢與全注意力的精確比對放進同一個架構。",
-      "visual_story": "在羊皮紙中央建立一組簡潔的四層剪紙堆疊：三個赤陶色 KDA 模組與一個靛藍色 MLA 模組，赭黃色 token 紙帶依序穿過。左下角以小型固定狀態盒表示有限記憶，右側以逐漸拉長的 KV 紙卡軌跡表示全注意力成本。保持場景簡潔，不加入人物、工廠、伺服器城市或精密論文括號。",
-      "key_elements": [
-        "三個赤陶色 KDA 模組",
-        "一個靛藍色 MLA 模組",
-        "穿過四層的 token 紙帶",
-        "固定狀態盒與增長 KV 紙卡的簡單對比"
+      "anchor_score": {
+        "comprehension_gain": 2,
+        "visual_structure": 2,
+        "context_specificity": 2,
+        "non_redundancy": 2,
+        "placement_value": 2
+      },
+      "core_idea": "Kimi Linear 用較輕的 3:1 混合架構，在長上下文保留精確檢索並降低記憶負擔。",
+      "eyebrow": "Kimi Linear",
+      "headline": "線性注意力首度全面超越全注意力",
+      "subheadline": "3:1 混合架構，KV 最多省 75%",
+      "scene": "A two-route paper-craft race on parchment. On the left, a heavy full-attention machine drags a rapidly growing pile of KV-cache cards. On the right, a lighter vehicle carries three terracotta KDA modules and one indigo MLA module toward a finish line. The comparison is immediately readable without becoming a technical diagram.",
+      "scene_elements": [
+        "heavy full-attention machine",
+        "growing KV-cache card pile",
+        "three terracotta KDA modules",
+        "one indigo MLA module",
+        "finish line and efficiency flag"
       ],
-      "explainers": [
-        {
-          "title": "3:1 分層混合",
-          "body": "每四層有三層 KDA、一層 MLA。",
-          "accent": "terracotta",
-          "visual_anchor": "中央四層剪紙堆疊"
-        },
-        {
-          "title": "固定狀態",
-          "body": "KDA 把歷史壓進有限容量的遞迴記憶。",
-          "accent": "sage",
-          "visual_anchor": "左下角固定大小的狀態盒"
-        },
-        {
-          "title": "保留精確檢索",
-          "body": "少量 MLA 層補回需要直接比對的能力。",
-          "accent": "indigo",
-          "visual_anchor": "四層中的靛藍色 MLA 模組"
-        }
+      "labels": [
+        {"text": "KDA × 3", "meaning": "多數層使用線性 KDA", "accent": "terracotta"},
+        {"text": "MLA × 1", "meaning": "少數層保留精確檢索", "accent": "indigo"},
+        {"text": "KV cache 更短", "meaning": "長上下文的記憶負擔更低", "accent": "sage"}
       ],
-      "motion_cues": [
-        "token 紙卡依序穿過四個模組",
-        "固定狀態盒保持大小不變",
-        "KV 紙卡軌跡逐漸拉長"
+      "bottom_takeaway": "多數層保持高效率，少數層保留精確比對",
+      "caveat": "",
+      "people_required": false,
+      "title_coverage": ["claim", "key_result", "mechanism"],
+      "filename": "00-kimi-linear-featured.png",
+      "alt_text": "全注意力機器拖著大量 KV cache，而 Kimi Linear 以三個 KDA 與一個 MLA 模組輕裝抵達終點。",
+      "caption": "Kimi Linear 以 3:1 混合架構降低長上下文記憶負擔，同時保留少量全注意力層。"
+    },
+    {
+      "id": "01",
+      "image_role": "inline",
+      "layout": "mechanism-tableau",
+      "placement": {
+        "section_heading": "KDA：用更細的閘控精煉 Gated DeltaNet",
+        "after_paragraph_global_index": 3,
+        "after_paragraph_excerpt": "KDA 把閘控的粒度切細，讓同一個固定容量工作區能更精準地寫入、保留與遺忘。",
+        "reason": "把較抽象的 finer-grained gating 轉成一眼可懂的門與固定記憶盒。"
+      },
+      "anchor_score": {
+        "comprehension_gain": 2,
+        "visual_structure": 2,
+        "context_specificity": 2,
+        "non_redundancy": 2,
+        "placement_value": 2
+      },
+      "core_idea": "KDA 的優勢不是增加記憶，而是用更細的閘控管理同一塊固定記憶。",
+      "eyebrow": "Kimi Linear",
+      "headline": "KDA 用更細的閘控管理固定記憶",
+      "subheadline": "不是增加記憶體，而是更精細地決定寫入、保留與遺忘",
+      "scene": "A paper-craft mechanism scene matching the hero style. A single coarse stone-and-wood gate on the left is transformed into three separate parchment-and-wood gates in the center: write, keep, and forget. Token cards flow through the gates into one fixed-size compartment box on the right. No person is required.",
+      "scene_elements": [
+        "one coarse gate",
+        "three finer gates",
+        "token cards",
+        "one fixed-state memory box"
       ],
-      "filename": "01-kimi-linear-overview.png",
-      "alt_text": "羊皮紙剪紙圖以三個 KDA 模組和一個 MLA 模組呈現 Kimi Linear 的 3:1 混合架構，旁邊比較固定狀態與持續增長的 KV cache。",
-      "caption": "Kimi Linear 把多數層放在線性注意力路徑，只保留少量全注意力層維持精確檢索。"
+      "labels": [
+        {"text": "寫入重要新資訊", "meaning": "選擇值得進入固定狀態的內容", "accent": "terracotta"},
+        {"text": "保留仍有用內容", "meaning": "讓有價值資訊持續存在", "accent": "sage"},
+        {"text": "移除低價值資訊", "meaning": "釋放有限狀態中的空間", "accent": "brick"},
+        {"text": "記憶大小不變", "meaning": "閘控變細，但固定狀態容量不增加", "accent": "indigo"}
+      ],
+      "bottom_takeaway": "更細的閘控，不代表更多記憶，而是更聰明地使用同一塊記憶",
+      "caveat": "",
+      "people_required": false,
+      "title_coverage": [],
+      "filename": "01-kda-fine-gating.png",
+      "alt_text": "粗閘門被拆成寫入、保留與遺忘三道細閘門，Token 最後進入同一個固定大小的記憶盒。",
+      "caption": "KDA 透過更細粒度的閘控，提高固定狀態記憶的使用效率。"
     },
     {
       "id": "02",
-      "kind": "inline",
-      "placement": {
-        "section_heading": "KDA：用更細的閘控精煉 Gated DeltaNet",
-        "section_index": 2,
-        "after_paragraph_index": 4,
-        "after_paragraph_excerpt": "KDA 進一步把閘控的粒度切細，等於給同一個工作區更精準的寫入、保留、遺忘控制。",
-        "reason": "該段第一次完整說明 KDA 的核心機制，讀者此時最需要一張寫入／保留／遺忘的直觀圖。"
-      },
-      "purpose": "mechanism",
-      "layout": "mechanism-focus",
-      "eyebrow": "KDA GATING",
-      "headline": "同一塊有限記憶，用更細的閘控分配",
-      "subheadline": "KDA 不增加無限記憶，而是更精準地決定哪些資訊寫入、保留或遺忘。",
-      "visual_story": "左側是一個固定大小的剪紙記憶盒，數條不同粗細的 token 紙帶經過三個小型閘門後進入盒中；部分紙片被保留、部分覆寫、部分淡出。畫面只呈現有限記憶與細粒度控制，不畫大腦、機器人或複雜公式。右側保留乾淨區給三張解釋卡。",
-      "key_elements": [
-        "固定大小的記憶盒",
-        "三個細粒度閘門",
-        "寫入、保留與淡出的 token 紙片"
-      ],
-      "explainers": [
-        {
-          "title": "寫入",
-          "body": "新資訊依通道決定進入多少。",
-          "accent": "terracotta",
-          "visual_anchor": "進入記憶盒的 token 紙帶"
-        },
-        {
-          "title": "保留",
-          "body": "仍有用的狀態留在固定工作區。",
-          "accent": "sage",
-          "visual_anchor": "記憶盒內保留的紙片"
-        },
-        {
-          "title": "遺忘",
-          "body": "低價值內容逐步淡出，騰出有限容量。",
-          "accent": "brick",
-          "visual_anchor": "閘門旁逐漸淡出的紙片"
-        }
-      ],
-      "motion_cues": [
-        "不同 token 紙帶通過各自閘門",
-        "部分紙片進入、覆寫或淡出"
-      ],
-      "filename": "02-kda-gating.png",
-      "alt_text": "固定大小的剪紙記憶盒前有多個細粒度閘門，分別控制資訊寫入、保留與遺忘。",
-      "caption": "KDA 的重點不是擴大記憶，而是更精準地使用有限狀態。"
-    },
-    {
-      "id": "03",
-      "kind": "inline",
+      "image_role": "inline",
+      "layout": "growing-burden-comparison",
       "placement": {
         "section_heading": "75%、6 倍與 6.3 倍：長上下文推論的實際意義",
-        "section_index": 4,
-        "after_paragraph_index": 8,
-        "after_paragraph_excerpt": "KV cache 最多降低 75%；在 1M token 的上下文，解碼吞吐提升 6 倍。",
-        "reason": "這一段聚集文章最重要的部署結果，適合用一張結果板統整數字與適用條件。"
+        "after_paragraph_global_index": 6,
+        "after_paragraph_excerpt": "上下文越長，全注意力的 KV cache 與延遲持續膨脹，混合線性注意力的優勢也越明顯。",
+        "reason": "用兩條相同里程的路徑呈現固定狀態與持續增長 KV cache 的負擔差異。"
       },
-      "purpose": "result",
-      "layout": "result-board",
-      "eyebrow": "LONG-CONTEXT RESULT",
-      "headline": "上下文越長，混合線性注意力的優勢越明顯",
-      "subheadline": "核心收益來自 KV cache 不再隨多數層持續膨脹，但數字仍取決於測試條件。",
-      "visual_story": "中間以同一批 token 紙卡分成兩條簡單軌跡：Kimi Linear 路徑維持短而穩定的記憶堆疊，MLA 路徑隨上下文向右拉長。不要畫複雜長條圖、圖例、分組括號或大量折線；只保留一個直觀的長度與速度差異。下方留出三張結果卡。",
-      "key_elements": [
-        "短而穩定的 Kimi Linear 記憶軌跡",
-        "隨上下文拉長的 MLA KV 軌跡",
-        "同一批 token 作為比較起點"
+      "anchor_score": {
+        "comprehension_gain": 2,
+        "visual_structure": 2,
+        "context_specificity": 2,
+        "non_redundancy": 2,
+        "placement_value": 2
+      },
+      "core_idea": "上下文越長，Kimi Linear 的較小記憶負擔與全注意力持續增長的 KV cache 差距越大。",
+      "eyebrow": "Kimi Linear",
+      "headline": "上下文越長，Kimi Linear 優勢越明顯",
+      "subheadline": "Kimi Linear 保持較小的記憶負擔；全注意力的 KV cache 會隨上下文持續增長",
+      "scene": "Two parallel parchment roads matching the approved hero style. The upper Kimi Linear route carries one fixed-state box and a short stack of KV cards from 128K to 1M. The lower full-attention route becomes increasingly cracked and buried under growing piles of KV-cache cards at 128K, 512K, and 1M. No person is required.",
+      "scene_elements": [
+        "upper Kimi Linear route",
+        "fixed-state box and short KV stack",
+        "lower full-attention route",
+        "growing KV-cache piles",
+        "128K, 512K and 1M milestones"
       ],
-      "explainers": [
-        {
-          "title": "KV cache 最多 -75%",
-          "body": "最佳值出現在特定長上下文條件。",
-          "accent": "sage",
-          "visual_anchor": "較短的 Kimi Linear 記憶軌跡"
-        },
-        {
-          "title": "1M 解碼最高 6×",
-          "body": "長上下文時，吞吐量差距被放大。",
-          "accent": "ochre",
-          "visual_anchor": "Kimi Linear 路徑的快速輸出紙卡"
-        },
-        {
-          "title": "仍需實機重測",
-          "body": "實際收益會隨硬體、批次與工作負載改變。",
-          "accent": "brick",
-          "visual_anchor": "兩條比較軌跡的共同起點"
-        }
+      "labels": [
+        {"text": "固定狀態 + 較短 KV", "meaning": "Kimi Linear 的記憶負擔維持較小", "accent": "sage"},
+        {"text": "KV cache 持續變長", "meaning": "全注意力的記憶需求隨上下文增加", "accent": "brick"},
+        {"text": "KV 最多省 75%", "meaning": "特定測試條件下的最佳記憶節省", "accent": "ochre"},
+        {"text": "1M 解碼最高 6×", "meaning": "百萬上下文下的最佳吞吐提升", "accent": "indigo"}
       ],
-      "motion_cues": [
-        "兩條路徑從同一批 token 開始",
-        "MLA KV 軌跡持續拉長",
-        "Kimi Linear 路徑保持短而穩定"
-      ],
-      "filename": "03-long-context-results.png",
-      "alt_text": "兩條剪紙記憶軌跡比較 Kimi Linear 與 MLA：前者保持短而穩定，後者隨上下文持續拉長，並以三張卡說明 KV cache、1M 解碼和測試限制。",
-      "caption": "長上下文把記憶體與解碼成本差距放大，但最佳數字仍需在實際工作負載中驗證。"
+      "bottom_takeaway": "長上下文下，混合線性注意力能在保留部分精確檢索的同時，大幅降低記憶成本",
+      "caveat": "最佳結果來自測試環境，實際表現仍需依模型、硬體與工作負載驗證",
+      "people_required": false,
+      "title_coverage": [],
+      "filename": "02-long-context-burden.png",
+      "alt_text": "Kimi Linear 的固定狀態與短 KV 路徑保持輕量，全注意力路徑的 KV cache 在 128K 到 1M 間持續堆高。",
+      "caption": "上下文愈長，固定狀態與持續成長 KV cache 的成本差距愈明顯。"
     }
   ]
 }

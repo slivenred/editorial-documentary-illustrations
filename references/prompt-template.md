@@ -1,51 +1,92 @@
 # Prompt Assembly
 
-每張無字底圖 prompt 使用以下順序：
+## 原則
 
-1. Article context。
-2. Visual story。
-3. Key elements。
-4. Explainer-to-visual mapping。
-5. Layout reservation。
-6. Style Lock。
-7. Output constraints。
+圖中文字與主場景一起生成。提示詞必須列出所有文字的精確內容，並要求不得增加其他文字。
 
-## 靜態底圖範本
+## Prompt 順序
+
+1. 圖片用途與對應上下文。
+2. 精選圖 Title Contract 或文內圖 Core Idea。
+3. 精確文字清單。
+4. 主場景與物件關係。
+5. Style Lock。
+6. Visual Bible。
+7. 安全區與 QA 限制。
+
+## 精選圖 Prompt 範本
 
 ```text
-Create one original 16:9 editorial documentary paper-cutout illustration for an article.
+Create one final 16:9 featured editorial illustration for this article.
 
-ARTICLE CONTEXT
-Article summary: {article_summary}
-Section anchor: {anchor_summary}
-Image purpose: {purpose}
-Headline meaning: {headline}
+TITLE CONTRACT
+Claim: {claim}
+Key result: {key_result}
+Mechanism: {mechanism}
+Coverage: {title_coverage}
 
-VISUAL STORY
-{visual_story}
+Render these exact strings and no other text:
+Eyebrow: {eyebrow}
+Headline: {headline}
+Subheadline: {subheadline}
+Labels:
+- {label_1}
+- {label_2}
+- {label_3}
+Bottom takeaway: {bottom_takeaway}
+Caveat: {caveat_or_none}
 
-KEY ELEMENTS
-{key_elements}
-
-EXPLAINER-TO-VISUAL MAPPING
-{explainer_mappings}
-
-TEXT-SAFE LAYOUT
-Use the {layout} composition. Reserve the required header and explainer-card zones. Keep the central visual readable and do not place faces or essential objects under those zones.
+MAIN TABLEAU
+{scene}
+Required elements: {scene_elements}
 
 {STYLE_LOCK_VERBATIM}
 
-OUTPUT CONSTRAINTS
-No text, letters, numbers, labels, logos, watermarks, UI, dashboards, formal flowchart boxes, or fake writing in the base image. Use one clear focal scene with 2–6 key object types. The scene must directly match the article section, but it does not need to encode every technical detail without the later explanatory text.
+{VISUAL_BIBLE}
+
+LAYOUT
+Canvas 1600x900. Keep at least {outer_margin_px}px outer margin.
+Center the eyebrow, headline, and subheadline at the top.
+Keep the tableau in the middle/lower area.
+Use only short callout lines. Keep every object and every glyph fully inside the border.
+No overlap between text cards and the central subject.
 ```
 
-## 技術內容
+## 文內圖 Prompt 範本
 
-- 使用簡化且可辨識的模組、Token、狀態、記憶卡、層或對比軌跡。
-- 不追求精密論文圖重製。
-- 不把演算法變成一群人操作泛用機器。
-- 精確比例與數字可放入後製解釋卡。
+```text
+Create one final 16:9 inline editorial illustration for the following article context.
 
-## 參考圖
+Context section: {section_heading}
+Context excerpt: {after_paragraph_excerpt}
+Core idea: {core_idea}
 
-第一張合格底圖只鎖定羊皮紙、剪紙材質、色盤、鏡頭、陰影與物件比例，不複製後續構圖。
+Use the approved featured image only as a style reference.
+Match its parchment tone, fine border, corner ornaments, centered title hierarchy,
+paper-crafted depth, shadow direction, label-card treatment, accent colors,
+and bottom takeaway ribbon. Do not copy its composition.
+
+Render these exact strings and no other text:
+Eyebrow: {eyebrow}
+Headline: {headline}
+Subheadline: {subheadline}
+Labels: {labels}
+Bottom takeaway: {bottom_takeaway}
+Caveat: {caveat_or_none}
+
+Main tableau: {scene}
+Required elements: {scene_elements}
+People required: {people_required}
+
+{STYLE_LOCK_VERBATIM}
+
+Keep all content inside the safe area. Do not crop or hide any important object.
+```
+
+## 修字 Prompt
+
+```text
+Edit the provided image without changing the composition, paper-craft objects, colors, border, or lighting.
+Replace only the incorrect text "{wrong}" with the exact text "{correct}".
+Keep every other pixel and every other string unchanged.
+```

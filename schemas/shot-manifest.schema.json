@@ -1,130 +1,166 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.local/editorial-documentary-manifest-v5.schema.json",
-  "title": "Editorial Documentary Illustration Manifest v5",
+  "$id": "https://example.local/editorial-documentary-illustrations-v6.schema.json",
+  "title": "Editorial Documentary Illustrations Manifest v6",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "article", "visual_bible", "shots"],
   "properties": {
-    "version": {"type": "integer", "const": 5},
+    "version": {"type": "integer", "const": 6},
     "article": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "title", "slug", "language", "annotation_language", "summary",
-        "reading_minutes", "section_count", "image_count_mode", "include_hero",
-        "high_value_anchor_count", "target_count", "count_reason"
+        "reading_minutes", "include_hero", "high_value_anchor_count",
+        "target_count", "title_contract"
       ],
       "properties": {
-        "title": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1, "maxLength": 180},
         "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
-        "language": {"type": "string", "minLength": 2},
-        "annotation_language": {"type": "string", "minLength": 2},
-        "summary": {"type": "string", "minLength": 20},
+        "language": {"type": "string", "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$"},
+        "annotation_language": {"type": "string", "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$"},
+        "summary": {"type": "string", "minLength": 20, "maxLength": 600},
         "reading_minutes": {"type": "number", "exclusiveMinimum": 0, "maximum": 120},
-        "section_count": {"type": "integer", "minimum": 1, "maximum": 100},
-        "image_count_mode": {"type": "string", "enum": ["auto", "fixed"]},
         "include_hero": {"type": "boolean"},
-        "high_value_anchor_count": {"type": "integer", "minimum": 1, "maximum": 30},
-        "target_count": {"type": "integer", "minimum": 1, "maximum": 8},
-        "count_reason": {"type": "string", "minLength": 12, "maxLength": 320}
+        "high_value_anchor_count": {"type": "integer", "minimum": 1, "maximum": 20},
+        "target_count": {"type": "integer", "minimum": 1, "maximum": 7},
+        "title_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["claim", "key_result", "mechanism"],
+          "properties": {
+            "claim": {"type": "string", "minLength": 8, "maxLength": 240},
+            "key_result": {"type": "string", "minLength": 4, "maxLength": 180},
+            "mechanism": {"type": "string", "minLength": 4, "maxLength": 180}
+          }
+        }
       }
     },
     "visual_bible": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "background", "palette", "camera", "lighting", "cutout_style",
-        "typography", "continuity_rules"
+        "background", "border", "palette", "typography", "scene_style",
+        "camera", "lighting", "label_style", "takeaway_style",
+        "continuity_rules", "layout_contract"
       ],
       "properties": {
         "background": {"type": "string", "minLength": 20},
+        "border": {"type": "string", "minLength": 10},
         "palette": {
           "type": "array", "minItems": 4, "maxItems": 7,
           "items": {"type": "string", "minLength": 3}
         },
-        "camera": {
-          "type": "string",
-          "enum": ["top-down-map-15deg", "flat-orthographic", "soft-isometric"]
-        },
-        "lighting": {"type": "string", "minLength": 10},
-        "cutout_style": {"type": "string", "minLength": 20},
         "typography": {"type": "string", "minLength": 20},
+        "scene_style": {"type": "string", "minLength": 20},
+        "camera": {"type": "string", "enum": ["front-tableau", "top-down-map-15deg", "soft-isometric"]},
+        "lighting": {"type": "string", "minLength": 10},
+        "label_style": {"type": "string", "minLength": 15},
+        "takeaway_style": {"type": "string", "minLength": 10},
         "continuity_rules": {
-          "type": "array", "minItems": 4, "maxItems": 12,
+          "type": "array", "minItems": 5, "maxItems": 12,
           "items": {"type": "string", "minLength": 3}
+        },
+        "layout_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "canvas_width", "canvas_height", "outer_margin_px",
+            "header_max_height_px", "footer_max_height_px",
+            "max_labels", "allow_text_over_subject", "allow_overflow"
+          ],
+          "properties": {
+            "canvas_width": {"type": "integer", "const": 1600},
+            "canvas_height": {"type": "integer", "const": 900},
+            "outer_margin_px": {"type": "integer", "minimum": 64, "maximum": 140},
+            "header_max_height_px": {"type": "integer", "minimum": 180, "maximum": 320},
+            "footer_max_height_px": {"type": "integer", "minimum": 60, "maximum": 150},
+            "max_labels": {"type": "integer", "minimum": 2, "maximum": 4},
+            "allow_text_over_subject": {"const": false},
+            "allow_overflow": {"const": false}
+          }
         }
       }
     },
     "shots": {
-      "type": "array", "minItems": 1, "maxItems": 8,
+      "type": "array", "minItems": 1, "maxItems": 7,
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id", "kind", "placement", "purpose", "layout", "eyebrow",
-          "headline", "subheadline", "visual_story", "key_elements",
-          "explainers", "motion_cues", "filename", "alt_text", "caption"
+          "id", "image_role", "layout", "placement", "anchor_score",
+          "core_idea", "eyebrow", "headline", "subheadline", "scene",
+          "scene_elements", "labels", "bottom_takeaway", "caveat",
+          "people_required", "title_coverage", "filename", "alt_text", "caption"
         ],
         "properties": {
           "id": {"type": "string", "pattern": "^[0-9]{2}$"},
-          "kind": {"type": "string", "enum": ["hero", "inline"]},
+          "image_role": {"type": "string", "enum": ["hero", "inline"]},
+          "layout": {
+            "type": "string",
+            "enum": [
+              "hero-comparison", "hybrid-stack-tableau", "mechanism-tableau",
+              "growing-burden-comparison", "process-journey",
+              "before-after-tableau", "timeline-route"
+            ]
+          },
           "placement": {
             "type": "object",
             "additionalProperties": false,
             "required": [
-              "section_heading", "section_index", "after_paragraph_index",
+              "section_heading", "after_paragraph_global_index",
               "after_paragraph_excerpt", "reason"
             ],
             "properties": {
               "section_heading": {"type": "string", "minLength": 1, "maxLength": 180},
-              "section_index": {"type": "integer", "minimum": 0, "maximum": 100},
-              "after_paragraph_index": {"type": "integer", "minimum": 0, "maximum": 1000},
-              "after_paragraph_excerpt": {"type": "string", "minLength": 5, "maxLength": 240},
-              "reason": {"type": "string", "minLength": 10, "maxLength": 280}
+              "after_paragraph_global_index": {"type": "integer", "minimum": 0},
+              "after_paragraph_excerpt": {"type": "string", "minLength": 8, "maxLength": 360},
+              "reason": {"type": "string", "minLength": 12, "maxLength": 360}
             }
           },
-          "purpose": {
-            "type": "string",
-            "enum": ["overview", "mechanism", "process", "comparison", "timeline", "evidence", "result"]
+          "anchor_score": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "comprehension_gain", "visual_structure", "context_specificity",
+              "non_redundancy", "placement_value"
+            ],
+            "properties": {
+              "comprehension_gain": {"type": "integer", "minimum": 0, "maximum": 2},
+              "visual_structure": {"type": "integer", "minimum": 0, "maximum": 2},
+              "context_specificity": {"type": "integer", "minimum": 0, "maximum": 2},
+              "non_redundancy": {"type": "integer", "minimum": 0, "maximum": 2},
+              "placement_value": {"type": "integer", "minimum": 0, "maximum": 2}
+            }
           },
-          "layout": {
-            "type": "string",
-            "enum": [
-              "hero-explainer", "mechanism-focus", "process-strip",
-              "comparison-split", "timeline-route", "result-board"
-            ]
-          },
-          "eyebrow": {"type": "string", "minLength": 1, "maxLength": 40},
+          "core_idea": {"type": "string", "minLength": 10, "maxLength": 260},
+          "eyebrow": {"type": "string", "maxLength": 50},
           "headline": {"type": "string", "minLength": 4, "maxLength": 90},
-          "subheadline": {"type": "string", "minLength": 8, "maxLength": 180},
-          "visual_story": {"type": "string", "minLength": 40, "maxLength": 1200},
-          "key_elements": {
-            "type": "array", "minItems": 2, "maxItems": 6, "uniqueItems": true,
-            "items": {"type": "string", "minLength": 2, "maxLength": 140}
+          "subheadline": {"type": "string", "minLength": 8, "maxLength": 150},
+          "scene": {"type": "string", "minLength": 60, "maxLength": 1400},
+          "scene_elements": {
+            "type": "array", "minItems": 2, "maxItems": 8,
+            "items": {"type": "string", "minLength": 2, "maxLength": 160}
           },
-          "explainers": {
+          "labels": {
             "type": "array", "minItems": 2, "maxItems": 4,
             "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["title", "body", "accent", "visual_anchor"],
+              "type": "object", "additionalProperties": false,
+              "required": ["text", "meaning", "accent"],
               "properties": {
-                "title": {"type": "string", "minLength": 1, "maxLength": 60},
-                "body": {"type": "string", "minLength": 4, "maxLength": 150},
-                "accent": {
-                  "anyOf": [
-                    {"enum": ["ink", "terracotta", "ochre", "sage", "indigo", "brick"]},
-                    {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}
-                  ]
-                },
-                "visual_anchor": {"type": "string", "minLength": 3, "maxLength": 160}
+                "text": {"type": "string", "minLength": 1, "maxLength": 50},
+                "meaning": {"type": "string", "minLength": 3, "maxLength": 180},
+                "accent": {"type": "string", "enum": ["ink", "terracotta", "indigo", "sage", "ochre", "brick"]}
               }
             }
           },
-          "motion_cues": {
-            "type": "array", "minItems": 1, "maxItems": 4,
-            "items": {"type": "string", "minLength": 3, "maxLength": 220}
+          "bottom_takeaway": {"type": "string", "maxLength": 140},
+          "caveat": {"type": "string", "maxLength": 140},
+          "people_required": {"type": "boolean"},
+          "title_coverage": {
+            "type": "array", "maxItems": 3, "uniqueItems": true,
+            "items": {"type": "string", "enum": ["claim", "key_result", "mechanism"]}
           },
           "filename": {"type": "string", "pattern": "^[0-9]{2}-[a-z0-9-]+\\.png$"},
           "alt_text": {"type": "string", "minLength": 12, "maxLength": 240},

@@ -1,23 +1,11 @@
-# Motion Mode — Exactly 10 Seconds
-
-動畫沿用已通過 QA 的 `visual_story` 與 Visual Bible。
-
-## 固定規格
+# Motion Mode
 
 - exactly 10 seconds
 - smooth 24fps
-- one continuous scene
+- one continuous paper-craft scene
 - no voiceover
-- no subtitles or text overlays
-- only subtle ambient sound implied
-- camera locked or very slow drift
+- no text overlays in the generated motion layer
+- preserve the same parchment, border-free motion framing, paper-craft depth, palette and core metaphor
 - final 0.5–0.8 seconds hold
 
-## 四個節拍
-
-- 0.0–1.5 秒：建立主物件與場景。
-- 1.5–4.0 秒：開始核心動作或轉化。
-- 4.0–7.5 秒：擴張流程、對比或結果。
-- 7.5–10.0 秒：形成穩定終局。
-
-不要把靜態圖的 headline 與卡片燒進動畫。需要文字時由影片剪輯層處理。
+動畫由已通過 QA 的 still shot 延伸，不重新發明主場景。
