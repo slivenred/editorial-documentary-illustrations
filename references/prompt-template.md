@@ -1,92 +1,81 @@
-# Prompt Assembly
+# Prompt Assembly (v5 — lean)
 
 ## 原則
 
-圖中文字與主場景一起生成。提示詞必須列出所有文字的精確內容，並要求不得增加其他文字。
+**Lean prompt，豐富場景。** 圖中文字與主場景一起生成，但提示詞必須**短而啟發式**：一段豐富、有觸感、會說故事的場景描述 + 精確文字清單 + 一行濃縮風格。不要把所有安全/版面/材質限制預先倒進 prompt——過度約束會讓模型產出**安全但平面、圖表化**的圖（v4 的 ~1,100 字 prompt 即如此）；精簡 prompt 讓模型有空間渲染**豐富、有深度、紙雕敘事場景**（已實驗驗證）。
 
-## Prompt 順序
+實測對比（同一模型）：1,100 字 prompt → 圖表化（色塊、輸送帶、堆疊）；334 字 prompt → 豐富 3D 場景（機器、路徑、旗子、寫實紋理）。
 
-1. 圖片用途與對應上下文。
-2. 精選圖 Title Contract 或文內圖 Core Idea。
-3. 精確文字清單。
-4. 主場景與物件關係。
-5. Style Lock。
-6. Visual Bible。
-7. 安全區與 QA 限制。
+## Prompt 順序（5 段，~300-350 字）
+
+1. 一句開場：16:9、暖色羊皮紙、淡網格、雙線邊框、角飾。
+2. Context：精選圖 Title Contract（claim/key_result/mechanism）或文內圖 Article Context（section/core_idea ＋ 以精選圖為 style reference）。
+3. 主場景：manifest 的 `scene` 段落（豐富敘事）＋ 一句輕材質提示（紙雕、無金屬/玻璃/螢幕）。
+4. 精確文字清單（逐字，不加其他文字）：eyebrow/headline/subheadline/labels/bottom_takeaway/caveat。
+5. 一行濃縮風格：色盤（含概念對應，如 terracotta=KDA）＋ 標題階層位置 ＋ 光線 ＋ 安全邊界（outer_margin_px）。
 
 ## 精選圖 Prompt 範本
 
 ```text
-Create one final 16:9 featured editorial illustration for this article.
+Create one original 16:9 featured / hero editorial illustration on warm aged parchment
+with a faint grid, a fine double-line ink border, and small corner ornaments.
 
 TITLE CONTRACT
 Claim: {claim}
 Key result: {key_result}
 Mechanism: {mechanism}
-Coverage: {title_coverage}
+The featured image must visibly answer the article title.
 
-Render these exact strings and no other text:
-Eyebrow: {eyebrow}
-Headline: {headline}
-Subheadline: {subheadline}
-Labels:
-- {label_1}
-- {label_2}
-- {label_3}
-Bottom takeaway: {bottom_takeaway}
-Caveat: {caveat_or_none}
+{scene} Build it as a dimensional handcrafted paper-craft tableau — layered cardstock,
+parchment, corrugated paper and balsa wood with ink detailing and soft paper shadows;
+no metal, no glass, no screens, no robot silhouettes.
 
-MAIN TABLEAU
-{scene}
-Required elements: {scene_elements}
+{EXACT TEXT — RENDER VERBATIM AND ADD NO OTHER TEXT}
 
-{STYLE_LOCK_VERBATIM}
-
-{VISUAL_BIBLE}
-
-LAYOUT
-Canvas 1600x900. Keep at least {outer_margin_px}px outer margin.
-Center the eyebrow, headline, and subheadline at the top.
-Keep the tableau in the middle/lower area.
-Use only short callout lines. Keep every object and every glyph fully inside the border.
-No overlap between text cards and the central subject.
+STYLE
+Palette: {palette}. A centered editorial title hierarchy (small eyebrow, large headline,
+concise subheadline) sits at the top; the paper-craft tableau occupies the middle and
+lower canvas; an optional bottom takeaway ribbon closes the composition. Soft warm
+upper-left light with short consistent lower-right shadows. Keep every word and object
+fully inside the border with at least {outer_margin_px}px of clear margin.
 ```
 
 ## 文內圖 Prompt 範本
 
 ```text
-Create one final 16:9 inline editorial illustration for the following article context.
+Create one original 16:9 inline article editorial illustration on warm aged parchment ...
 
-Context section: {section_heading}
-Context excerpt: {after_paragraph_excerpt}
+ARTICLE CONTEXT
+Section: {section_heading}
 Core idea: {core_idea}
+Use the approved featured image only as a style reference. Match its parchment tone,
+fine double-line border, corner ornaments, centered title hierarchy, paper-crafted
+depth, shadow direction, and accent colors. Do not copy its composition.
 
-Use the approved featured image only as a style reference.
-Match its parchment tone, fine border, corner ornaments, centered title hierarchy,
-paper-crafted depth, shadow direction, label-card treatment, accent colors,
-and bottom takeaway ribbon. Do not copy its composition.
+{scene} Build it as a dimensional handcrafted paper-craft tableau ...
 
-Render these exact strings and no other text:
-Eyebrow: {eyebrow}
-Headline: {headline}
-Subheadline: {subheadline}
-Labels: {labels}
-Bottom takeaway: {bottom_takeaway}
-Caveat: {caveat_or_none}
+{EXACT TEXT — RENDER VERBATIM AND ADD NO OTHER TEXT}
 
-Main tableau: {scene}
-Required elements: {scene_elements}
-People required: {people_required}
-
-{STYLE_LOCK_VERBATIM}
-
-Keep all content inside the safe area. Do not crop or hide any important object.
+STYLE
+Palette: {palette}. ...
 ```
 
-## 修字 Prompt
+## 寫 scene 段落的要點（lean 下，scene 是品質樞紐）
+
+- **描述你要的，而非禁你要的**：用正向、具體、有觸感的詞描述物件與動作（「三道低矮的紙雕閘板，token 卡片從細縫穿過」），優於負向約束（「不要畫成門」）。必要時一句輕材質提示即可。
+- **會說故事的物理場景**：機器、路徑、推車、旗子、堆疊、轉化——讓物件互動、有深度、有紋理，而非抽象色塊。
+- **避免 1,100 字的 v4 習慣**：不要倒 MATERIAL LOCK / VERTICAL COMPOSITION BANDS / GLYPH CLAMP / LAYOUT 條列 / SELF-CHECK。這些是 v4 的過度工程，會把模型推向圖表化。
+
+## 修字 Prompt（文字錯才用，不重產場景）
 
 ```text
-Edit the provided image without changing the composition, paper-craft objects, colors, border, or lighting.
-Replace only the incorrect text "{wrong}" with the exact text "{correct}".
-Keep every other pixel and every other string unchanged.
+Edit the provided image without changing the composition, paper-craft objects, colors,
+border, or lighting. Replace only the incorrect text "{wrong}" with the exact text
+"{correct}". Keep every other pixel and every other string unchanged.
 ```
+
+## 美學生成 vs 文字修復（預設工作流）
+
+1. 用 lean prompt 生成豐富場景（信任模型）。
+2. 只在「某個字串錯」時，用修字 prompt 做針對性編輯——**不要**為了防字錯而預載一堆文字安全限制（那正是 v4 過度約束的成因）。
+3. 只在「場景與上下文不符」時，才重產整張場景。

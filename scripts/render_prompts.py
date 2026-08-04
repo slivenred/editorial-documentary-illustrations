@@ -62,7 +62,13 @@ Bottom takeaway: {takeaway}
 Caveat: {caveat}"""
 
 
-def render_still(style_lock: str, data: dict[str, Any], shot: dict[str, Any]) -> str:
+def render_still(_style_lock: str, data: dict[str, Any], shot: dict[str, Any]) -> str:
+    # LEAN prompt (v5): one rich evocative scene + the exact verbatim text + a
+    # condensed style line (~300-350 words). Over-specified prompts (~1,100 words)
+    # produced flat, diagrammatic images; a concise prompt lets the model render a
+    # rich, tactile 3D paper-craft scene (validated: a 334-word prompt yielded
+    # web-quality output from the same model). `style_lock` is accepted for
+    # signature/test compatibility but is no longer dumped verbatim.
     article = data["article"]
     placement = shot["placement"]
     role_intro = "featured / hero" if shot["image_role"] == "hero" else "inline article"
@@ -71,72 +77,39 @@ def render_still(style_lock: str, data: dict[str, Any], shot: dict[str, Any]) ->
 Claim: {article['title_contract']['claim']}
 Key result: {article['title_contract']['key_result']}
 Mechanism: {article['title_contract']['mechanism']}
-Required coverage: {join(shot['title_coverage'])}
-The featured image must visibly answer the article title before it explains secondary details."""
-        style_reference = "This is the calibration image for the article. Establish the final visual system."
+The featured image must visibly answer the article title."""
     else:
         context = f"""ARTICLE CONTEXT
 Section: {placement['section_heading']}
-Paragraph excerpt: {placement['after_paragraph_excerpt']}
 Core idea: {shot['core_idea']}
-Placement reason: {placement['reason']}"""
-        style_reference = """Use the approved featured image only as a style reference. Match its parchment tone, fine double-line border, corner ornaments, centered title hierarchy, paper-crafted depth, shadow direction, label-card treatment, accent colors, and bottom takeaway ribbon. Do not copy its composition."""
+Use the approved featured image only as a style reference. Match its parchment tone, fine double-line border, corner ornaments, centered title hierarchy, paper-crafted depth, shadow direction, and accent colors. Do not copy its composition."""
 
-    people = "Include people only when they improve comprehension." if shot["people_required"] else "No human figure is required; let the paper-crafted objects carry the explanation."
-    labels = "\n".join(
-        f"- {item['text']}: visually point to or explain {item['meaning']} using {item['accent']} accent."
-        for item in shot["labels"]
-    )
-    layout = data["visual_bible"]["layout_contract"]
-    return f"""Create one final production-ready 16:9 {role_intro} editorial illustration.
+    vb = data["visual_bible"]
+    margin = vb["layout_contract"]["outer_margin_px"]
+    people_clause = " Include people only if they clearly aid comprehension." if shot.get("people_required") else ""
+
+    return f"""Create one original 16:9 {role_intro} editorial illustration on warm aged parchment with a faint grid, a fine double-line ink border, and small corner ornaments.
 
 {context}
 
+{shot['scene']} Build it as a dimensional handcrafted paper-craft tableau — layered cardstock, parchment, corrugated paper and balsa wood with ink detailing and soft paper shadows; no metal, no glass, no screens, no robot silhouettes.{people_clause}
+
 {exact_text_block(shot)}
 
-MAIN TABLEAU
-Layout pattern: {shot['layout']}
-Scene: {shot['scene']}
-Required scene elements: {join(shot['scene_elements'])}
-{people}
-Label meanings and accents:
-{labels}
-
-STYLE REFERENCE
-{style_reference}
-
-{style_lock.strip()}
-
-{visual_bible_text(data['visual_bible'])}
-
-LAYOUT AND SAFETY
-- Render at {layout['canvas_width']}x{layout['canvas_height']} or the exact same 16:9 ratio.
-- Keep at least {layout['outer_margin_px']}px of clear outer safe margin inside the border.
-- Center the eyebrow, headline, and subheadline in the upper area.
-- Keep the main tableau in the middle and lower area without touching the frame.
-- Keep all labels near their targets with short non-crossing leader lines.
-- Never place a text card over the main subject or decisive comparison.
-- Keep every glyph, card, road, machine, door, box, flag, ornament, and shadow fully inside the border.
-- Verify every requested string for spelling and punctuation before final output.
-- Do not add placeholder text, extra labels, fake writing, logo, watermark, or unrelated objects.
-
-FINAL SELF-CHECK
-1. Does the image immediately communicate the intended title or paragraph idea?
-2. Does it look like the same editorial series as the approved featured image?
-3. Is every requested string exact and readable?
-4. Is any important element covered or cropped?
-If any answer is no, correct the image before output.
+STYLE
+Palette: {join(vb['palette'])}. A centered editorial title hierarchy (small eyebrow, large high-contrast headline, concise subheadline) sits at the top; the paper-craft tableau occupies the middle and lower canvas; an optional bottom takeaway ribbon closes the composition. Soft warm upper-left light with short consistent lower-right shadows. Compose the whole scene inside the central canvas with generous margin: every road, path, machine, and tall object must stay fully within the double-line border — nothing may touch, cross, or be cropped by the border or the canvas edge, and all text keeps at least {margin}px clear of it; do not overlap text with the subject.
 """
 
 
-def render_motion(style_lock: str, data: dict[str, Any], shot: dict[str, Any]) -> str:
+def render_motion(_style_lock: str, data: dict[str, Any], shot: dict[str, Any]) -> str:
+    vb = data["visual_bible"]
     return f"""Create an exactly 10-second, smooth 24fps paper-craft editorial animation based on this approved still concept.
 
 Core idea: {shot['core_idea']}
 Scene: {shot['scene']}
 Required elements: {join(shot['scene_elements'])}
 
-{style_lock.strip()}
+Style: warm aged parchment, fine double-line border; palette {join(vb['palette'])}; dimensional handcrafted paper-craft (cardstock/parchment/wood, no metal or glass); soft warm light, short consistent shadows.
 
 Use one continuous scene. Animate the physical mechanism, comparison, burden, path, or transformation. No voiceover, no dialogue, no text overlays, no logo, and no watermark. Keep the camera locked or use one subtle drift. Hold the final tableau for 0.5–0.8 seconds.
 """

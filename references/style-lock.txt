@@ -1,4 +1,5 @@
 APPROVED EDITORIAL PARCHMENT CUTOUT STYLE LOCK
+(REFERENCE ONLY since v5 — no longer dumped verbatim into prompts. The lean renderer inlines a one-line condensed style instead; this file documents the full approved style for human reference and scene authoring.)
 
 Create one original 16:9 editorial explainer illustration on elegant warm aged parchment. Use a faint low-contrast grid, subtle paper fibers and creases, a fine double-line border, and restrained ornamental corners. Build the central scene from dimensional paper-cut and paper-craft objects with slightly irregular edges, natural wear, and consistent short soft shadows.
 
