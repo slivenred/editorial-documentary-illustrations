@@ -11,6 +11,7 @@
 ./README.zh-TW.md
 ./SKILL.md
 ./agents/openai.yaml
+./assets/style-reference/README.md
 ./references/annotation-system.md
 ./references/article-analysis.md
 ./references/character-system.md

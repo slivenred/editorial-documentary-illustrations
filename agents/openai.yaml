@@ -1,6 +1,6 @@
 interface:
-  display_name: "羊皮紙剪紙文章解說圖"
-  short_description: "自動規劃標題導向精選圖與同風格文內圖，依文章長度和上下文決定數量與位置"
-  default_prompt: "Use $editorial-documentary-illustrations 分析這篇文章，自動決定最合適的精選圖與文內圖數量及插入位置。精選圖必須回應文章標題、最重要結果與核心原因；文內圖必須沿用精選圖的羊皮紙、邊框、置中標題、紙雕場景、短標註卡與底部結論旗帶，每張只解釋一個上下文核心。圖內文字使用文章或指定讀者語言，並完整檢查錯字、遮擋、裁切與跨圖一致性。"
+  display_name: "羊皮紙剪紙文章精選圖與文內圖"
+  short_description: "一個 Prompt 自動完成文章分析、精選圖、文內圖、QA 與插入"
+  default_prompt: "Use $editorial-documentary-illustrations 讀取我提供的文章網址、檔案或全文，自動生成一張標題導向的精選圖片與最合適數量的文內圖。請依文章長度、上下文、理解增益與非重複性決定數量和插入位置；使用高品質圖片模型實際生圖，保持精簡圖片 Prompt，完成文字、裁切、遮擋與跨圖一致性 QA，並把圖片插入原文章。"
 policy:
   allow_implicit_invocation: true
